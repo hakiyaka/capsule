@@ -2616,7 +2616,11 @@ function doctor() {
     });
     checks.push({
       check: "automatic_token_routing",
-      ok: policyActive,
+      // The global AGENTS.md policy is an optional convenience layer.  A
+      // standalone Capsule install remains healthy when it is absent; users
+      // can still invoke the MCP directly and install the policy later.
+      ok: true,
+      required: false,
       active: policyActive,
       mode: policyActive ? "global AGENTS.md -> Capsule MCP" : "inactive",
       policy_file: policyFile,

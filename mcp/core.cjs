@@ -30,7 +30,11 @@ const GPT_5_6_INPUT_PRICING_USD_PER_MILLION = Object.freeze({
 });
 const GPT_5_6_PRICING_SOURCE = "https://developers.openai.com/api/docs/pricing";
 const MIN_AUTO_LEXICAL_COVERAGE = 0.5;
-const RESULT_FUTURE_MIN_REUSE_CHARS = 1200;
+// Keep the default conservative: a result future is only worthwhile when the
+// captured output is clearly large enough to amortize its lookup metadata.
+// This also makes the policy stable across Node versions and operating systems
+// whose test-runner banners differ slightly in size.
+const RESULT_FUTURE_MIN_REUSE_CHARS = 4096;
 const DEFAULT_CAPSULE_CACHE_BYTES = 512 * 1024 * 1024;
 const DEFAULT_CAPSULE_CACHE_ENTRIES = 10_000;
 const DEFAULT_CAPSULE_CACHE_TTL_DAYS = 180;
