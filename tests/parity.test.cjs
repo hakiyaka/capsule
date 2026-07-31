@@ -7,7 +7,15 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
 const test = require("node:test");
-const { DatabaseSync } = require("node:sqlite");
+let DatabaseSync = null;
+try {
+  ({ DatabaseSync } = require("node:sqlite"));
+} catch {
+  // node:sqlite is not available on the supported Node 18 baseline.  The
+  // production search path already falls back to its portable implementation;
+  // only the SQLite-lock contention probe must be skipped on that runtime.
+  DatabaseSync = null;
+}
 
 const state = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-parity-state-"));
 process.env.CAPSULE_STATE = state;
@@ -169,7 +177,7 @@ test("advanced search supports stemming, substrings, typo correction, filters, a
   fs.rmSync(workspace, { recursive: true, force: true });
 });
 
-test("public index writes wait for a short competing SQLite writer", async () => {
+test("public index writes wait for a short competing SQLite writer", { skip: !DatabaseSync }, async () => {
   await unified.dispatch({
     action: "remember",
     payload: { content: "SQLITE-CONTENTION-SEED", tag: "contention" },
