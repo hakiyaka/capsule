@@ -1,0 +1,118 @@
+{
+  "benchmark": "quota-to-progress-exchange-ab",
+  "generated_at": "2026-07-29T15:19:16.144Z",
+  "task_set": "Ten synthetic, frequently repeated verified-state continuations plus changed-epoch neutral controls.",
+  "arm_a": "Re-expose the verbose verified continuation and invite re-evaluation.",
+  "arm_b": "Expose a bounded anti-memory receipt and quota-progress checkpoint.",
+  "eligible_scenarios": 10,
+  "policy_oracles_passed": 10,
+  "neutral_controls_passed": 10,
+  "control_tokens": 5146,
+  "treatment_tokens": 770,
+  "saved_tokens": 4376,
+  "eligible_context_savings_percent": 85.04,
+  "max_treatment_chars": 273,
+  "caveat": "Synthetic repeated-state context exposure only. It does not measure hidden reasoning, provider billing, cache effects, or the frequency of verified repeats. Low-progress brakes add a bounded instruction and are not counted as direct savings.",
+  "rows": [
+    {
+      "scenario": "code-edit",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 529,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    },
+    {
+      "scenario": "bug-diagnosis",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 511,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    },
+    {
+      "scenario": "browser-check",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 583,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    },
+    {
+      "scenario": "terminal-build",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 511,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    },
+    {
+      "scenario": "web-research",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 529,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    },
+    {
+      "scenario": "file-edit",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 493,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    },
+    {
+      "scenario": "installation",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 529,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    },
+    {
+      "scenario": "data-check",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 511,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    },
+    {
+      "scenario": "document-work",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 493,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    },
+    {
+      "scenario": "status-repeat",
+      "repeat_policy": "anti-memory",
+      "repeat_kind": "near",
+      "control_tokens": 457,
+      "treatment_tokens": 77,
+      "exact_state_receipt": true,
+      "changed_epoch_neutral_chars": 0,
+      "treatment_chars": 273
+    }
+  ]
+}

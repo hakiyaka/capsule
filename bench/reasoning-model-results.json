@@ -1,0 +1,161 @@
+{
+  "method": {
+    "runner": "codex exec --ignore-user-config --ephemeral --sandbox read-only --json",
+    "design": "Same seven symbolic tasks. Treatment receives a deterministic certificate and is told not to recompute.",
+    "order": "Alternating AB/BA to reduce order bias.",
+    "repetitions": 1,
+    "caveat": "Small real-model sample; reasoning tokens are provider telemetry for these runs, not a universal guarantee."
+  },
+  "summary": {
+    "tasks": 7,
+    "baseline_reasoning_output_tokens": 1037,
+    "treatment_reasoning_output_tokens": 8,
+    "reasoning_saving_percent": 99.23,
+    "baseline_correct": 7,
+    "treatment_correct": 7,
+    "baseline_output_tokens": 1179,
+    "treatment_output_tokens": 140
+  },
+  "rows": [
+    {
+      "task": "exact-cover",
+      "arm": "baseline",
+      "correct": true,
+      "answer": "selected=a,b,c;cost=7",
+      "input_tokens": 15825,
+      "cached_input_tokens": 0,
+      "output_tokens": 156,
+      "reasoning_output_tokens": 142
+    },
+    {
+      "task": "exact-cover",
+      "arm": "treatment",
+      "correct": true,
+      "answer": "selected=a,b,c;cost=7",
+      "input_tokens": 15027,
+      "cached_input_tokens": 0,
+      "output_tokens": 22,
+      "reasoning_output_tokens": 8
+    },
+    {
+      "task": "parallel-dag",
+      "arm": "baseline",
+      "correct": true,
+      "answer": "batches=inspect|schema|api,ui|docs,e2e,security,unit|pack;critical=inspect,schema,api,e2e,pack",
+      "input_tokens": 14923,
+      "cached_input_tokens": 14080,
+      "output_tokens": 154,
+      "reasoning_output_tokens": 114
+    },
+    {
+      "task": "parallel-dag",
+      "arm": "treatment",
+      "correct": true,
+      "answer": "batches=inspect|schema|api,ui|docs,e2e,security,unit|pack;critical=inspect,schema,api,e2e,pack",
+      "input_tokens": 15024,
+      "cached_input_tokens": 0,
+      "output_tokens": 38,
+      "reasoning_output_tokens": 0
+    },
+    {
+      "task": "weighted-decision",
+      "arm": "baseline",
+      "correct": true,
+      "answer": "winner=beta",
+      "input_tokens": 14970,
+      "cached_input_tokens": 12032,
+      "output_tokens": 231,
+      "reasoning_output_tokens": 222
+    },
+    {
+      "task": "weighted-decision",
+      "arm": "treatment",
+      "correct": true,
+      "answer": "winner=beta",
+      "input_tokens": 15043,
+      "cached_input_tokens": 0,
+      "output_tokens": 7,
+      "reasoning_output_tokens": 0
+    },
+    {
+      "task": "information-gain",
+      "arm": "baseline",
+      "correct": true,
+      "answer": "next=cache-bypass",
+      "input_tokens": 15064,
+      "cached_input_tokens": 0,
+      "output_tokens": 158,
+      "reasoning_output_tokens": 147
+    },
+    {
+      "task": "information-gain",
+      "arm": "treatment",
+      "correct": true,
+      "answer": "next=cache-bypass",
+      "input_tokens": 15143,
+      "cached_input_tokens": 0,
+      "output_tokens": 9,
+      "reasoning_output_tokens": 0
+    },
+    {
+      "task": "exact-assignment",
+      "arm": "baseline",
+      "correct": true,
+      "answer": "assignment=api:ada,docs:grace,ops:linus,security:margaret,tests:donald;cost=8",
+      "input_tokens": 14938,
+      "cached_input_tokens": 14080,
+      "output_tokens": 32,
+      "reasoning_output_tokens": 0
+    },
+    {
+      "task": "exact-assignment",
+      "arm": "treatment",
+      "correct": true,
+      "answer": "assignment=api:ada,docs:grace,ops:linus,security:margaret,tests:donald;cost=8",
+      "input_tokens": 15036,
+      "cached_input_tokens": 14080,
+      "output_tokens": 32,
+      "reasoning_output_tokens": 0
+    },
+    {
+      "task": "exact-knapsack",
+      "arm": "baseline",
+      "correct": true,
+      "answer": "selected=b,d,g;cost=17;value=36",
+      "input_tokens": 14896,
+      "cached_input_tokens": 0,
+      "output_tokens": 371,
+      "reasoning_output_tokens": 353
+    },
+    {
+      "task": "exact-knapsack",
+      "arm": "treatment",
+      "correct": true,
+      "answer": "selected=b,d,g;cost=17;value=36",
+      "input_tokens": 14979,
+      "cached_input_tokens": 0,
+      "output_tokens": 16,
+      "reasoning_output_tokens": 0
+    },
+    {
+      "task": "shortest-path",
+      "arm": "baseline",
+      "correct": true,
+      "answer": "path=a,c,b,d,f,g,h;cost=8",
+      "input_tokens": 14917,
+      "cached_input_tokens": 14080,
+      "output_tokens": 77,
+      "reasoning_output_tokens": 59
+    },
+    {
+      "task": "shortest-path",
+      "arm": "treatment",
+      "correct": true,
+      "answer": "path=a,c,b,d,f,g,h;cost=8",
+      "input_tokens": 14997,
+      "cached_input_tokens": 0,
+      "output_tokens": 16,
+      "reasoning_output_tokens": 0
+    }
+  ]
+}

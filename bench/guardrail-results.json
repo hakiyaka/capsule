@@ -1,0 +1,143 @@
+{
+  "method": {
+    "baseline": "C:\\Users\\90530\\.codex\\plugins\\cache\\personal\\capsule\\0.18.0+codex.20260728004657",
+    "treatment": "C:\\Users\\90530\\Documents\\Codex\\2026-07-26\\c\\outputs\\capsule",
+    "routing_dataset": "Nine local task intents: two control-plane negatives, two observed domain/name collisions, two direct-skill negatives, and three positive security controls.",
+    "failure_dataset": "One deterministic 420-frame repeated error; first occurrences cancel, changed evidence is a safety control.",
+    "plan_dataset": "One unchanged repeated plan plus a real-mutation reset control.",
+    "accounting": "Model-visible character proxy for wrong routed SKILL.md bodies and the second identical failure. Plan-loop detection is reported separately, not converted into speculative tokens.",
+    "caveat": "This is a targeted waste-event A/B, not an all-task billing percentage."
+  },
+  "routing": {
+    "cases": [
+      {
+        "id": "observed-control-plane-false-positive",
+        "expected": null,
+        "baseline": "hunt-session",
+        "treatment": null,
+        "baseline_correct": false,
+        "treatment_correct": true,
+        "baseline_wrong_skill_body_chars": 18178,
+        "treatment_wrong_skill_body_chars": 0
+      },
+      {
+        "id": "compaction-control-plane",
+        "expected": null,
+        "baseline": null,
+        "treatment": null,
+        "baseline_correct": true,
+        "treatment_correct": true,
+        "baseline_wrong_skill_body_chars": 0,
+        "treatment_wrong_skill_body_chars": 0
+      },
+      {
+        "id": "website-security-name-collision",
+        "expected": null,
+        "baseline": null,
+        "treatment": null,
+        "baseline_correct": true,
+        "treatment_correct": true,
+        "baseline_wrong_skill_body_chars": 0,
+        "treatment_wrong_skill_body_chars": 0
+      },
+      {
+        "id": "gmail-triage-name-collision",
+        "expected": null,
+        "baseline": "hunt-tls-network",
+        "treatment": null,
+        "baseline_correct": false,
+        "treatment_correct": true,
+        "baseline_wrong_skill_body_chars": 20218,
+        "treatment_wrong_skill_body_chars": 0
+      },
+      {
+        "id": "direct-spreadsheet-skill",
+        "expected": null,
+        "baseline": null,
+        "treatment": null,
+        "baseline_correct": true,
+        "treatment_correct": true,
+        "baseline_wrong_skill_body_chars": 0,
+        "treatment_wrong_skill_body_chars": 0
+      },
+      {
+        "id": "direct-presentation-skill",
+        "expected": null,
+        "baseline": null,
+        "treatment": null,
+        "baseline_correct": true,
+        "treatment_correct": true,
+        "baseline_wrong_skill_body_chars": 0,
+        "treatment_wrong_skill_body_chars": 0
+      },
+      {
+        "id": "specific-session-security-task",
+        "expected": "hunt-session",
+        "baseline": "hunt-session",
+        "treatment": "hunt-session",
+        "baseline_correct": true,
+        "treatment_correct": true,
+        "baseline_wrong_skill_body_chars": 0,
+        "treatment_wrong_skill_body_chars": 0
+      },
+      {
+        "id": "specific-sqli-security-task",
+        "expected": "hunt-sqli",
+        "baseline": "hunt-nosqli",
+        "treatment": "hunt-sqli",
+        "baseline_correct": false,
+        "treatment_correct": true,
+        "baseline_wrong_skill_body_chars": 0,
+        "treatment_wrong_skill_body_chars": 0
+      },
+      {
+        "id": "specific-oauth-security-task",
+        "expected": "hunt-oauth",
+        "baseline": "hunt-websocket",
+        "treatment": "hunt-oauth",
+        "baseline_correct": false,
+        "treatment_correct": true,
+        "baseline_wrong_skill_body_chars": 0,
+        "treatment_wrong_skill_body_chars": 0
+      }
+    ],
+    "baseline_accuracy_percent": 55.56,
+    "treatment_accuracy_percent": 100,
+    "wrong_skill_body_chars_avoided": 38396,
+    "wrong_skill_body_approx_text_tokens_avoided": 9599
+  },
+  "repeated_failure": {
+    "baseline": {
+      "raw_chars": 27319,
+      "repeated_visible_chars": 1312,
+      "retry_warning": false,
+      "exact_recovery": true,
+      "changed_evidence_not_suppressed": true
+    },
+    "treatment": {
+      "raw_chars": 27319,
+      "repeated_visible_chars": 331,
+      "retry_warning": true,
+      "exact_recovery": true,
+      "changed_evidence_not_suppressed": true
+    },
+    "repeated_visible_saving_percent": 74.77
+  },
+  "plan_progress": {
+    "baseline": {
+      "repeated_plan_detected": false,
+      "normal_plan_after_mutation_flagged": false
+    },
+    "treatment": {
+      "repeated_plan_detected": true,
+      "normal_plan_after_mutation_flagged": false
+    }
+  },
+  "combined_measured_waste_events": {
+    "baseline_visible_chars": 39708,
+    "treatment_visible_chars": 331,
+    "avoided_chars": 39377,
+    "avoided_approx_text_tokens": 9845,
+    "saving_percent": 99.17
+  }
+}

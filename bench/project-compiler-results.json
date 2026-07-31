@@ -1,0 +1,752 @@
+{
+  "benchmark": "project-compiler-ab",
+  "root": "C:\\Users\\90530\\Documents\\Codex\\2026-07-26\\c\\outputs\\capsule",
+  "cases": [
+    {
+      "id": "mcp-dispatch",
+      "query": "How does Capsule dispatch MCP actions and preserve exact evidence?",
+      "baseline_tokens": 162815,
+      "cold": {
+        "elapsed_ms": 258.82,
+        "cache_mode": "cold",
+        "emitted_tokens": 3876,
+        "avoided_tokens": 158939,
+        "avoided_ratio": 0.9762
+      },
+      "warm": {
+        "elapsed_ms": 145.25,
+        "cache_mode": "warm",
+        "emitted_tokens": 3876,
+        "avoided_tokens": 158939,
+        "avoided_ratio": 0.9762
+      },
+      "selected_paths": [
+        {
+          "path": "mcp/project.cjs",
+          "score": 114.68,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/cognition.cjs",
+          "score": 109.2,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/server.cjs",
+          "score": 91.8,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/unified.cjs",
+          "score": 89.76,
+          "via": "seed"
+        },
+        {
+          "path": "scripts/hook.cjs",
+          "score": 86.44,
+          "via": "seed"
+        },
+        {
+          "path": "README.md",
+          "score": 44.51,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/core.cjs",
+          "score": 39.4,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compaction.cjs",
+          "score": 24.38,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compat.cjs",
+          "score": 24.38,
+          "via": "graph:1"
+        },
+        {
+          "path": "tests/project.test.cjs",
+          "score": 24.17,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/quota-shadow.cjs",
+          "score": 23.74,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/provider-telemetry.cjs",
+          "score": 14.19,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/project_compiler_ab.cjs",
+          "score": 13.56,
+          "via": "graph:1"
+        },
+        {
+          "path": "scripts/cognition.cjs",
+          "score": 9.46,
+          "via": "graph:1"
+        },
+        {
+          "path": "tests/cognition.test.cjs",
+          "score": 9.2,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/cognition_benchmark.cjs",
+          "score": 5.77,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/reasoning_model_ab.cjs",
+          "score": 4.38,
+          "via": "graph:1"
+        },
+        {
+          "path": "tests/quota-shadow.test.cjs",
+          "score": 3.31,
+          "via": "graph:1"
+        }
+      ],
+      "quality": {
+        "passed": true,
+        "expected_groups": [
+          [
+            "mcp/server.cjs"
+          ],
+          [
+            "mcp/unified.cjs"
+          ]
+        ],
+        "missing_groups": []
+      },
+      "exact": "cap_8f5633b9afda0389"
+    },
+    {
+      "id": "project-profit",
+      "query": "How does project scanning, semantic cache reuse, impact selection, and the token profit gate work?",
+      "baseline_tokens": 144357,
+      "cold": {
+        "elapsed_ms": 221.72,
+        "cache_mode": "cold",
+        "emitted_tokens": 4011,
+        "avoided_tokens": 140346,
+        "avoided_ratio": 0.9722
+      },
+      "warm": {
+        "elapsed_ms": 139.96,
+        "cache_mode": "warm",
+        "emitted_tokens": 4011,
+        "avoided_tokens": 140346,
+        "avoided_ratio": 0.9722
+      },
+      "selected_paths": [
+        {
+          "path": "mcp/unified.cjs",
+          "score": 131.98,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/cognition.cjs",
+          "score": 124,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/project.cjs",
+          "score": 94.15,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/terminal-genome.cjs",
+          "score": 87.09,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/core.cjs",
+          "score": 70.31,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/semantic-interrupt.cjs",
+          "score": 59.43,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/quota-progress.cjs",
+          "score": 56.61,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compat.cjs",
+          "score": 39.81,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compaction.cjs",
+          "score": 30.58,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/adaptive_microprogram_ab.cjs",
+          "score": 7.73,
+          "via": "graph:1"
+        },
+        {
+          "path": "package.json",
+          "score": 5.16,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/terminal-novelty.cjs",
+          "score": 5.07,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/adaptive_pressure_ab.cjs",
+          "score": 3.2,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/browser_efficiency_ab.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/capability_airlock_ab.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/edit.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/runtime.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "scripts/install-hooks.cjs",
+          "score": 0,
+          "via": "graph:1"
+        }
+      ],
+      "quality": {
+        "passed": true,
+        "expected_groups": [
+          [
+            "mcp/project.cjs"
+          ]
+        ],
+        "missing_groups": []
+      },
+      "exact": "cap_40b18c259de27cc8"
+    },
+    {
+      "id": "lifecycle-compaction",
+      "query": "How do lifecycle hooks preserve session continuity across context compaction?",
+      "baseline_tokens": 169648,
+      "cold": {
+        "elapsed_ms": 218.05,
+        "cache_mode": "cold",
+        "emitted_tokens": 3857,
+        "avoided_tokens": 165791,
+        "avoided_ratio": 0.9773
+      },
+      "warm": {
+        "elapsed_ms": 138.02,
+        "cache_mode": "warm",
+        "emitted_tokens": 3857,
+        "avoided_tokens": 165791,
+        "avoided_ratio": 0.9773
+      },
+      "selected_paths": [
+        {
+          "path": "scripts/hook.cjs",
+          "score": 175.59,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/unified.cjs",
+          "score": 101.25,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/compaction.cjs",
+          "score": 85.81,
+          "via": "seed"
+        },
+        {
+          "path": "scripts/install-hooks.cjs",
+          "score": 80.61,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/cognition.cjs",
+          "score": 72.11,
+          "via": "seed"
+        },
+        {
+          "path": "optional-skills/map-token-context/references/capsule-contract.md",
+          "score": 61.89,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/quota-progress.cjs",
+          "score": 61.34,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/core.cjs",
+          "score": 33.57,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/adaptive_pressure_ab.cjs",
+          "score": 14.16,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/compaction_replay_benchmark.cjs",
+          "score": 11.56,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/delta_control_ab.cjs",
+          "score": 9.02,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/context_interest_ab.cjs",
+          "score": 6.6,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/guardrail_ab.cjs",
+          "score": 4.32,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compat.cjs",
+          "score": 3.68,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/terminal-genome.cjs",
+          "score": 3.68,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/browser_efficiency_ab.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/cognition_benchmark.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/reasoning-residual.cjs",
+          "score": 0,
+          "via": "graph:1"
+        }
+      ],
+      "quality": {
+        "passed": true,
+        "expected_groups": [
+          [
+            "scripts/hook.cjs"
+          ],
+          [
+            "mcp/compaction.cjs"
+          ]
+        ],
+        "missing_groups": []
+      },
+      "exact": "cap_0569afc74985a37c"
+    },
+    {
+      "id": "atomic-edit",
+      "query": "How are multi-file edits validated, verified, and rolled back atomically?",
+      "baseline_tokens": 149297,
+      "cold": {
+        "elapsed_ms": 209.28,
+        "cache_mode": "cold",
+        "emitted_tokens": 3692,
+        "avoided_tokens": 145605,
+        "avoided_ratio": 0.9753
+      },
+      "warm": {
+        "elapsed_ms": 138.07,
+        "cache_mode": "warm",
+        "emitted_tokens": 3692,
+        "avoided_tokens": 145605,
+        "avoided_ratio": 0.9753
+      },
+      "selected_paths": [
+        {
+          "path": "mcp/unified.cjs",
+          "score": 54.32,
+          "via": "seed"
+        },
+        {
+          "path": "bench/project_compiler_ab.cjs",
+          "score": 20.86,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/edit.cjs",
+          "score": 7.36,
+          "via": "seed"
+        },
+        {
+          "path": "BENCHMARK.md",
+          "score": 6.36,
+          "via": "seed"
+        },
+        {
+          "path": "skills/map-token-context/SKILL.md",
+          "score": 6.36,
+          "via": "seed"
+        },
+        {
+          "path": "bench/file_edit_ab.cjs",
+          "score": 5.74,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/cognition.cjs",
+          "score": 5.36,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/quota-progress.cjs",
+          "score": 5.36,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/adaptive_microprogram_ab.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compaction.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compat.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/core.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/project.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/runtime.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/semantic-interrupt.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/terminal-novelty.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "package.json",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "scripts/install-hooks.cjs",
+          "score": 0,
+          "via": "graph:1"
+        }
+      ],
+      "quality": {
+        "passed": true,
+        "expected_groups": [
+          [
+            "mcp/edit.cjs"
+          ]
+        ],
+        "missing_groups": []
+      },
+      "exact": "cap_66a6a85e0a771d35"
+    },
+    {
+      "id": "skill-routing",
+      "query": "How does skill routing select a relevant specialist and abstain from unrelated matches?",
+      "baseline_tokens": 203575,
+      "cold": {
+        "elapsed_ms": 245.68,
+        "cache_mode": "cold",
+        "emitted_tokens": 3954,
+        "avoided_tokens": 199621,
+        "avoided_ratio": 0.9806
+      },
+      "warm": {
+        "elapsed_ms": 156.51,
+        "cache_mode": "warm",
+        "emitted_tokens": 3954,
+        "avoided_tokens": 199621,
+        "avoided_ratio": 0.9806
+      },
+      "selected_paths": [
+        {
+          "path": "mcp/unified.cjs",
+          "score": 104.38,
+          "via": "seed"
+        },
+        {
+          "path": "scripts/hook.cjs",
+          "score": 72.73,
+          "via": "seed"
+        },
+        {
+          "path": "BENCHMARK.md",
+          "score": 47.25,
+          "via": "seed"
+        },
+        {
+          "path": "tests/unified.test.cjs",
+          "score": 45.46,
+          "via": "seed"
+        },
+        {
+          "path": "optional-skills/map-token-context/references/capsule-contract.md",
+          "score": 41.55,
+          "via": "seed"
+        },
+        {
+          "path": "skills/map-token-context/references/capsule-contract.md",
+          "score": 41.55,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/terminal-novelty.cjs",
+          "score": 39.87,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/cognition.cjs",
+          "score": 6.64,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/core.cjs",
+          "score": 6.64,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compat.cjs",
+          "score": 6.28,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compaction.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/edit.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/project.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/quota-progress.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/runtime.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/semantic-interrupt.cjs",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "package.json",
+          "score": 0,
+          "via": "graph:1"
+        },
+        {
+          "path": "scripts/install-hooks.cjs",
+          "score": 0,
+          "via": "graph:1"
+        }
+      ],
+      "quality": {
+        "passed": true,
+        "expected_groups": [
+          [
+            "mcp/unified.cjs"
+          ]
+        ],
+        "missing_groups": []
+      },
+      "exact": "cap_e7d044d2ee6cd1a8"
+    },
+    {
+      "id": "terminal-reuse",
+      "query": "How are repeated terminal results reduced while preserving exact changed evidence?",
+      "baseline_tokens": 178324,
+      "cold": {
+        "elapsed_ms": 217.98,
+        "cache_mode": "cold",
+        "emitted_tokens": 3887,
+        "avoided_tokens": 174437,
+        "avoided_ratio": 0.9782
+      },
+      "warm": {
+        "elapsed_ms": 147.11,
+        "cache_mode": "warm",
+        "emitted_tokens": 3887,
+        "avoided_tokens": 174437,
+        "avoided_ratio": 0.9782
+      },
+      "selected_paths": [
+        {
+          "path": "scripts/hook.cjs",
+          "score": 113.4,
+          "via": "seed"
+        },
+        {
+          "path": "BENCHMARK.md",
+          "score": 70.89,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/terminal-novelty.cjs",
+          "score": 63.95,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/semantic-interrupt.cjs",
+          "score": 58.8,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/compaction.cjs",
+          "score": 54.29,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/project.cjs",
+          "score": 39.28,
+          "via": "seed"
+        },
+        {
+          "path": "mcp/core.cjs",
+          "score": 35.96,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/unified.cjs",
+          "score": 35.33,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/terminal-genome.cjs",
+          "score": 31.46,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/cognition.cjs",
+          "score": 29.72,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/reasoning-residual.cjs",
+          "score": 22,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/compat.cjs",
+          "score": 17.05,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/compaction_replay_benchmark.cjs",
+          "score": 16.41,
+          "via": "graph:1"
+        },
+        {
+          "path": "mcp/quota-progress.cjs",
+          "score": 11.76,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/browser_efficiency_ab.cjs",
+          "score": 8.93,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/adaptive_pressure_ab.cjs",
+          "score": 4.01,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/cognition_benchmark.cjs",
+          "score": 2.46,
+          "via": "graph:1"
+        },
+        {
+          "path": "bench/context_interest_ab.cjs",
+          "score": 0,
+          "via": "graph:1"
+        }
+      ],
+      "quality": {
+        "passed": true,
+        "expected_groups": [
+          [
+            "mcp/terminal-novelty.cjs",
+            "mcp/terminal-genome.cjs",
+            "mcp/terminal-lattice.cjs"
+          ]
+        ],
+        "missing_groups": []
+      },
+      "exact": "cap_c8458bfd195fecf8"
+    }
+  ],
+  "aggregate": {
+    "cases": 6,
+    "quality_passed": 6,
+    "baseline_tokens": 1008016,
+    "cold_emitted_tokens": 23277,
+    "cold_avoided_tokens": 984739,
+    "cold_avoided_ratio": 0.9769,
+    "warm_emitted_tokens": 23277,
+    "warm_avoided_tokens": 984739,
+    "warm_avoided_ratio": 0.9769
+  },
+  "caveat": "Token comparison is against the raw selected-file evidence for the same query, not provider billing."
+}

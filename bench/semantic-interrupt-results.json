@@ -1,0 +1,59 @@
+{
+  "benchmark": "semantic-interrupt-ab",
+  "generated_at": "2026-07-28T18:16:27.171Z",
+  "scenarios": 5,
+  "polls_per_scenario": 8,
+  "oracles_passed": "5/5",
+  "tokenizer": "o200k_base",
+  "roundtrip_reduction_percent": 87.5,
+  "visible_result_savings_percent": 23.5,
+  "average_input_exposure_savings_percent": 87.5,
+  "caveat": "Local file-change polling A/B. Provider caching, hidden reasoning, billing, and network latency are excluded.",
+  "rows": [
+    {
+      "context_tokens": 8000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 40,
+      "treatment_visible_tokens": 31,
+      "input_exposure_savings_percent": 87.49
+    },
+    {
+      "context_tokens": 32000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 40,
+      "treatment_visible_tokens": 29,
+      "input_exposure_savings_percent": 87.5
+    },
+    {
+      "context_tokens": 96000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 40,
+      "treatment_visible_tokens": 29,
+      "input_exposure_savings_percent": 87.5
+    },
+    {
+      "context_tokens": 160000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 40,
+      "treatment_visible_tokens": 31,
+      "input_exposure_savings_percent": 87.5
+    },
+    {
+      "context_tokens": 240000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 40,
+      "treatment_visible_tokens": 33,
+      "input_exposure_savings_percent": 87.5
+    }
+  ]
+}

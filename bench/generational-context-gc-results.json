@@ -1,0 +1,75 @@
+{
+  "benchmark": "proof-carrying-generational-context-gc-ab",
+  "generated_at": "2026-07-28T18:29:04.018Z",
+  "method": {
+    "task_set": "Eight consecutive PreCompact seeds; progress changes once at generation six.",
+    "arm_a": "Existing bounded prose map emitted independently on every compaction.",
+    "arm_b": "Legacy bootstrap, then the smaller of the legacy seed or live roots, content-addressed unchanged roots, set deltas, and an exact recovery capsule.",
+    "tokenizer": "o200k_base"
+  },
+  "generations": 8,
+  "oracles_passed": "8/8",
+  "control_visible_tokens": 2408,
+  "treatment_visible_tokens": 1254,
+  "total_visible_seed_savings_percent": 47.92,
+  "warm_generation_visible_seed_savings_percent": 54.77,
+  "rows": [
+    {
+      "generation": 1,
+      "oracle": true,
+      "control_tokens": 301,
+      "treatment_tokens": 301,
+      "savings_percent": 0
+    },
+    {
+      "generation": 2,
+      "oracle": true,
+      "control_tokens": 301,
+      "treatment_tokens": 132,
+      "savings_percent": 56.15
+    },
+    {
+      "generation": 3,
+      "oracle": true,
+      "control_tokens": 301,
+      "treatment_tokens": 132,
+      "savings_percent": 56.15
+    },
+    {
+      "generation": 4,
+      "oracle": true,
+      "control_tokens": 301,
+      "treatment_tokens": 132,
+      "savings_percent": 56.15
+    },
+    {
+      "generation": 5,
+      "oracle": true,
+      "control_tokens": 301,
+      "treatment_tokens": 132,
+      "savings_percent": 56.15
+    },
+    {
+      "generation": 6,
+      "oracle": true,
+      "control_tokens": 301,
+      "treatment_tokens": 159,
+      "savings_percent": 47.18
+    },
+    {
+      "generation": 7,
+      "oracle": true,
+      "control_tokens": 301,
+      "treatment_tokens": 133,
+      "savings_percent": 55.81
+    },
+    {
+      "generation": 8,
+      "oracle": true,
+      "control_tokens": 301,
+      "treatment_tokens": 133,
+      "savings_percent": 55.81
+    }
+  ],
+  "caveat": "This measures model-visible continuation seeds, not the provider's hidden compactor request, cache behavior, reasoning tokens, subscription quota, or billing."
+}

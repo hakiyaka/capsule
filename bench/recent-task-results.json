@@ -1,0 +1,154 @@
+{
+  "generated_at": "2026-07-27T21:58:35.107Z",
+  "baseline_root": "C:\\Users\\90530\\.codex\\plugins\\cache\\personal\\capsule\\0.14.0+codex.20260727203236",
+  "treatment_root": "C:\\Users\\90530\\Documents\\Codex\\2026-07-26\\c\\outputs\\capsule",
+  "sessions_scanned": [
+    "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
+    "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+    "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
+    "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
+    "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl"
+  ],
+  "routing": {
+    "scope": "Router response plus the SKILL.md reads required by positive matches.",
+    "before_chars": 42032,
+    "after_chars": 585,
+    "avoided_chars": 41447,
+    "avoided_approx_text_tokens": 10362,
+    "saved_percent": 98.61,
+    "cases": [
+      {
+        "query_sha256": "996a5ccaa0f817ef8d4e9d20fa87027e7521fb4bee1f4d158c1242599217c4ae",
+        "baseline_matches": [
+          "codex-bughunter",
+          "ctf-sandbox-orchestrator",
+          "competition-android-hooking"
+        ],
+        "treatment_matches": [],
+        "baseline_route_chars": 1675,
+        "treatment_route_chars": 296,
+        "baseline_required_skill_chars": 13926,
+        "treatment_required_skill_chars": 0,
+        "before_chars": 15601,
+        "after_chars": 296,
+        "saved_percent": 98.1
+      },
+      {
+        "query_sha256": "d8d07802a1a85dc9e0bb27c3d0495662a3e6162d86710d076b3491d11f5714c4",
+        "baseline_matches": [
+          "codex-bughunter",
+          "hunt-session",
+          "competition-dpapi-credential-chain"
+        ],
+        "treatment_matches": [],
+        "baseline_route_chars": 1616,
+        "treatment_route_chars": 289,
+        "baseline_required_skill_chars": 24815,
+        "treatment_required_skill_chars": 0,
+        "before_chars": 26431,
+        "after_chars": 289,
+        "saved_percent": 98.91
+      }
+    ]
+  },
+  "compaction": {
+    "insight": {
+      "scope": "Serialized compaction audit section; treatment keeps aggregates plus the latest event.",
+      "before_chars": 23681,
+      "after_chars": 4968,
+      "avoided_chars": 18713,
+      "avoided_approx_text_tokens": 4679,
+      "saved_percent": 79.02,
+      "cases": [
+        {
+          "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
+          "compactions": 11,
+          "before_chars": 3523,
+          "after_chars": 1247,
+          "avoided_chars": 2276,
+          "saved_percent": 64.6
+        },
+        {
+          "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+          "compactions": 40,
+          "before_chars": 10149,
+          "after_chars": 1243,
+          "avoided_chars": 8906,
+          "saved_percent": 87.75
+        },
+        {
+          "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
+          "compactions": 2,
+          "before_chars": 1459,
+          "after_chars": 1235,
+          "avoided_chars": 224,
+          "saved_percent": 15.35
+        },
+        {
+          "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
+          "compactions": 33,
+          "before_chars": 8550,
+          "after_chars": 1243,
+          "avoided_chars": 7307,
+          "saved_percent": 85.46
+        }
+      ]
+    },
+    "seed": {
+      "scope": "PreCompact continuation seed input; treatment uses a 1,200-char field budget and <=600-token summary target.",
+      "before_chars": 5581,
+      "after_chars": 3992,
+      "avoided_chars": 1589,
+      "avoided_approx_text_tokens": 398,
+      "saved_percent": 28.47,
+      "cases": [
+        {
+          "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
+          "before_chars": 1401,
+          "after_chars": 839,
+          "avoided_chars": 562,
+          "saved_percent": 40.11,
+          "baseline_capsules_retained": 0,
+          "treatment_capsules_retained": 0
+        },
+        {
+          "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+          "before_chars": 1322,
+          "after_chars": 854,
+          "avoided_chars": 468,
+          "saved_percent": 35.4,
+          "baseline_capsules_retained": 0,
+          "treatment_capsules_retained": 0
+        },
+        {
+          "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
+          "before_chars": 920,
+          "after_chars": 726,
+          "avoided_chars": 194,
+          "saved_percent": 21.09,
+          "baseline_capsules_retained": 0,
+          "treatment_capsules_retained": 0
+        },
+        {
+          "session": "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
+          "before_chars": 743,
+          "after_chars": 754,
+          "avoided_chars": -11,
+          "saved_percent": -1.48,
+          "baseline_capsules_retained": 0,
+          "treatment_capsules_retained": 0
+        },
+        {
+          "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
+          "before_chars": 1195,
+          "after_chars": 819,
+          "avoided_chars": 376,
+          "saved_percent": 31.46,
+          "baseline_capsules_retained": 0,
+          "treatment_capsules_retained": 0
+        }
+      ]
+    }
+  },
+  "caveat": "Local serialized-character A/B. Approximate text tokens use four characters per token; image tokens, provider billing, caching, latency, and hidden compactor generation are excluded."
+}

@@ -1,0 +1,47 @@
+{
+  "method": {
+    "scope": "Model-visible characters when identical large read-only evidence is requested after compaction.",
+    "arm_a": "v0.13 behavior: replay state is cleared, then ordinary large-output compaction runs.",
+    "arm_b": "Compaction-safe exact capsule dictionary plus a bounded replay reference.",
+    "accounting": "B conservatively includes PreCompact dictionary characters and the post-compaction replay reference.",
+    "exclusion": "Character exposure is not provider billing, cache behavior, latency, or the hidden compaction model cost."
+  },
+  "summary": {
+    "cases": 3,
+    "safety_pass": true,
+    "a_total_chars": 1739,
+    "b_total_chars": 555,
+    "weighted_saving_percent": 68.09
+  },
+  "safety": {
+    "exact_large_replay_compact": true,
+    "changed_large_evidence_not_replay": true,
+    "uncapsuled_small_evidence_not_replay": true
+  },
+  "cases": [
+    {
+      "raw_chars": 65536,
+      "a_baseline_post_compaction_chars": 604,
+      "b_capsule_dictionary_chars": 185,
+      "saving_percent": 69.37,
+      "exact_capsule_reference": true,
+      "marked_after_compaction": true
+    },
+    {
+      "raw_chars": 262144,
+      "a_baseline_post_compaction_chars": 546,
+      "b_capsule_dictionary_chars": 185,
+      "saving_percent": 66.12,
+      "exact_capsule_reference": true,
+      "marked_after_compaction": true
+    },
+    {
+      "raw_chars": 1048576,
+      "a_baseline_post_compaction_chars": 589,
+      "b_capsule_dictionary_chars": 185,
+      "saving_percent": 68.59,
+      "exact_capsule_reference": true,
+      "marked_after_compaction": true
+    }
+  ]
+}

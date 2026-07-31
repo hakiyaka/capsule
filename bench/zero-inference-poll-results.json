@@ -1,0 +1,185 @@
+{
+  "benchmark": "zero-inference-poll-reactor-ab",
+  "generated_at": "2026-07-28T18:52:39.836Z",
+  "method": {
+    "task_set": "15 warm-state status-wait scenarios: GitHub Actions, Kubernetes, and Git worktree across five context sizes.",
+    "arm_a": "Five unchanged/change status results, each followed by a separate model re-entry.",
+    "arm_b": "One repeated status invocation; four bounded local observations are coalesced before one model re-entry.",
+    "warmup": "One identical successful observation precedes both measured arms and is excluded from both.",
+    "oracle": "Both arms must expose the same terminal semantic state; every local observation remains exactly capsule-recoverable.",
+    "tokenizer": "o200k_base"
+  },
+  "scenarios": 15,
+  "oracles_passed": "15/15",
+  "model_reentry_reduction_percent": 80,
+  "visible_result_change_percent": 14.7,
+  "average_input_exposure_savings_percent": 79.99,
+  "rows": [
+    {
+      "family": "github-actions",
+      "context_tokens": 8000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 42,
+      "treatment_visible_tokens": 47,
+      "input_exposure_savings_percent": 79.94
+    },
+    {
+      "family": "github-actions",
+      "context_tokens": 32000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 42,
+      "treatment_visible_tokens": 48,
+      "input_exposure_savings_percent": 79.99
+    },
+    {
+      "family": "github-actions",
+      "context_tokens": 96000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 42,
+      "treatment_visible_tokens": 45,
+      "input_exposure_savings_percent": 80
+    },
+    {
+      "family": "github-actions",
+      "context_tokens": 160000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 42,
+      "treatment_visible_tokens": 48,
+      "input_exposure_savings_percent": 80
+    },
+    {
+      "family": "github-actions",
+      "context_tokens": 240000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 42,
+      "treatment_visible_tokens": 48,
+      "input_exposure_savings_percent": 80
+    },
+    {
+      "family": "kubernetes",
+      "context_tokens": 8000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 100,
+      "treatment_visible_tokens": 56,
+      "input_exposure_savings_percent": 80.01
+    },
+    {
+      "family": "kubernetes",
+      "context_tokens": 32000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 100,
+      "treatment_visible_tokens": 58,
+      "input_exposure_savings_percent": 80
+    },
+    {
+      "family": "kubernetes",
+      "context_tokens": 96000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 100,
+      "treatment_visible_tokens": 57,
+      "input_exposure_savings_percent": 80
+    },
+    {
+      "family": "kubernetes",
+      "context_tokens": 160000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 100,
+      "treatment_visible_tokens": 58,
+      "input_exposure_savings_percent": 80
+    },
+    {
+      "family": "kubernetes",
+      "context_tokens": 240000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 100,
+      "treatment_visible_tokens": 57,
+      "input_exposure_savings_percent": 80
+    },
+    {
+      "family": "git-worktree",
+      "context_tokens": 8000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 43,
+      "treatment_visible_tokens": 55,
+      "input_exposure_savings_percent": 79.92
+    },
+    {
+      "family": "git-worktree",
+      "context_tokens": 32000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 43,
+      "treatment_visible_tokens": 52,
+      "input_exposure_savings_percent": 79.98
+    },
+    {
+      "family": "git-worktree",
+      "context_tokens": 96000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 43,
+      "treatment_visible_tokens": 53,
+      "input_exposure_savings_percent": 79.99
+    },
+    {
+      "family": "git-worktree",
+      "context_tokens": 160000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 43,
+      "treatment_visible_tokens": 53,
+      "input_exposure_savings_percent": 80
+    },
+    {
+      "family": "git-worktree",
+      "context_tokens": 240000,
+      "oracle": true,
+      "control_model_reentries": 5,
+      "treatment_model_reentries": 1,
+      "local_observations": 4,
+      "control_visible_tokens": 43,
+      "treatment_visible_tokens": 54,
+      "input_exposure_savings_percent": 80
+    }
+  ],
+  "caveat": "Warm-state deterministic polling benchmark. It measures model-visible post-tool input exposure, not provider billing, cache pricing, hidden reasoning, subscription weighting, or the probability that a user/model would have continued polling for the full horizon."
+}

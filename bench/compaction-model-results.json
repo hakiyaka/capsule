@@ -1,0 +1,79 @@
+{
+  "method": {
+    "runner": "codex exec --ignore-user-config --ephemeral --sandbox read-only --json",
+    "design": "Same two noisy continuation transcripts. Treatment adds the deterministic <=1200-character field-budgeted dictionary used by the PreCompact hook and caps the summary at 600 tokens.",
+    "order": "Alternating AB/BA; one repetition.",
+    "incremental_accounting": "Local prompt tokens use tiktoken o200k_base when installed, then add provider-reported output tokens; this removes unrelated shared Codex system/tool context.",
+    "caveat": "Small synthetic real-model sample. It measures these explicit summarization calls, not Codex's hidden automatic compaction model or provider billing."
+  },
+  "summary": {
+    "tasks": 2,
+    "baseline_quality_pass": 2,
+    "treatment_quality_pass": 2,
+    "baseline_output_tokens": 1555,
+    "treatment_output_tokens": 929,
+    "output_saving_percent": 40.26,
+    "baseline_input_plus_output_tokens": 173410,
+    "treatment_input_plus_output_tokens": 174412,
+    "full_call_saving_percent": -0.58,
+    "baseline_local_prompt_plus_output_tokens": 11961,
+    "treatment_local_prompt_plus_output_tokens": 11626,
+    "incremental_saving_percent": 2.8,
+    "baseline_reasoning_output_tokens": 133,
+    "treatment_reasoning_output_tokens": 159
+  },
+  "rows": [
+    {
+      "task": "plugin-upgrade",
+      "arm": "baseline",
+      "facts_passed": 8,
+      "facts_total": 8,
+      "quality_pass": true,
+      "answer_chars": 2421,
+      "local_prompt_tokens": 5213,
+      "input_tokens": 85421,
+      "cached_input_tokens": 61696,
+      "output_tokens": 867,
+      "reasoning_output_tokens": 94
+    },
+    {
+      "task": "plugin-upgrade",
+      "arm": "treatment",
+      "facts_passed": 8,
+      "facts_total": 8,
+      "quality_pass": true,
+      "answer_chars": 406,
+      "local_prompt_tokens": 5365,
+      "input_tokens": 86721,
+      "cached_input_tokens": 61696,
+      "output_tokens": 492,
+      "reasoning_output_tokens": 107
+    },
+    {
+      "task": "cross-platform-cache-fix",
+      "arm": "baseline",
+      "facts_passed": 8,
+      "facts_total": 8,
+      "quality_pass": true,
+      "answer_chars": 1697,
+      "local_prompt_tokens": 5193,
+      "input_tokens": 86434,
+      "cached_input_tokens": 75776,
+      "output_tokens": 688,
+      "reasoning_output_tokens": 39
+    },
+    {
+      "task": "cross-platform-cache-fix",
+      "arm": "treatment",
+      "facts_passed": 8,
+      "facts_total": 8,
+      "quality_pass": true,
+      "answer_chars": 429,
+      "local_prompt_tokens": 5332,
+      "input_tokens": 86762,
+      "cached_input_tokens": 61696,
+      "output_tokens": 437,
+      "reasoning_output_tokens": 52
+    }
+  ]
+}

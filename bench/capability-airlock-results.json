@@ -1,0 +1,40 @@
+{
+  "active_skill_frontmatters": 53,
+  "measured_metadata_chars": 20955,
+  "static_catalog_tokens_per_request": 5239,
+  "airlock_anchor_tokens_per_request": 73,
+  "static_catalog_component_savings_percent": 98.61,
+  "scope_note": "Measures the recurring skill-catalog component only. Selected skill bodies are on-demand in both conditions.",
+  "rows": [
+    {
+      "model_requests": 1,
+      "static_catalog_tokens": 5239,
+      "capability_airlock_tokens": 73,
+      "tokens_avoided": 5166
+    },
+    {
+      "model_requests": 4,
+      "static_catalog_tokens": 20956,
+      "capability_airlock_tokens": 292,
+      "tokens_avoided": 20664
+    },
+    {
+      "model_requests": 10,
+      "static_catalog_tokens": 52390,
+      "capability_airlock_tokens": 730,
+      "tokens_avoided": 51660
+    },
+    {
+      "model_requests": 20,
+      "static_catalog_tokens": 104780,
+      "capability_airlock_tokens": 1460,
+      "tokens_avoided": 103320
+    },
+    {
+      "model_requests": 40,
+      "static_catalog_tokens": 209560,
+      "capability_airlock_tokens": 2920,
+      "tokens_avoided": 206640
+    }
+  ]
+}

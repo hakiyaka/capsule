@@ -1,0 +1,59 @@
+{
+  "benchmark": "adaptive-microprogram-ab",
+  "generated_at": "2026-07-28T18:19:57.231Z",
+  "scenarios": 5,
+  "adaptive_stages": 4,
+  "oracles_passed": "5/5",
+  "tokenizer": "o200k_base",
+  "roundtrip_reduction_percent": 87.5,
+  "visible_result_savings_percent": 55.68,
+  "average_input_exposure_savings_percent": 87.5,
+  "caveat": "Four binary adaptive stages compiled before execution. Provider caching, hidden reasoning, billing, and model planning cost are excluded.",
+  "rows": [
+    {
+      "context_tokens": 8000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 88,
+      "treatment_visible_tokens": 39,
+      "input_exposure_savings_percent": 87.52
+    },
+    {
+      "context_tokens": 32000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 88,
+      "treatment_visible_tokens": 39,
+      "input_exposure_savings_percent": 87.5
+    },
+    {
+      "context_tokens": 96000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 88,
+      "treatment_visible_tokens": 39,
+      "input_exposure_savings_percent": 87.5
+    },
+    {
+      "context_tokens": 160000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 88,
+      "treatment_visible_tokens": 39,
+      "input_exposure_savings_percent": 87.5
+    },
+    {
+      "context_tokens": 240000,
+      "oracle": true,
+      "control_roundtrips": 8,
+      "treatment_roundtrips": 1,
+      "control_visible_tokens": 88,
+      "treatment_visible_tokens": 39,
+      "input_exposure_savings_percent": 87.5
+    }
+  ]
+}

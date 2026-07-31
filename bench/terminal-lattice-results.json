@@ -1,0 +1,104 @@
+{
+  "benchmark": "terminal-lattice-ab",
+  "generated_at": "2026-07-28T20:08:32.804Z",
+  "task_set": "Ten first-seen successful shell families with 180 structured rows, one warning, and one unique proof each.",
+  "scenarios": 10,
+  "activations": "10/10",
+  "oracles_passed": "10/10",
+  "control_tokens": 34694,
+  "treatment_tokens": 1358,
+  "savings_percent": 96.09,
+  "rows": [
+    {
+      "family": "git",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3253,
+      "treatment_tokens": 132,
+      "savings_percent": 95.94,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "npm",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3253,
+      "treatment_tokens": 131,
+      "savings_percent": 95.97,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "pytest",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3434,
+      "treatment_tokens": 135,
+      "savings_percent": 96.07,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "docker",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3253,
+      "treatment_tokens": 135,
+      "savings_percent": 95.85,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "kubectl",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3796,
+      "treatment_tokens": 140,
+      "savings_percent": 96.31,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "cargo",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3433,
+      "treatment_tokens": 137,
+      "savings_percent": 96.01,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "dotnet",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3793,
+      "treatment_tokens": 139,
+      "savings_percent": 96.34,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "go",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3251,
+      "treatment_tokens": 130,
+      "savings_percent": 96,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "powershell",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3795,
+      "treatment_tokens": 143,
+      "savings_percent": 96.23,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "generic",
+      "activated": true,
+      "oracle": true,
+      "control_tokens": 3433,
+      "treatment_tokens": 136,
+      "savings_percent": 96.04,
+      "tokenizer": "o200k_base"
+    }
+  ],
+  "caveat": "Feature-activation benchmark, not an all-shell or billing percentage. Unstructured, short, failed, critical-heavy, and token-negative output deliberately passes through."
+}

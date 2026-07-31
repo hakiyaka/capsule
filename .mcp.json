@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "capsule": {
+      "command": "node",
+      "args": [
+        "--no-warnings",
+        "./mcp/server.cjs"
+      ],
+      "cwd": "."
+    }
+  }
+}

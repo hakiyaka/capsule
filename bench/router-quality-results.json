@@ -1,0 +1,93 @@
+{
+  "method": "Replay exact historical false-positive intents against the current real capability catalog, then verify explicit modality positives.",
+  "summary": {
+    "historical_cases": 8,
+    "before_false_positives": 8,
+    "after_false_positives": 0,
+    "negative_passes": 8,
+    "positive_cases": 5,
+    "positive_passes": 5
+  },
+  "historical_replay": [
+    {
+      "query": "Passively audit every currently live virtual football match and all betting markets for data, timing, score, odds, identifier, and network anomalies without placing bets or mutating the service.",
+      "before": "artifact-template-market-trends-report",
+      "after": null,
+      "pass": true
+    },
+    {
+      "query": "Build a fast retrospective Goaloo scraper and anomaly detector for Crown bookmaker early market closures in FT/HT 1X2 and over-under odds.",
+      "before": "artifact-template-market-trends-report",
+      "after": null,
+      "pass": true
+    },
+    {
+      "query": "Find evidence-based internal pricing or state anomalies across already captured live virtual football matches using score-dependent market validity, monotonic odds lines, and cross-market probability consistency; do not invent suspicion.",
+      "before": "artifact-template-market-trends-report",
+      "after": null,
+      "pass": true
+    },
+    {
+      "query": "Persist the confirmed stale last_event anomaly and conduct an extended passive longitudinal audit of all live virtual football matches across multiple rounds, tracking score, time, events, odds, and market consistency.",
+      "before": "artifact-template-market-trends-report",
+      "after": null,
+      "pass": true
+    },
+    {
+      "query": "Invent a radically new architecture for reducing model reasoning and output tokens before generation while preserving correctness.",
+      "before": "improve-codebase-architecture",
+      "after": null,
+      "pass": true
+    },
+    {
+      "query": "Passively investigate a public live virtual football event for anomalies using browser, API, WebSocket, network traffic, and client-side evidence without mutating the service.",
+      "before": "thick-client",
+      "after": null,
+      "pass": true
+    },
+    {
+      "query": "Explain and verify how Capsule reduces model-generated output tokens before and during generation.",
+      "before": "capsule-router",
+      "after": null,
+      "pass": true
+    },
+    {
+      "query": "What is the current status?",
+      "before": "gmail-inbox-triage",
+      "after": null,
+      "pass": true
+    }
+  ],
+  "positive_guards": [
+    {
+      "query": "Create the Market Trends Report template",
+      "expected": "artifact-template-market-trends-report",
+      "after": "artifact-template-market-trends-report",
+      "pass": true
+    },
+    {
+      "query": "Review this repository codebase architecture and refactor its modules",
+      "expected": "improve-codebase-architecture",
+      "after": "improve-codebase-architecture",
+      "pass": true
+    },
+    {
+      "query": "Perform authorized security testing of a desktop thick client",
+      "expected": "thick-client",
+      "after": "thick-client",
+      "pass": true
+    },
+    {
+      "query": "Investigate why the Capsule skill router selects irrelevant skills",
+      "expected": "capsule-router",
+      "after": "capsule-router",
+      "pass": true
+    },
+    {
+      "query": "Triage my Gmail inbox and rank messages needing replies",
+      "expected": "gmail-inbox-triage",
+      "after": "gmail-inbox-triage",
+      "pass": true
+    }
+  ]
+}

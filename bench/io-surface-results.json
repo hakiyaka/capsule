@@ -1,0 +1,75 @@
+{
+  "method": {
+    "scope": "Deterministic characters exposed at hook/tool-schema boundaries.",
+    "treatment": "Current Capsule hooks and MCP contract.",
+    "exclusions": "No claim about provider billing, hidden platform prompts, image-token accounting, or answer-quality equivalence.",
+    "fork_note": "Fork savings use a synthetic 20-turn context fixture; they are not provider telemetry."
+  },
+  "summary": {
+    "scenarios": 8,
+    "safety_pass": true
+  },
+  "repeated_text": [
+    {
+      "raw_chars": 65536,
+      "repetitions": 5,
+      "a_unmediated_chars": 327680,
+      "b_capsule_chars": 880,
+      "saving_percent": 99.73,
+      "exact_replays_compacted": true
+    },
+    {
+      "raw_chars": 262144,
+      "repetitions": 5,
+      "a_unmediated_chars": 1310720,
+      "b_capsule_chars": 876,
+      "saving_percent": 99.93,
+      "exact_replays_compacted": true
+    },
+    {
+      "raw_chars": 1048576,
+      "repetitions": 5,
+      "a_unmediated_chars": 5242880,
+      "b_capsule_chars": 886,
+      "saving_percent": 99.98,
+      "exact_replays_compacted": true
+    }
+  ],
+  "cross_turn_text_replay": {
+    "turns": 2,
+    "read_only_tool_identities": 2,
+    "a_reloaded_chars": 524288,
+    "b_task_cache_chars": 136,
+    "saving_percent": 99.97,
+    "second_result_is_reference": true
+  },
+  "progressive_expand": {
+    "a_legacy_default_chars": 6200,
+    "b_progressive_default_chars": 2520,
+    "saving_percent": 59.35,
+    "first_line_preserved": true,
+    "continuation_available": true
+  },
+  "task_history_projection": {
+    "a_raw_chars": 480553,
+    "b_projected_chars": 323,
+    "saving_percent": 99.93,
+    "preserves_user_decision": true,
+    "preserves_final_decision": true,
+    "removes_tool_argument": true
+  },
+  "subagent_fork_fixture": {
+    "fixture_turns": 20,
+    "selected_fork_turns": "none",
+    "a_full_history_chars": 30928,
+    "b_bounded_history_chars": 298,
+    "simulated_saving_percent": 99.04,
+    "task_message_unchanged": true
+  },
+  "mcp_contract": {
+    "a_v0_9_contract_chars": 1004,
+    "b_current_contract_chars": 742,
+    "saving_percent": 26.1,
+    "action_count": 27
+  }
+}

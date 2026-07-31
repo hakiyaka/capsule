@@ -1,0 +1,280 @@
+{
+  "method": {
+    "scope": "Deterministic search moved outside model generation plus automatic hook input overhead.",
+    "measurement": "Exact solver states and serialized model-visible characters; not a claim that one state equals one provider reasoning token.",
+    "quality": "Known optima, schedules, rankings, and next-check choices are asserted."
+  },
+  "summary": {
+    "cases": 7,
+    "quality_passes": 7,
+    "symbolic_states_externalized": 626404,
+    "model_visible_chars": 2732,
+    "trivial_prompts_with_zero_added_context": 10,
+    "trivial_prompts": 10,
+    "offload_prompts_detected": 7,
+    "offload_prompts": 7,
+    "average_offload_context_chars": 146.6
+  },
+  "cases": [
+    {
+      "name": "minimum-evidence-cover",
+      "quality_pass": true,
+      "symbolic_states_externalized": 511,
+      "model_visible_chars": 298,
+      "result": {
+        "requirements": [
+          "alerts",
+          "audit",
+          "auth",
+          "billing",
+          "export",
+          "profile"
+        ],
+        "selected": [
+          "a",
+          "b",
+          "c"
+        ],
+        "total_cost": 7,
+        "certificate": {
+          "solver": "exact-cover-v1",
+          "complete": true,
+          "missing": [],
+          "search_space": 511,
+          "examined": 511,
+          "input_sha256": "e76d7dec6f717a498a91b697f2f3ae1d2ae59b8eea504a0bfc65831accb3513d"
+        }
+      }
+    },
+    {
+      "name": "parallel-dag",
+      "quality_pass": true,
+      "symbolic_states_externalized": 362880,
+      "model_visible_chars": 351,
+      "result": {
+        "batches": [
+          [
+            "inspect"
+          ],
+          [
+            "schema"
+          ],
+          [
+            "api",
+            "ui"
+          ],
+          [
+            "docs",
+            "e2e",
+            "security",
+            "unit"
+          ],
+          [
+            "pack"
+          ]
+        ],
+        "critical_path": [
+          "inspect",
+          "schema",
+          "api",
+          "e2e",
+          "pack"
+        ],
+        "serial_cost": 29,
+        "critical_cost": 18,
+        "certificate": {
+          "solver": "dag-v1",
+          "acyclic": true,
+          "cycle_nodes": [],
+          "tasks_scheduled": 9,
+          "input_sha256": "2ee23c2c42dec1fca32c21bc58b64893cd100a1186df5935958dd020da1789c1"
+        }
+      }
+    },
+    {
+      "name": "weighted-decision",
+      "quality_pass": true,
+      "symbolic_states_externalized": 20,
+      "model_visible_chars": 386,
+      "result": {
+        "winner": "beta",
+        "ranking": [
+          {
+            "id": "beta",
+            "score": 0.757653
+          },
+          {
+            "id": "gamma",
+            "score": 0.630612
+          },
+          {
+            "id": "epsilon",
+            "score": 0.470918
+          },
+          {
+            "id": "alpha",
+            "score": 0.414286
+          },
+          {
+            "id": "delta",
+            "score": 0.357143
+          }
+        ],
+        "margin": 0.127041,
+        "stable": true,
+        "certificate": {
+          "solver": "weighted-decision-v1",
+          "complete": true,
+          "normalized": true,
+          "input_sha256": "c90dbde3ee6c2308289b4f260cedb65f67d4c62bc0c7d31ba2a579835075a418"
+        }
+      }
+    },
+    {
+      "name": "diagnostic-information-gain",
+      "quality_pass": true,
+      "symbolic_states_externalized": 50,
+      "model_visible_chars": 794,
+      "result": {
+        "next_check": "cache-bypass",
+        "prior_entropy": 2.121127,
+        "ranking": [
+          {
+            "id": "cache-bypass",
+            "information_gain": 0.600505,
+            "information_gain_per_cost": 0.600505,
+            "positive_probability": 0.385
+          },
+          {
+            "id": "query-plan",
+            "information_gain": 0.384086,
+            "information_gain_per_cost": 0.128029,
+            "positive_probability": 0.33
+          },
+          {
+            "id": "lock-dump",
+            "information_gain": 0.364783,
+            "information_gain_per_cost": 0.091196,
+            "positive_probability": 0.225
+          },
+          {
+            "id": "packet-trace",
+            "information_gain": 0.329946,
+            "information_gain_per_cost": 0.065989,
+            "positive_probability": 0.285
+          },
+          {
+            "id": "heap-profile",
+            "information_gain": 0.140909,
+            "information_gain_per_cost": 0.02013,
+            "positive_probability": 0.1325
+          }
+        ],
+        "certificate": {
+          "solver": "information-gain-v1",
+          "normalized_priors": true,
+          "input_sha256": "f6dc5f6c238be40bb62b7d8bd693ebdd1ee57f0a460c6c1cc3581b14a7e0add8"
+        }
+      }
+    },
+    {
+      "name": "exact-assignment",
+      "quality_pass": true,
+      "symbolic_states_externalized": 720,
+      "model_visible_chars": 419,
+      "result": {
+        "assignments": [
+          {
+            "task": "api",
+            "agent": "a",
+            "cost": 1
+          },
+          {
+            "task": "docs",
+            "agent": "b",
+            "cost": 1
+          },
+          {
+            "task": "ops",
+            "agent": "c",
+            "cost": 1
+          },
+          {
+            "task": "qa",
+            "agent": "d",
+            "cost": 1
+          },
+          {
+            "task": "security",
+            "agent": "e",
+            "cost": 1
+          },
+          {
+            "task": "ui",
+            "agent": "f",
+            "cost": 1
+          }
+        ],
+        "total_cost": 6,
+        "certificate": {
+          "solver": "exact-assignment-v1",
+          "complete": true,
+          "states_examined": 192,
+          "input_sha256": "92a8b457a1244501ffd015575e3c6fb70f38a30b3da49e164d1eff550128be07"
+        }
+      }
+    },
+    {
+      "name": "exact-knapsack",
+      "quality_pass": true,
+      "symbolic_states_externalized": 262143,
+      "model_visible_chars": 275,
+      "result": {
+        "budget": 9,
+        "selected": [
+          "i01",
+          "i02",
+          "i03",
+          "i04",
+          "i05",
+          "i06",
+          "i07",
+          "i08",
+          "i09"
+        ],
+        "total_cost": 9,
+        "total_value": 9,
+        "certificate": {
+          "solver": "exact-knapsack-v1",
+          "complete": true,
+          "states_examined": 126,
+          "input_sha256": "f675898e4fa1dd949b51fe952fc6e761d87d5e86161942057ed22baa2d55320d"
+        }
+      }
+    },
+    {
+      "name": "shortest-path",
+      "quality_pass": true,
+      "symbolic_states_externalized": 80,
+      "model_visible_chars": 209,
+      "result": {
+        "path": [
+          "a",
+          "c",
+          "b",
+          "d",
+          "f",
+          "g",
+          "h"
+        ],
+        "total_cost": 8,
+        "certificate": {
+          "solver": "dijkstra-v1",
+          "reachable": true,
+          "settled_nodes": 8,
+          "input_sha256": "99418ab6972fc85fbbf67815ed6496f5fa81af044f8c256785fdb191d16d4da1"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "benchmark": "terminal-pareto-fuzz",
+  "generated_at": "2026-07-28T20:11:24.685Z",
+  "seed": "0x5eeda11",
+  "cases": 320,
+  "activations": 160,
+  "oracles_passed": "320/320",
+  "tokenizer": "o200k_base",
+  "activated_control_tokens": 566744,
+  "activated_treatment_tokens": 28117,
+  "activated_savings_percent": 95.04,
+  "token_regressions": 0,
+  "false_activations": 0,
+  "missed_expected_activations": 0,
+  "categories": [
+    {
+      "category": "critical-heavy",
+      "cases": 40,
+      "activations": 0,
+      "oracles": "40/40",
+      "control_tokens": 19160,
+      "treatment_tokens": 19160,
+      "savings_percent": 0
+    },
+    {
+      "category": "critical-safe",
+      "cases": 40,
+      "activations": 40,
+      "oracles": "40/40",
+      "control_tokens": 143961,
+      "treatment_tokens": 10042,
+      "savings_percent": 93.02
+    },
+    {
+      "category": "failed",
+      "cases": 40,
+      "activations": 0,
+      "oracles": "40/40",
+      "control_tokens": 144010,
+      "treatment_tokens": 144010,
+      "savings_percent": 0
+    },
+    {
+      "category": "literal",
+      "cases": 40,
+      "activations": 0,
+      "oracles": "40/40",
+      "control_tokens": 146434,
+      "treatment_tokens": 146434,
+      "savings_percent": 0
+    },
+    {
+      "category": "structured",
+      "cases": 40,
+      "activations": 40,
+      "oracles": "40/40",
+      "control_tokens": 140749,
+      "treatment_tokens": 7002,
+      "savings_percent": 95.03
+    },
+    {
+      "category": "unicode-structured",
+      "cases": 40,
+      "activations": 40,
+      "oracles": "40/40",
+      "control_tokens": 190074,
+      "treatment_tokens": 7273,
+      "savings_percent": 96.17
+    },
+    {
+      "category": "unstructured",
+      "cases": 40,
+      "activations": 0,
+      "oracles": "40/40",
+      "control_tokens": 30560,
+      "treatment_tokens": 30560,
+      "savings_percent": 0
+    },
+    {
+      "category": "warm-semantic-change",
+      "cases": 40,
+      "activations": 40,
+      "oracles": "40/40",
+      "control_tokens": 91960,
+      "treatment_tokens": 3800,
+      "savings_percent": 95.87
+    }
+  ],
+  "failures": []
+}

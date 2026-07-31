@@ -1,0 +1,25 @@
+name: Feature request
+description: Propose a measurable Capsule improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Which real workflow is inefficient or unsupported?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: measurement
+    attributes:
+      label: Verification
+      description: Describe an A/B case, correctness invariant, or regression test.
+    validations:
+      required: true

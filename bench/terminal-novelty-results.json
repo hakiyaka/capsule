@@ -1,0 +1,130 @@
+{
+  "cases": 20,
+  "raw_tokens": 74660,
+  "baseline_tokens": 5670,
+  "novelty_tokens": 942,
+  "savings_vs_raw_percent": 98.74,
+  "incremental_savings_vs_existing_compressor_percent": 83.39,
+  "rows": [
+    {
+      "command": "npm test",
+      "run": 1,
+      "baseline_chars": 1212,
+      "novelty_chars": 148
+    },
+    {
+      "command": "npm test",
+      "run": 2,
+      "baseline_chars": 1212,
+      "novelty_chars": 159
+    },
+    {
+      "command": "pnpm lint",
+      "run": 1,
+      "baseline_chars": 1176,
+      "novelty_chars": 148
+    },
+    {
+      "command": "pnpm lint",
+      "run": 2,
+      "baseline_chars": 1176,
+      "novelty_chars": 159
+    },
+    {
+      "command": "tsc --noEmit",
+      "run": 1,
+      "baseline_chars": 1176,
+      "novelty_chars": 153
+    },
+    {
+      "command": "tsc --noEmit",
+      "run": 2,
+      "baseline_chars": 1176,
+      "novelty_chars": 164
+    },
+    {
+      "command": "npm run build",
+      "run": 1,
+      "baseline_chars": 1195,
+      "novelty_chars": 149
+    },
+    {
+      "command": "npm run build",
+      "run": 2,
+      "baseline_chars": 1195,
+      "novelty_chars": 160
+    },
+    {
+      "command": "prettier --check .",
+      "run": 1,
+      "baseline_chars": 1224,
+      "novelty_chars": 156
+    },
+    {
+      "command": "prettier --check .",
+      "run": 2,
+      "baseline_chars": 1224,
+      "novelty_chars": 167
+    },
+    {
+      "command": "git status --short",
+      "run": 1,
+      "baseline_chars": 1204,
+      "novelty_chars": 154
+    },
+    {
+      "command": "git status --short",
+      "run": 2,
+      "baseline_chars": 1204,
+      "novelty_chars": 165
+    },
+    {
+      "command": "git diff --stat",
+      "run": 1,
+      "baseline_chars": 1196,
+      "novelty_chars": 152
+    },
+    {
+      "command": "git diff --stat",
+      "run": 2,
+      "baseline_chars": 1196,
+      "novelty_chars": 163
+    },
+    {
+      "command": "rg -n TODO src",
+      "run": 1,
+      "baseline_chars": 1175,
+      "novelty_chars": 150
+    },
+    {
+      "command": "rg -n TODO src",
+      "run": 2,
+      "baseline_chars": 1175,
+      "novelty_chars": 161
+    },
+    {
+      "command": "Get-ChildItem -Recurse",
+      "run": 1,
+      "baseline_chars": 1191,
+      "novelty_chars": 153
+    },
+    {
+      "command": "Get-ChildItem -Recurse",
+      "run": 2,
+      "baseline_chars": 1191,
+      "novelty_chars": 164
+    },
+    {
+      "command": "npm audit",
+      "run": 1,
+      "baseline_chars": 1176,
+      "novelty_chars": 154
+    },
+    {
+      "command": "npm audit",
+      "run": 2,
+      "baseline_chars": 1176,
+      "novelty_chars": 165
+    }
+  ]
+}

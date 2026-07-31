@@ -1,0 +1,165 @@
+{
+  "benchmark": "reasoning-residual-ab",
+  "generated_at": "2026-07-28T16:19:56.428Z",
+  "scope": "10 common four-step edit-validation loops; control already includes Terminal Novelty Ledger",
+  "scenarios": 10,
+  "iterations": 40,
+  "control_tokens": 2364,
+  "treatment_tokens": 1883,
+  "saved_tokens": 481,
+  "savings_percent": 20.35,
+  "measurement": "Capsule tokenizer estimate over actually emitted control/treatment strings",
+  "reasoning_claim": "The control tags preserve causal state and instruct against re-diagnosis; hidden model reasoning-token savings are not directly observable and are not included.",
+  "rows": [
+    {
+      "scenario": "node-test",
+      "command": "npm test",
+      "iterations": 4,
+      "control_tokens": 243,
+      "treatment_tokens": 192,
+      "saved_tokens": 51,
+      "savings_percent": 20.99,
+      "transitions": [
+        "baseline",
+        "persistent-failure",
+        "changed-failure",
+        "resolved"
+      ]
+    },
+    {
+      "scenario": "python-test",
+      "command": "pytest -q",
+      "iterations": 4,
+      "control_tokens": 243,
+      "treatment_tokens": 192,
+      "saved_tokens": 51,
+      "savings_percent": 20.99,
+      "transitions": [
+        "baseline",
+        "persistent-failure",
+        "changed-failure",
+        "resolved"
+      ]
+    },
+    {
+      "scenario": "rust-test",
+      "command": "cargo test",
+      "iterations": 4,
+      "control_tokens": 243,
+      "treatment_tokens": 192,
+      "saved_tokens": 51,
+      "savings_percent": 20.99,
+      "transitions": [
+        "baseline",
+        "persistent-failure",
+        "changed-failure",
+        "resolved"
+      ]
+    },
+    {
+      "scenario": "go-test",
+      "command": "go test ./...",
+      "iterations": 4,
+      "control_tokens": 243,
+      "treatment_tokens": 192,
+      "saved_tokens": 51,
+      "savings_percent": 20.99,
+      "transitions": [
+        "baseline",
+        "persistent-failure",
+        "changed-failure",
+        "resolved"
+      ]
+    },
+    {
+      "scenario": "dotnet-test",
+      "command": "dotnet test",
+      "iterations": 4,
+      "control_tokens": 243,
+      "treatment_tokens": 192,
+      "saved_tokens": 51,
+      "savings_percent": 20.99,
+      "transitions": [
+        "baseline",
+        "persistent-failure",
+        "changed-failure",
+        "resolved"
+      ]
+    },
+    {
+      "scenario": "javascript-lint",
+      "command": "npm run lint",
+      "iterations": 4,
+      "control_tokens": 269,
+      "treatment_tokens": 208,
+      "saved_tokens": 61,
+      "savings_percent": 22.68,
+      "transitions": [
+        "baseline",
+        "terminal-novelty",
+        "changed-failure",
+        "resolved"
+      ]
+    },
+    {
+      "scenario": "typescript-check",
+      "command": "tsc --noEmit",
+      "iterations": 4,
+      "control_tokens": 270,
+      "treatment_tokens": 211,
+      "saved_tokens": 59,
+      "savings_percent": 21.85,
+      "transitions": [
+        "baseline",
+        "terminal-novelty",
+        "changed-failure",
+        "resolved"
+      ]
+    },
+    {
+      "scenario": "frontend-build",
+      "command": "npm run build",
+      "iterations": 4,
+      "control_tokens": 251,
+      "treatment_tokens": 196,
+      "saved_tokens": 55,
+      "savings_percent": 21.91,
+      "transitions": [
+        "baseline",
+        "persistent-failure",
+        "changed-failure",
+        "resolved"
+      ]
+    },
+    {
+      "scenario": "maven-test",
+      "command": "mvn test",
+      "iterations": 4,
+      "control_tokens": 243,
+      "treatment_tokens": 192,
+      "saved_tokens": 51,
+      "savings_percent": 20.99,
+      "transitions": [
+        "baseline",
+        "persistent-failure",
+        "changed-failure",
+        "resolved"
+      ]
+    },
+    {
+      "scenario": "gradle-test",
+      "command": "./gradlew test",
+      "iterations": 4,
+      "control_tokens": 116,
+      "treatment_tokens": 116,
+      "saved_tokens": 0,
+      "savings_percent": 0,
+      "transitions": [
+        "baseline",
+        "terminal-novelty",
+        "terminal-novelty",
+        "terminal-novelty"
+      ]
+    }
+  ]
+}

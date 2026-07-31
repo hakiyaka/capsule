@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a reproducible Capsule defect
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Capsule version
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS, Node, and Codex versions
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Remove credentials, private prompts, and personal paths.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Include relevant errors or capsule IDs only when safe.

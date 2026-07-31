@@ -1,0 +1,7 @@
+interface:
+  display_name: "Capsule"
+  short_description: "Adaptive skill routing and context savings"
+  default_prompt: "Use $map-token-context to minimize context and route virtualized expertise for this task."
+
+policy:
+  allow_implicit_invocation: true

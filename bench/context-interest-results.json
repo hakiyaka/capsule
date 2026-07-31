@@ -1,0 +1,90 @@
+{
+  "cases": 10,
+  "requested_singleton_rounds_per_case": 16,
+  "baseline_weighted_context_tokens": 8144000,
+  "exchange_weighted_context_tokens": 2036000,
+  "projected_roundtrip_context_savings_percent": 75,
+  "conservative_note": "Counts the denied attempt and one replacement batch round; excludes tool-output savings.",
+  "rows": [
+    {
+      "input": 92000,
+      "cached": 70000,
+      "weighted": 29000,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    },
+    {
+      "input": 180000,
+      "cached": 140000,
+      "weighted": 54000,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    },
+    {
+      "input": 240000,
+      "cached": 190000,
+      "weighted": 69000,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    },
+    {
+      "input": 125000,
+      "cached": 80000,
+      "weighted": 53000,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    },
+    {
+      "input": 70000,
+      "cached": 45000,
+      "weighted": 29500,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    },
+    {
+      "input": 210000,
+      "cached": 170000,
+      "weighted": 57000,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    },
+    {
+      "input": 150000,
+      "cached": 100000,
+      "weighted": 60000,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    },
+    {
+      "input": 96000,
+      "cached": 60000,
+      "weighted": 42000,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    },
+    {
+      "input": 230000,
+      "cached": 180000,
+      "weighted": 68000,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    },
+    {
+      "input": 115000,
+      "cached": 75000,
+      "weighted": 47500,
+      "baseline_rounds": 16,
+      "exchange_rounds": 4,
+      "gate_at": 3
+    }
+  ]
+}

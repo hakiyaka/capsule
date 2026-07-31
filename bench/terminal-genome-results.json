@@ -1,0 +1,93 @@
+{
+  "benchmark": "terminal-genome-ab",
+  "generated_at": "2026-07-28T20:08:36.009Z",
+  "task_set": "Ten shell families, four different successful commands each, with cross-command shared boilerplate and unique terminal evidence.",
+  "scenarios": 10,
+  "oracles_passed": "10/10",
+  "control_tokens": 57932,
+  "treatment_tokens": 2188,
+  "savings_percent": 96.22,
+  "rows": [
+    {
+      "family": "git",
+      "oracle": true,
+      "control_tokens": 5792,
+      "treatment_tokens": 214,
+      "savings_percent": 96.31,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "npm",
+      "oracle": true,
+      "control_tokens": 5792,
+      "treatment_tokens": 218,
+      "savings_percent": 96.24,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "pytest",
+      "oracle": true,
+      "control_tokens": 5792,
+      "treatment_tokens": 217,
+      "savings_percent": 96.25,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "docker",
+      "oracle": true,
+      "control_tokens": 5792,
+      "treatment_tokens": 212,
+      "savings_percent": 96.34,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "kubectl",
+      "oracle": true,
+      "control_tokens": 5796,
+      "treatment_tokens": 220,
+      "savings_percent": 96.2,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "cargo",
+      "oracle": true,
+      "control_tokens": 5792,
+      "treatment_tokens": 218,
+      "savings_percent": 96.24,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "dotnet",
+      "oracle": true,
+      "control_tokens": 5796,
+      "treatment_tokens": 218,
+      "savings_percent": 96.24,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "go",
+      "oracle": true,
+      "control_tokens": 5792,
+      "treatment_tokens": 223,
+      "savings_percent": 96.15,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "powershell",
+      "oracle": true,
+      "control_tokens": 5796,
+      "treatment_tokens": 228,
+      "savings_percent": 96.07,
+      "tokenizer": "o200k_base"
+    },
+    {
+      "family": "generic",
+      "oracle": true,
+      "control_tokens": 5792,
+      "treatment_tokens": 220,
+      "savings_percent": 96.2,
+      "tokenizer": "o200k_base"
+    }
+  ],
+  "caveat": "Feature-activation benchmark for cross-command repeated boilerplate; unique, small, failed, unsafe, and token-negative outputs pass through."
+}

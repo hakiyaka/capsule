@@ -1,0 +1,64 @@
+{
+  "benchmark": "causal-toolchain-jit-ab",
+  "generated_at": "2026-07-28T18:40:30.281Z",
+  "method": {
+    "task_set": "Five context sizes; a learned rg A -> rg B investigation sequence with real local command execution.",
+    "arm_a": "Two serial shell-tool results and two model re-entries.",
+    "arm_b": "The first command plus a locally JIT-executed learned successor and one model re-entry.",
+    "training": "Two identical safe transitions with 100% dominance; training output is excluded from both arms.",
+    "tokenizer": "o200k_base"
+  },
+  "scenarios": 5,
+  "oracles_passed": "5/5",
+  "model_reentry_reduction_percent": 50,
+  "visible_result_change_percent": -35.34,
+  "average_input_exposure_savings_percent": 49.9,
+  "rows": [
+    {
+      "context_tokens": 8000,
+      "oracle": true,
+      "control_model_reentries": 2,
+      "treatment_model_reentries": 1,
+      "control_visible_tokens": 104,
+      "treatment_visible_tokens": 139,
+      "input_exposure_savings_percent": 49.63
+    },
+    {
+      "context_tokens": 32000,
+      "oracle": true,
+      "control_model_reentries": 2,
+      "treatment_model_reentries": 1,
+      "control_visible_tokens": 99,
+      "treatment_visible_tokens": 131,
+      "input_exposure_savings_percent": 49.91
+    },
+    {
+      "context_tokens": 96000,
+      "oracle": true,
+      "control_model_reentries": 2,
+      "treatment_model_reentries": 1,
+      "control_visible_tokens": 99,
+      "treatment_visible_tokens": 135,
+      "input_exposure_savings_percent": 49.97
+    },
+    {
+      "context_tokens": 160000,
+      "oracle": true,
+      "control_model_reentries": 2,
+      "treatment_model_reentries": 1,
+      "control_visible_tokens": 98,
+      "treatment_visible_tokens": 134,
+      "input_exposure_savings_percent": 49.98
+    },
+    {
+      "context_tokens": 240000,
+      "oracle": true,
+      "control_model_reentries": 2,
+      "treatment_model_reentries": 1,
+      "control_visible_tokens": 98,
+      "treatment_visible_tokens": 135,
+      "input_exposure_savings_percent": 49.99
+    }
+  ],
+  "caveat": "Measures post-tool model-input exposure for a learned deterministic safe sequence. Provider cache accounting, hidden reasoning, subscription weighting, and cold training turns are excluded; cold and low-context paths emit no JIT payload."
+}

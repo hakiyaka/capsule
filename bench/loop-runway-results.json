@@ -1,0 +1,186 @@
+{
+  "method": {
+    "dataset": "Recent local Codex session metadata plus 3,000-4,999-character non-media read outputs.",
+    "replay_accounting": "Model-visible characters on an exact reread after compaction; treatment includes its PreCompact capsule dictionary.",
+    "poll_accounting": "Counterfactual polling cadence from the recorded timeout/yield values after applying the 60-second floor.",
+    "privacy": "No prompt or tool content is copied into the report.",
+    "caveat": "Replay characters are an input-context proxy. Poll cadence is not a billing or token claim; event-driven wakeups can return before the timeout."
+  },
+  "compaction_replay": {
+    "samples": 20,
+    "baseline_chars": 80290,
+    "treatment_chars": 3700,
+    "avoided_chars": 76590,
+    "avoided_approx_text_tokens": 19148,
+    "saving_percent": 95.39,
+    "exact_recovery_pass": true,
+    "rows": [
+      {
+        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
+        "raw_chars": 4416,
+        "baseline_chars": 4604,
+        "treatment_chars": 185,
+        "saved_percent": 95.98,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3110,
+        "baseline_chars": 3295,
+        "treatment_chars": 185,
+        "saved_percent": 94.39,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3626,
+        "baseline_chars": 3811,
+        "treatment_chars": 185,
+        "saved_percent": 95.15,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3302,
+        "baseline_chars": 3487,
+        "treatment_chars": 185,
+        "saved_percent": 94.69,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 4409,
+        "baseline_chars": 4594,
+        "treatment_chars": 185,
+        "saved_percent": 95.97,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 4196,
+        "baseline_chars": 4381,
+        "treatment_chars": 185,
+        "saved_percent": 95.78,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 4359,
+        "baseline_chars": 4544,
+        "treatment_chars": 185,
+        "saved_percent": 95.93,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3341,
+        "baseline_chars": 3526,
+        "treatment_chars": 185,
+        "saved_percent": 94.75,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3341,
+        "baseline_chars": 3526,
+        "treatment_chars": 185,
+        "saved_percent": 94.75,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3341,
+        "baseline_chars": 3526,
+        "treatment_chars": 185,
+        "saved_percent": 94.75,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3776,
+        "baseline_chars": 3961,
+        "treatment_chars": 185,
+        "saved_percent": 95.33,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3341,
+        "baseline_chars": 3526,
+        "treatment_chars": 185,
+        "saved_percent": 94.75,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3341,
+        "baseline_chars": 3526,
+        "treatment_chars": 185,
+        "saved_percent": 94.75,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 3235,
+        "baseline_chars": 3423,
+        "treatment_chars": 185,
+        "saved_percent": 94.6,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
+        "raw_chars": 4650,
+        "baseline_chars": 4838,
+        "treatment_chars": 185,
+        "saved_percent": 96.18,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
+        "raw_chars": 4612,
+        "baseline_chars": 4797,
+        "treatment_chars": 185,
+        "saved_percent": 96.14,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
+        "raw_chars": 3196,
+        "baseline_chars": 3381,
+        "treatment_chars": 185,
+        "saved_percent": 94.53,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
+        "raw_chars": 4464,
+        "baseline_chars": 4652,
+        "treatment_chars": 185,
+        "saved_percent": 96.02,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
+        "raw_chars": 4173,
+        "baseline_chars": 4361,
+        "treatment_chars": 185,
+        "saved_percent": 95.76,
+        "exact_recovery": true
+      },
+      {
+        "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
+        "raw_chars": 4346,
+        "baseline_chars": 4531,
+        "treatment_chars": 185,
+        "saved_percent": 95.92,
+        "exact_recovery": true
+      }
+    ]
+  },
+  "poll_cadence": {
+    "samples": 100,
+    "waits_tightened": 99,
+    "minimum_after_ms": 60000,
+    "modeled_poll_rate_reduction_percent": 85.75
+  }
+}

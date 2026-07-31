@@ -1,0 +1,107 @@
+{
+  "benchmark": "capsule-real-hook-contract",
+  "generated_at": "2026-07-28T02:42:49.193Z",
+  "seed": 549519342,
+  "cases_per_class": 30,
+  "corpus_manifest_sha256": "dc26337056ada64f73b178aa517676c493b56b53e22b3077fb0980b50f4da619",
+  "tokenizer": {
+    "exact": true,
+    "encoding": "o200k_base",
+    "version": "0.12.0",
+    "strings_counted": 360
+  },
+  "oracles": {
+    "baseline": "180/180",
+    "treatment": "180/180",
+    "all_treatment_pass": true
+  },
+  "overall_positive": {
+    "cases": 90,
+    "baseline_tokens": 394080,
+    "treatment_tokens": 13731,
+    "avoided_tokens": 380349,
+    "savings_percent": 96.52
+  },
+  "overall_mixed": {
+    "cases": 180,
+    "baseline_tokens": 434596,
+    "treatment_tokens": 54247,
+    "avoided_tokens": 380349,
+    "savings_percent": 87.52
+  },
+  "families": {
+    "hook_contract": {
+      "positive": {
+        "cases": 30,
+        "baseline_tokens": 365530,
+        "treatment_tokens": 1289,
+        "avoided_tokens": 364241,
+        "savings_percent": 99.65
+      },
+      "mixed": {
+        "cases": 60,
+        "baseline_tokens": 365925,
+        "treatment_tokens": 1684,
+        "avoided_tokens": 364241,
+        "savings_percent": 99.54
+      },
+      "negative": {
+        "cases": 30,
+        "baseline_tokens": 395,
+        "treatment_tokens": 395,
+        "avoided_tokens": 0,
+        "savings_percent": 0
+      },
+      "false_positive_count": 0
+    },
+    "small_poll": {
+      "positive": {
+        "cases": 30,
+        "baseline_tokens": 985,
+        "treatment_tokens": 210,
+        "avoided_tokens": 775,
+        "savings_percent": 78.68
+      },
+      "mixed": {
+        "cases": 60,
+        "baseline_tokens": 1915,
+        "treatment_tokens": 1140,
+        "avoided_tokens": 775,
+        "savings_percent": 40.47
+      },
+      "negative": {
+        "cases": 30,
+        "baseline_tokens": 930,
+        "treatment_tokens": 930,
+        "avoided_tokens": 0,
+        "savings_percent": 0
+      },
+      "false_positive_count": 0
+    },
+    "session_query": {
+      "positive": {
+        "cases": 30,
+        "baseline_tokens": 27565,
+        "treatment_tokens": 12232,
+        "avoided_tokens": 15333,
+        "savings_percent": 55.62
+      },
+      "mixed": {
+        "cases": 60,
+        "baseline_tokens": 66756,
+        "treatment_tokens": 51423,
+        "avoided_tokens": 15333,
+        "savings_percent": 22.97
+      },
+      "negative": {
+        "cases": 30,
+        "baseline_tokens": 39191,
+        "treatment_tokens": 39191,
+        "avoided_tokens": 0,
+        "savings_percent": 0
+      },
+      "false_positive_count": 0
+    }
+  },
+  "caveat": "Exact model-visible payload A/B under current documented PostToolUse replacement semantics. It excludes fixed prompts, hidden reasoning, provider caching/billing, and host compaction envelopes."
+}

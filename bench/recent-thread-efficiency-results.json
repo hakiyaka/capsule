@@ -1,0 +1,75 @@
+{
+  "source_audit": {
+    "threads": 20,
+    "sampled_turns": 103,
+    "tool_calls": 2258,
+    "failed_tool_calls": 157,
+    "capsule_calls": 1096,
+    "node_repl_calls": 1135,
+    "file_calls": 254,
+    "expand_calls": 498,
+    "repeated_exact_expand_signatures": 27,
+    "repeated_exact_expand_calls": 74,
+    "failed_full_command_string_calls": 14
+  },
+  "method": {
+    "baseline": "2,400-character exact pages after a selective file capsule.",
+    "treatment": "12,000-character explicit ranges and one-call selected skill/reference reads.",
+    "caveat": "Call and serialized-character exposure benchmark; not provider billing."
+  },
+  "summary": {
+    "cases": 3,
+    "baseline_calls": 35,
+    "treatment_calls": 5,
+    "weighted_call_reduction_percent": 85.71,
+    "baseline_chars": 85632,
+    "treatment_chars": 73826,
+    "weighted_char_reduction_percent": 13.79,
+    "safety_pass": true
+  },
+  "latest_fixes": {
+    "exact_read_fuse": {
+      "observed_baseline_calls": 74,
+      "treatment_ceiling_calls": 54,
+      "avoidable_calls_after_second_identical_read": 20,
+      "bounded_call_reduction_percent": 27.03,
+      "assumption": "The agent follows the hook warning after the second identical read in one mutation epoch."
+    },
+    "full_command_string_compatibility": {
+      "observed_failed_calls": 14,
+      "baseline_calls_per_success": 2,
+      "treatment_calls_per_success": 1,
+      "retry_call_reduction_percent": 50,
+      "safety": "Simple strings are tokenized; unquoted shell syntax is dispatched through an explicit platform shell."
+    }
+  },
+  "cases": [
+    {
+      "name": "explicit-exact-range",
+      "baseline_calls": 11,
+      "treatment_calls": 3,
+      "call_reduction_percent": 72.73,
+      "baseline_chars": 27982,
+      "treatment_chars": 26882,
+      "exact_complete": true
+    },
+    {
+      "name": "selected-skill-full-read",
+      "baseline_calls": 12,
+      "treatment_calls": 1,
+      "call_reduction_percent": 91.67,
+      "baseline_chars": 28825,
+      "treatment_chars": 23472,
+      "exact_complete": true
+    },
+    {
+      "name": "bare-source-full-read",
+      "baseline_calls": 12,
+      "treatment_calls": 1,
+      "call_reduction_percent": 91.67,
+      "baseline_chars": 28825,
+      "treatment_chars": 23472,
+      "exact_complete": true
+    }
+  ]
+}

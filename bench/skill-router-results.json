@@ -1,0 +1,147 @@
+{
+  "method": {
+    "scope": "Marginal specialist-skill metadata and route-result tokens; selected SKILL.md bodies cancel from both arms.",
+    "a": "Expose every direct specialist's metadata on every task.",
+    "b": "Expose one compact Capsule route result per task.",
+    "tokenizer": "o200k_base",
+    "exclusions": "System/plugin skills, selected skill bodies, provider caching, billing, and answer tokens."
+  },
+  "catalog": {
+    "virtualized": true,
+    "skills": 163,
+    "baseline_metadata_tokens_per_task": 26391
+  },
+  "summary": {
+    "tasks": 15,
+    "evaluated_tasks": 15,
+    "skipped_tasks": 0,
+    "top3_passes": 15,
+    "top3_accuracy_percent": 100.0,
+    "a_total_tokens": 395865,
+    "b_total_tokens": 2288,
+    "weighted_saving_percent": 99.42,
+    "average_route_tokens": 152.53
+  },
+  "cases": [
+    {
+      "query": "authorized Android APK reverse engineering",
+      "top3": [
+        "apk-reverse"
+      ],
+      "pass": true,
+      "route_tokens": 188
+    },
+    {
+      "query": "analyze a stripped Go binary",
+      "top3": [
+        "go-rust-reverse"
+      ],
+      "pass": true,
+      "route_tokens": 148
+    },
+    {
+      "query": "find SQL injection in a web API",
+      "top3": [
+        "hunt-sqli"
+      ],
+      "pass": true,
+      "route_tokens": 171
+    },
+    {
+      "query": "hunt an IDOR authorization flaw",
+      "top3": [
+        "hunt-idor"
+      ],
+      "pass": true,
+      "route_tokens": 132
+    },
+    {
+      "query": "audit OAuth account takeover",
+      "top3": [
+        "hunt-ato"
+      ],
+      "pass": true,
+      "route_tokens": 162
+    },
+    {
+      "query": "write a bug bounty vulnerability report",
+      "top3": [
+        "bug-bounty"
+      ],
+      "pass": true,
+      "route_tokens": 154
+    },
+    {
+      "query": "automate a browser with Playwright",
+      "top3": [
+        "playwright"
+      ],
+      "pass": true,
+      "route_tokens": 147
+    },
+    {
+      "query": "inspect and verify a PDF",
+      "top3": [
+        "pdf"
+      ],
+      "pass": true,
+      "route_tokens": 138
+    },
+    {
+      "query": "diagnose a hard performance regression bug",
+      "top3": [
+        "diagnosing-bugs"
+      ],
+      "pass": true,
+      "route_tokens": 143
+    },
+    {
+      "query": "audit a smart contract for DeFi vulnerabilities",
+      "top3": [
+        "web3-audit"
+      ],
+      "pass": true,
+      "route_tokens": 175
+    },
+    {
+      "query": "assess Active Directory security",
+      "top3": [
+        "windows-ad"
+      ],
+      "pass": true,
+      "route_tokens": 140
+    },
+    {
+      "query": "pentest IoT firmware",
+      "top3": [
+        "firmware-pentest"
+      ],
+      "pass": true,
+      "route_tokens": 115
+    },
+    {
+      "query": "reverse a .NET assembly",
+      "top3": [
+        "dotnet-reverse"
+      ],
+      "pass": true,
+      "route_tokens": 219
+    },
+    {
+      "query": "audit cloud IAM permissions",
+      "top3": [
+        "cloud-k8s"
+      ],
+      "pass": true,
+      "route_tokens": 142
+    },
+    {
+      "query": "build a pwn exploit chain",
+      "top3": [
+        "pwn-chain"
+      ],
+      "pass": true,
+      "route_tokens": 114
+    }
+  ]
+}

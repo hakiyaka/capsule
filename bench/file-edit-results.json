@@ -1,0 +1,43 @@
+{
+  "method": {
+    "baseline": "Traditional patch request, tiny success output, then one full-file verification read.",
+    "treatment": "Compact atomic edit tuples plus checksum/exact-capsule receipt; no redundant full reread.",
+    "scope": "Serialized model-visible characters, not provider billing or cached-input accounting."
+  },
+  "summary": {
+    "cases": 3,
+    "baseline_chars": 178086,
+    "treatment_chars": 5551,
+    "weighted_saving_percent": 96.88,
+    "safety_pass": true
+  },
+  "cases": [
+    {
+      "name": "single-medium",
+      "files": 1,
+      "baseline_patch_plus_full_verification_chars": 14678,
+      "transaction_request_plus_receipt_chars": 973,
+      "saving_percent": 93.37,
+      "committed": true,
+      "exact_capsules": true
+    },
+    {
+      "name": "multi-file",
+      "files": 5,
+      "baseline_patch_plus_full_verification_chars": 44231,
+      "transaction_request_plus_receipt_chars": 3605,
+      "saving_percent": 91.85,
+      "committed": true,
+      "exact_capsules": true
+    },
+    {
+      "name": "single-large",
+      "files": 1,
+      "baseline_patch_plus_full_verification_chars": 119177,
+      "transaction_request_plus_receipt_chars": 973,
+      "saving_percent": 99.18,
+      "committed": true,
+      "exact_capsules": true
+    }
+  ]
+}
