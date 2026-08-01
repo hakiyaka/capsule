@@ -913,6 +913,52 @@ function editDistance(left, right) {
   return row[b.length];
 }
 
+// Keep the no-SQLite catalog scan behavior close to the FTS5 porter tokenizer.
+// This is intentionally small and deterministic: it covers the common English
+// inflections that matter for local search without adding a dependency or
+// pretending to be a full linguistic stemmer.
+function stemSearchTerm(value) {
+  let term = String(value).toLowerCase();
+  if (term.length > 5 && term.endsWith("ies")) return `${term.slice(0, -3)}y`;
+  if (term.length > 5 && term.endsWith("ing")) term = term.slice(0, -3);
+  if (term.length > 4 && term.endsWith("ed")) term = term.slice(0, -2);
+  if (term.length > 4 && term.endsWith("es")) term = term.slice(0, -2);
+  if (term.length > 3 && term.endsWith("s")) term = term.slice(0, -1);
+  return term;
+}
+
+function fallbackSearchTokens(text) {
+  return tokenize(text).flatMap((token) => token.split(/[-_.]+/u).filter(Boolean));
+}
+
+function fallbackContentMatches(text, terms) {
+  const counts = new Map();
+  for (const token of fallbackSearchTokens(text)) {
+    const stem = stemSearchTerm(token);
+    counts.set(stem, (counts.get(stem) || 0) + 1);
+  }
+  return terms.reduce((sum, term) => sum + (counts.get(stemSearchTerm(term)) || 0), 0);
+}
+
+function correctedTermsFromVocabulary(terms, vocabulary) {
+  const candidates = [...new Set(vocabulary.map((term) => String(term).toLowerCase()))];
+  return terms.map((term) => {
+    if (term.length < 4 || candidates.includes(term)) return term;
+    let best = term;
+    let distance = term.length >= 8 ? 2 : 1;
+    for (const candidate of candidates) {
+      if (Math.abs(candidate.length - term.length) > distance) continue;
+      const score = editDistance(term, candidate);
+      if (score < distance) {
+        best = candidate;
+        distance = score;
+        if (score === 1) break;
+      }
+    }
+    return best;
+  });
+}
+
 function correctedTerms(database, terms) {
   if (!database || !terms.length) return terms;
   let vocabulary = [];
@@ -1041,6 +1087,27 @@ function searchIndex(args = {}) {
       }));
     }
 
+    if (!database && terms.length) {
+      // The portable catalog scan has no FTS vocabulary table.  Only attempt
+      // typo correction when the original query has no evidence at all, so a
+      // real substring or stem match is never rewritten speculatively.
+      const originalMatch = documents.some((document) => {
+        if (!documentMatchesFilters(document, args)) return false;
+        const archived = core.loadCapsule(document.capsule_id);
+        const lower = String(archived.text).toLowerCase();
+        return lower.includes(String(query).toLowerCase()) ||
+          fallbackContentMatches(archived.text, terms) > 0;
+      });
+      if (!originalMatch) {
+        const vocabulary = documents.flatMap((document) => {
+          const archived = core.loadCapsule(document.capsule_id);
+          return fallbackSearchTokens(`${document.title} ${archived.text}`);
+        });
+        const corrected = correctedTermsFromVocabulary(terms, vocabulary);
+        if (corrected.some((term, index) => term !== terms[index])) terms = corrected;
+      }
+    }
+
     const scored = [];
     const candidates = ranked.size ? [...ranked.keys()] : documents.map((document) => document.document_id);
     for (const documentId of candidates) {
@@ -1049,7 +1116,9 @@ function searchIndex(args = {}) {
       const archived = core.loadCapsule(document.capsule_id);
       const lower = archived.text.toLowerCase();
       const exact = lower.includes(String(query).toLowerCase());
-      const contentMatches = terms.reduce((sum, term) => sum + Math.min(20, lower.split(term).length - 1), 0);
+      const contentMatches = database
+        ? terms.reduce((sum, term) => sum + Math.min(20, lower.split(term).length - 1), 0)
+        : fallbackContentMatches(archived.text, terms);
       if (!ranked.size && !exact && !contentMatches) continue;
       const fused = ranked.get(documentId);
       const score = (fused ? fused.score * 1_000 : contentMatches) +
