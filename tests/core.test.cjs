@@ -195,6 +195,55 @@ test("smart_file bypasses low-token-density text when capsule overhead would reg
   fs.rmSync(workspace, { recursive: true, force: true });
 });
 
+test("smart_file replays unchanged large reads from a verified content hash", () => {
+  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-file-replay-"));
+  const file = path.join(workspace, "stable.log");
+  const lines = Array.from({ length: 700 }, (_, index) => `routine source line ${index + 1} remains stable`);
+  lines[511] = "FATAL FILE-REPLAY-NEEDLE: exact evidence";
+  const text = lines.join("\n");
+  fs.writeFileSync(file, text, "utf8");
+
+  const first = core.smartFile({ path: file, question: "FILE-REPLAY-NEEDLE", max_chars: 1_800 });
+  assert.equal(first.route, "capsule");
+  const second = core.smartFile({ path: file, question: "FILE-REPLAY-NEEDLE", max_chars: 1_800 });
+  assert.equal(second.route, "file-replay");
+  assert.equal(second.capturedChars, 0);
+  assert.match(second.response.capsule_id, /^cap_[a-f0-9]{16}$/);
+  assert.ok(core.renderOperation(second).length < core.renderOperation(first).length * 0.2);
+  assert.equal(core.loadCapsule(second.response.capsule_id).text, text);
+
+  const refreshed = core.smartFile({
+    path: file,
+    question: "FILE-REPLAY-NEEDLE",
+    max_chars: 1_800,
+    force_refresh: true,
+  });
+  assert.notEqual(refreshed.route, "file-replay");
+  fs.appendFileSync(file, "\nchanged after the verified replay", "utf8");
+  const changed = core.smartFile({ path: file, question: "FILE-REPLAY-NEEDLE", max_chars: 1_800 });
+  assert.notEqual(changed.route, "file-replay");
+  fs.rmSync(workspace, { recursive: true, force: true });
+});
+
+test("read_file_range returns a bounded exact page and replays it unchanged", () => {
+  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-file-range-"));
+  const file = path.join(workspace, "source.txt");
+  const text = Array.from({ length: 500 }, (_, index) => `source line ${index + 1}`).join("\n");
+  fs.writeFileSync(file, text, "utf8");
+
+  const first = core.readFileRange({ path: file, start_line: 200, end_line: 260 });
+  assert.equal(first.route, "file-range");
+  assert.match(first.response.excerpt, /200 \| source line 200/);
+  assert.match(first.response.excerpt, /260 \| source line 260/);
+  assert.doesNotMatch(first.response.excerpt, /1 \| source line 1/);
+  assert.match(first.response.exact_capsule_id, /^cap_[a-f0-9]{16}$/);
+
+  const second = core.readFileRange({ path: file, start_line: 200, end_line: 260 });
+  assert.equal(second.route, "file-replay");
+  assert.equal(second.response.capsule_id, first.response.exact_capsule_id);
+  fs.rmSync(workspace, { recursive: true, force: true });
+});
+
 test("smart_file covers three distant evidence terms", () => {
   const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-three-lines-"));
   const file = path.join(workspace, "distant.log");

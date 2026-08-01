@@ -6,7 +6,7 @@ Call one MCP tool named `capsule`. Select `action` and place all action-specific
 |---|---|---|
 | `run` | `command`, `args`, optional `cwd`, `query`, `profile` | One execution, adaptive compact output, exact archive |
 | `batch` | `commands[]`, optional `queries[]`, `concurrency` (1-8) | Parallel captures, auto-index, inline searches |
-| `file` | `path`; optional `operation`, `query`, `baseline_capsule_id`, edits, limits | Compact evidence, immutable-baseline edit, exact archive |
+| `file` | `path`; optional `operation`, `query`, `start_line`/`end_line`, `baseline_capsule_id`, edits, limits | Compact evidence, bounded exact range, content-hash replay, immutable-baseline edit, exact archive |
 | `project` | `operation: scan|query|impact|status|gc`; `root`, optional query/target, depth and cache limits | Incremental semantic index, task-conditioned impact cone, token-profit gate, exact proof, quota/LRU maintenance |
 | `index` | `path` or `content`; optional globs, gitignore, symlinks, chunk bounds | Persistent bounded file/content catalog |
 | `search` | `query` or `queries[]`; optional filters, timeline | Porter + trigram RRF, proximity, typo correction, staleness |
@@ -32,6 +32,14 @@ Call one MCP tool named `capsule`. Select `action` and place all action-specific
 | `doctor` | none | State, runtime, hooks, platform, and non-mutating skill-catalog checks |
 
 Legacy `command` and `ledger` actions map to `run` and `stats`.
+
+Automatic file reads use a bounded token-profit gate. An explicit
+`start_line`/`end_line` request emits one `file-range` page and an exact
+capsule, while a byte-identical repeat of a large automatic, bare, or range
+read emits only `route:"file-replay"` with its real `capsule_id` and
+`exact_expand:true`. Capsule rehashes the file before replaying, so edits or
+renames cannot reuse stale evidence. Use `force_refresh:true` or explicit
+`mode:"full"` for a deliberate literal reread.
 
 ## Adaptive command profiles
 

@@ -81,6 +81,13 @@ Verify the installation by calling the `capsule` tool:
 `fetch` requires `payload.url` or `payload.requests`. `expand` and `diff`
 require a real `payload.capsule_id` returned by an earlier Capsule result.
 
+`file` keeps literal access safe while avoiding repeated context transfer. A
+bounded `start_line`/`end_line` request returns one exact `file-range` page with
+an expandable capsule; an unchanged repeat of a large automatic, bare, or
+range read returns only a compact `file-replay` reference after a fresh
+SHA-256 check. Use `force_refresh:true` or explicit `mode:"full"` when a
+deliberate literal reread is required.
+
 `advisor` creates a compact task contract before expensive work: a cumulative
 tool-call/read budget, explicitly requested integration lanes, batching and
 verification steps, and a default of no worktree or subagent fan-out. The

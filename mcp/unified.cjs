@@ -474,11 +474,24 @@ function inspectFile(args = {}) {
   if (bareFileRead) {
     try {
       if (fs.statSync(resolvedPath).size <= bareFileLimit) {
-        return core.smartFile({ ...args, path: resolvedPath, question: "", mode: "full" });
+        return core.smartFile({
+          ...args,
+          path: resolvedPath,
+          question: "",
+          mode: "full",
+          replay_unchanged: true,
+        });
       }
     } catch {
       // Preserve the normal file error and recovery path below.
     }
+  }
+  const explicitRange = args.start_line != null || args.end_line != null;
+  if (explicitRange && !args.require_full && args.mode !== "full") {
+    return core.readFileRange({
+      ...args,
+      question: args.query || args.question,
+    });
   }
   if (args.require_full || args.mode === "full") {
     return core.smartFile({ ...args, question: args.query || args.question, mode: "full" });
@@ -2780,10 +2793,11 @@ function purge(args = {}) {
   const allowed = {
     index: [path.join(root, "index")],
     projects: [path.join(root, "projects")],
-    capsules: [path.join(root, "capsules"), path.join(root, "metadata"), path.join(root, "sources.json")],
+    capsules: [path.join(root, "capsules"), path.join(root, "metadata"), path.join(root, "sources.json"), path.join(root, "file-replays.json")],
     cache: [
       path.join(root, "index"), path.join(root, "projects"), path.join(root, "capsules"),
       path.join(root, "metadata"), path.join(root, "sources.json"), path.join(root, "result-futures"),
+      path.join(root, "file-replays.json"),
     ],
     jobs: [path.join(root, "jobs")],
     history: [path.join(root, "compat")],
@@ -2801,7 +2815,8 @@ function purge(args = {}) {
         resolved !== path.join(root, "jobs") && resolved !== path.join(root, "compat") &&
         resolved !== path.join(root, "hooks") && resolved !== path.join(root, "projects") &&
         resolved !== path.join(root, "capsules") && resolved !== path.join(root, "metadata") &&
-        resolved !== path.join(root, "sources.json") && resolved !== path.join(root, "result-futures")) {
+        resolved !== path.join(root, "sources.json") && resolved !== path.join(root, "result-futures") &&
+        resolved !== path.join(root, "file-replays.json")) {
       throw new Error(`refusing unsafe purge target: ${resolved}`);
     }
     if (fs.existsSync(resolved)) {

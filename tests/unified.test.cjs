@@ -522,6 +522,39 @@ test("bare source reads return files up to 32 KiB whole instead of forcing expan
     assert.equal(result.route, "passthrough");
     assert.equal(result.responseText, content);
     assert.equal(result.response, null);
+    const replay = await unified.dispatch({
+      action: "file",
+      payload: { path: target },
+    });
+    assert.equal(replay.route, "file-replay");
+    assert.equal(replay.response.exact_expand, true);
+    assert.equal(core.loadCapsule(replay.response.capsule_id).text, content);
+  } finally {
+    fs.rmSync(workspace, { recursive: true, force: true });
+  }
+});
+
+test("file action uses exact bounded ranges and content-hash replay", async () => {
+  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-unified-file-range-"));
+  const target = path.join(workspace, "large-source.js");
+  const content = Array.from({ length: 500 }, (_, index) => `const sourceLine${index + 1} = ${index + 1};`).join("\n");
+  fs.writeFileSync(target, content, "utf8");
+  try {
+    const first = await unified.dispatch({
+      action: "file",
+      payload: { path: target, start_line: 200, end_line: 260 },
+    });
+    assert.equal(first.route, "file-range");
+    assert.match(first.response.excerpt, /200 \| const sourceLine200/);
+    assert.match(first.response.excerpt, /260 \| const sourceLine260/);
+    assert.doesNotMatch(first.response.excerpt, /1 \| const sourceLine1/);
+
+    const second = await unified.dispatch({
+      action: "file",
+      payload: { path: target, start_line: 200, end_line: 260 },
+    });
+    assert.equal(second.route, "file-replay");
+    assert.equal(second.response.capsule_id, first.response.exact_capsule_id);
   } finally {
     fs.rmSync(workspace, { recursive: true, force: true });
   }

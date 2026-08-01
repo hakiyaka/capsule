@@ -39,6 +39,10 @@ const DEFAULT_CAPSULE_CACHE_BYTES = 512 * 1024 * 1024;
 const DEFAULT_CAPSULE_CACHE_ENTRIES = 10_000;
 const DEFAULT_CAPSULE_CACHE_TTL_DAYS = 180;
 const DEFAULT_CAPSULE_CACHE_MIN_RECENT = 256;
+const DEFAULT_FILE_REPLAY_MIN_CHARS = 1_600;
+const DEFAULT_FILE_REPLAY_ENTRIES = 512;
+const DEFAULT_FILE_RANGE_LINES = 80;
+const DEFAULT_FILE_RANGE_CHARS = 2_400;
 const SIGNAL_RE = /\b(error|fatal|exception|panic|failed?|warning|warn|todo|fixme|deprecated|security|denied|timeout)\b/i;
 const STRUCTURE_RE = /^(?:\s{0,3}#{1,6}\s|\s*(?:class|function|interface|enum|def|fn|func|struct|impl)\s+|\s*["'][^"']+["']\s*:)/;
 
@@ -152,6 +156,7 @@ function pathsForState() {
     sources: path.join(root, "sources.json"),
     ledger: path.join(root, "ledger.json"),
     resultFutures: path.join(root, "result-futures"),
+    fileReplays: path.join(root, "file-replays.json"),
   };
 }
 
@@ -973,14 +978,117 @@ function readFilePayload(args = {}) {
   }
   const text = buffer.toString("utf8");
   const maxChars = clampInt(args.max_chars, DEFAULT_MAX_CHARS, 800, MAX_RETURN_CHARS);
+  const contentHash = sha256(buffer);
   return {
     absolute,
     text,
     maxChars,
+    contentHash,
     details: {
       mtime: stat.mtime.toISOString(),
       requested_max_chars: maxChars,
+      sha256: contentHash,
+      bytes: buffer.length,
+      lines: normalizeLines(text).length,
     },
+  };
+}
+
+function fileReplayQuestion(args = {}) {
+  return String(args.question ?? args.query ?? "").trim();
+}
+
+function fileReplayKey(args, payload, mode, range = null) {
+  return sha256(JSON.stringify({
+    path: payload.absolute,
+    sha256: payload.contentHash,
+    mode,
+    question: fileReplayQuestion(args),
+    max_chars: payload.maxChars,
+    safety_ratio: args.safety_ratio == null ? null : Number(args.safety_ratio),
+    passthrough_chars: args.passthrough_chars == null ? null : Number(args.passthrough_chars),
+    range,
+  }));
+}
+
+function fileReplayStore(state) {
+  try {
+    const store = readJson(state.fileReplays, { version: 1, entries: {} });
+    return store && typeof store.entries === "object" && !Array.isArray(store.entries)
+      ? store
+      : { version: 1, entries: {} };
+  } catch {
+    // A corrupt optional index must never make a literal file unreadable.
+    return { version: 1, entries: {} };
+  }
+}
+
+function findFileReplay(args, payload, mode, range = null) {
+  if (mode === "full" || args.force_refresh === true) return null;
+  if (!range && payload.text.length < DEFAULT_FILE_REPLAY_MIN_CHARS) return null;
+  const state = ensureState();
+  const key = fileReplayKey(args, payload, mode, range);
+  const record = fileReplayStore(state).entries[key];
+  if (!record || record.sha256 !== payload.contentHash || !/^cap_[a-f0-9]{16}$/.test(String(record.capsule_id))) {
+    return null;
+  }
+  const files = capsuleFiles(record.capsule_id);
+  if (!fs.existsSync(files.raw) || !fs.existsSync(files.metadata)) return null;
+  let metadata;
+  try {
+    metadata = readJson(files.metadata, null);
+  } catch {
+    return null;
+  }
+  if (!metadata || metadata.sha256 !== payload.contentHash) return null;
+  return { ...record, key };
+}
+
+function rememberFileReplay(args, payload, mode, capsuleId, range = null, visibleChars = 0) {
+  if (mode === "full" || args.force_refresh === true) return;
+  if (!range && payload.text.length < DEFAULT_FILE_REPLAY_MIN_CHARS) return;
+  const state = ensureState();
+  const store = fileReplayStore(state);
+  const key = fileReplayKey(args, payload, mode, range);
+  const now = new Date().toISOString();
+  store.version = 1;
+  store.entries[key] = {
+    capsule_id: capsuleId,
+    path: payload.absolute,
+    sha256: payload.contentHash,
+    bytes: Buffer.byteLength(payload.text, "utf8"),
+    lines: normalizeLines(payload.text).length,
+    visible_chars: Math.max(0, Number(visibleChars) || 0),
+    created_at: store.entries[key]?.created_at || now,
+    last_seen_at: now,
+    ...(range ? { range } : {}),
+  };
+  const limit = clampInt(
+    process.env.CAPSULE_FILE_REPLAY_ENTRIES,
+    DEFAULT_FILE_REPLAY_ENTRIES,
+    16,
+    10_000
+  );
+  const entries = Object.entries(store.entries)
+    .sort((left, right) => String(right[1]?.last_seen_at || "").localeCompare(String(left[1]?.last_seen_at || "")));
+  for (const [entryKey] of entries.slice(limit)) delete store.entries[entryKey];
+  writeJsonAtomic(state.fileReplays, store);
+}
+
+function fileReplayOperation(record, payload, range = null) {
+  const response = {
+    route: "file-replay",
+    capsule_id: record.capsule_id,
+    exact_expand: true,
+    replayed: true,
+    proof: "unchanged sha256 + identical read request",
+    ...(range || {}),
+  };
+  response.saved_chars = Math.max(0, payload.text.length - JSON.stringify(response).length);
+  return {
+    response,
+    capturedChars: 0,
+    route: "file-replay",
   };
 }
 
@@ -1055,6 +1163,68 @@ function surveyFile(args = {}) {
   });
 }
 
+function readFileRange(args = {}) {
+  const payload = readFilePayload(args);
+  const lines = normalizeLines(payload.text);
+  const hasStart = args.start_line != null;
+  const hasEnd = args.end_line != null;
+  const requestedStart = hasStart ? clampInt(args.start_line, 1, 1, Math.max(1, lines.length)) : 1;
+  const rangeLines = clampInt(args.range_lines, DEFAULT_FILE_RANGE_LINES, 1, 1_000);
+  const start = requestedStart;
+  const requestedEnd = hasEnd
+    ? clampInt(args.end_line, start, start, Math.max(start, lines.length))
+    : Math.min(lines.length, start + rangeLines - 1);
+  const end = Math.max(start, Math.min(lines.length, requestedEnd));
+  const maxChars = clampInt(
+    args.range_max_chars ?? args.max_chars,
+    DEFAULT_FILE_RANGE_CHARS,
+    400,
+    MAX_RETURN_CHARS
+  );
+  const range = {
+    start_line: start,
+    end_line: end,
+    max_chars: maxChars,
+  };
+  const replay = findFileReplay(args, payload, "range", range);
+  if (replay) return fileReplayOperation(replay, payload, range);
+
+  const saved = saveCapsule({
+    kind: "file",
+    source: payload.absolute,
+    text: payload.text,
+    question: fileReplayQuestion(args),
+    maxChars,
+    details: { ...payload.details, read_range: range },
+  });
+  const page = expandAnchor({
+    capsule_id: saved.response.capsule_id,
+    start_line: start,
+    end_line: end,
+    max_chars: maxChars,
+  });
+  const operation = {
+    response: {
+      ...page.response,
+      route: "file-range",
+      path: payload.absolute,
+      exact_capsule_id: saved.response.capsule_id,
+    },
+    capturedChars: payload.text.length,
+    baselineText: payload.text,
+    route: "file-range",
+  };
+  rememberFileReplay(
+    args,
+    payload,
+    "range",
+    saved.response.capsule_id,
+    range,
+    JSON.stringify(operation.response).length
+  );
+  return operation;
+}
+
 function smartFile(args = {}) {
   const payload = readFilePayload(args);
   const mode = args.mode || (args.require_full ? "full" : "auto");
@@ -1069,11 +1239,33 @@ function smartFile(args = {}) {
     0,
     16 * 1024 * 1024
   );
+  const replayMode = args.replay_unchanged === true && mode === "full" ? "full-replay" : mode;
+  const replay = findFileReplay(args, payload, replayMode);
+  if (replay) return fileReplayOperation(replay, payload);
   if (mode === "full") {
     const encoded = encodeLineDictionary(payload.text);
-    return tokenSafe(payload.text, encoded, safetyRatio)
+    const operation = tokenSafe(payload.text, encoded, safetyRatio)
       ? lossless(payload.text, encoded, payload.details)
       : passthrough(payload.text, payload.details);
+    if (replayMode === "full-replay" && payload.text.length >= DEFAULT_FILE_REPLAY_MIN_CHARS) {
+      const saved = saveCapsule({
+        kind: "file",
+        source: payload.absolute,
+        text: payload.text,
+        question: fileReplayQuestion(args),
+        maxChars: payload.maxChars,
+        details: payload.details,
+      });
+      rememberFileReplay(
+        args,
+        payload,
+        replayMode,
+        saved.response.capsule_id,
+        null,
+        renderOperation(operation).length
+      );
+    }
+    return operation;
   }
   if (mode === "auto" && payload.text.length <= passthroughChars) {
     return passthrough(payload.text, payload.details);
@@ -1096,6 +1288,14 @@ function smartFile(args = {}) {
       return passthrough(payload.text, payload.details);
     }
   }
+  rememberFileReplay(
+    args,
+    payload,
+    mode,
+    candidate.response.capsule_id,
+    null,
+    renderOperation(candidate).length
+  );
   return candidate;
 }
 
@@ -1592,6 +1792,7 @@ module.exports = {
   saveCapsule,
   smartCommand,
   resultFutureCommand,
+  readFileRange,
   smartFile,
   stateRoot,
   surveyCommand,
