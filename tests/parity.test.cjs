@@ -527,7 +527,7 @@ test("universal hard cap envelopes giant unknown-tool output with exact recovery
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-universal-hard-cap-"));
   const sessionFile = path.join(root, "normal.jsonl");
   writePressureSession(sessionFile, { input: 20_000, cached: 19_000 });
-  const output = Array.from({ length: 1_050_000 }, (_, index) =>
+  const output = Array.from({ length: 600_000 }, (_, index) =>
     String.fromCodePoint(0x4e00 + (index * 7919) % 20_000)
   ).join("");
   try {
@@ -2266,6 +2266,22 @@ test("pre-tool hook bounds self-contained subagent context while preserving depe
     session_id: "fork-guidance",
   });
   assert.equal(explicit.hookSpecificOutput.updatedInput.model, "gpt-5.6-luna");
+
+  const alreadyBounded = hook.handle("pretooluse", {
+    tool_name: "collaboration.spawn_agent",
+    tool_input: {
+      task_name: "already_bounded",
+      message: "Run the isolated check and return its result.",
+      model: "gpt-5.6-luna",
+      fork_turns: "none",
+    },
+    session_id: "fork-guidance",
+  });
+  assert.equal(alreadyBounded.hookSpecificOutput?.updatedInput, undefined);
+  assert.doesNotMatch(
+    alreadyBounded.hookSpecificOutput?.additionalContext || "",
+    /subagent model|bounded_fork|history-dependent/i
+  );
 });
 
 test("automatic hooks do not persist raw user prompts without explicit opt-in", async () => {

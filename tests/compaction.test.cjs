@@ -128,6 +128,34 @@ test("context pressure predicts runway and escalates before context or quota exh
   }
 });
 
+test("large compaction replacement history tightens the next-turn policy", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-replacement-pressure-"));
+  const file = path.join(root, "replacement.jsonl");
+  try {
+    writeJsonl(file, [
+      usage(20_000, 19_000, 100, 20, 20_000, 100, 20, 200_000),
+      {
+        timestamp: new Date().toISOString(),
+        type: "compacted",
+        payload: {
+          window_number: 1,
+          replacement_history: [{ role: "assistant", content: "x".repeat(200_000) }],
+        },
+      },
+      usage(22_000, 21_000, 100, 20, 42_000, 200, 40, 200_000),
+    ]);
+    const result = compaction.contextPressure({ session_file: file }).response;
+    assert.ok(result.latest_replacement_history_chars >= 200_000);
+    assert.ok(result.recent_replacement_history_chars >= 200_000);
+    assert.equal(result.latest_replacement_history_items, 1);
+    assert.equal(result.mode, "high");
+    assert.equal(result.policy.tool_trigger_chars, 3_000);
+    assert.match(result.reasons.join(" "), /replacement history/i);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("context pressure mechanically tightens budgets when the uncached suffix is costly", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-roundtrip-pressure-"));
   const taxedFile = path.join(root, "taxed.jsonl");

@@ -18,7 +18,10 @@ All notable user-visible changes are recorded here.
   repeat, duplicate-output, compaction, and fan-out telemetry without
   persisting transcript text or modifying session files.
 - Added a universal exact-recoverable hard cap for giant non-failed tool
-  results, covering unknown tool semantics at 1,000,000 characters by default.
+  results, covering unknown tool semantics at 512,000 characters by default.
+- Added replacement-history pressure detection: large compaction handoffs now
+  tighten the next-turn policy before output and subagent fan-out can multiply
+  the same context again.
 - Added native Codex lifecycle hooks, a reversible capability airlock, and
   native-editor preference for bounded text changes.
 - Added the automatic Advisor contract: bounded cumulative tool/read budgets,

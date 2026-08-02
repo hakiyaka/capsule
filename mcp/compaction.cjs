@@ -495,6 +495,9 @@ function contextPressure(args = {}) {
   const compactionTimes = [];
   let retainedImageItems = 0;
   let retainedImageSerializedChars = 0;
+  let latestReplacementHistoryChars = 0;
+  let latestReplacementHistoryItems = 0;
+  let recentReplacementHistoryChars = 0;
   let usageSamples = [];
   let cacheSamples = [];
   for (const record of records) {
@@ -535,6 +538,9 @@ function contextPressure(args = {}) {
       ? record.payload.replacement_history
       : [];
     const serialized = JSON.stringify(replacement);
+    latestReplacementHistoryChars = serialized.length;
+    latestReplacementHistoryItems = replacement.length;
+    recentReplacementHistoryChars += serialized.length;
     const typedImages = (serialized.match(/"type"\s*:\s*"input_image"/g) || []).length;
     const dataImages = serialized.match(/data:image\/[^"\\\s]+/gi) || [];
     retainedImageItems = Math.max(typedImages, dataImages.length);
@@ -649,6 +655,16 @@ function contextPressure(args = {}) {
     );
   }
   if (retainedImageItems > 0) escalate("emergency", "retained-image payload");
+  if (latestReplacementHistoryChars >= 512_000) {
+    escalate("critical", "large compaction replacement history");
+  } else if (latestReplacementHistoryChars >= 128_000) {
+    escalate("high", "large compaction replacement history");
+  }
+  if (recentReplacementHistoryChars >= 1_000_000) {
+    escalate("critical", "compaction replacement churn");
+  } else if (recentReplacementHistoryChars >= 256_000) {
+    escalate("high", "compaction replacement churn");
+  }
   if (lastPostCompactionPercent >= 65) escalate("emergency", "high post-compaction occupancy");
   if (compactionsLast30m >= 2) escalate("emergency", "compaction thrash within 30 minutes");
   if (usedPercent >= 80) escalate("critical", "context occupancy >=80%");
@@ -677,6 +693,9 @@ function contextPressure(args = {}) {
       recent_compactions: recentCompactions,
       compactions_last_30m: compactionsLast30m,
       last_post_compaction_percent: lastPostCompactionPercent,
+      latest_replacement_history_chars: latestReplacementHistoryChars,
+      latest_replacement_history_items: latestReplacementHistoryItems,
+      recent_replacement_history_chars: recentReplacementHistoryChars,
       retained_image_items: retainedImageItems,
       retained_image_serialized_chars: retainedImageSerializedChars,
       growth_tokens_per_observation: growthTokens,

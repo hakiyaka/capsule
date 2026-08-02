@@ -214,7 +214,7 @@ npm run benchmark:project
 Benchmarks report workload-specific measurements, not a universal savings
 guarantee. See [BENCHMARK.md](BENCHMARK.md).
 
-Every non-failed tool result also has a default 1,000,000-character universal
+Every non-failed tool result also has a default 512,000-character universal
 hard cap. An incompressible giant result becomes a short, redacted evidence
 envelope with an exact local capsule, even when the tool's mutation semantics
 are unknown. Change the bound with `CAPSULE_UNIVERSAL_HARD_CAP_CHARS` or

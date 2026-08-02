@@ -2576,6 +2576,11 @@ function subagentForkPolicy(input, toolInput, forkTurns) {
     };
   }
 
+  // An explicitly bounded, explicitly modelled fork needs no explanatory
+  // prompt injection. Returning an empty hook result avoids paying for the
+  // same policy sentence on every routine subagent call.
+  if (explicitModel && explicitlyBounded) return {};
+
   return {
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
@@ -2946,7 +2951,7 @@ function postToolUseCore(input) {
     const universalHardCap = process.env.CAPSULE_UNIVERSAL_HARD_CAP !== "0" &&
       visibleOutput.length > (Number.isFinite(configuredUniversalCap)
         ? Math.min(4_000_000, Math.max(64_000, Math.trunc(configuredUniversalCap)))
-        : 1_000_000);
+        : 512_000);
     const absoluteEligible = process.env.CAPSULE_ABSOLUTE_OUTPUT !== "0" &&
       isReplayEligibleTool(input, name) &&
       !isFailedToolResult(input, output) &&

@@ -10,7 +10,7 @@ const DEFAULT_MAX_BYTES = 512 * 1024 * 1024 * 1024;
 const MAX_TOP_ENTRIES = 32;
 const MAX_TRACKED_HASHES_PER_SESSION = 50_000;
 const HASH_SAMPLE_CHARS = 4_096;
-const UNIVERSAL_HARD_CAP_CHARS = 1_000_000;
+const UNIVERSAL_HARD_CAP_CHARS = 512_000;
 const SIGNAL_RE = /\b(error|exception|fatal|fail(?:ed|ure)?|panic|security|timeout|traceback|warn(?:ing)?)\b/ig;
 const TOOL_RE = /[\\/]/;
 
@@ -625,6 +625,7 @@ function scanHistory(args = {}) {
       tool_output_records: aggregate.tool_output_records,
       large_output_records: aggregate.large_output_records,
       huge_output_records: aggregate.huge_output_records,
+      universal_hard_cap_chars: UNIVERSAL_HARD_CAP_CHARS,
       hard_cap_candidate_chars: aggregate.hard_cap_candidate_chars,
       approx_tool_output_tokens: Math.ceil(aggregate.tool_output_chars / 4),
     },
