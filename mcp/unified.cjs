@@ -1847,7 +1847,7 @@ const AIRLOCK_PROJECT_RULE =
 const AIRLOCK_AGENTS_RULES = [
   AIRLOCK_PROJECT_RULE,
   "- Sinirli metin duzenlemede mevcutsa native `apply_patch|Write|Edit|Update` kullan; gecici Python/PowerShell/Node scripti kullanma. Bulk/uretim/formatter/migration/binary/medya veya native arac yoksa shell serbesttir. Codex'i yalniz kullanici bu tur acikca isterse yeniden baslat.",
-  "- Her gorev basinda Capsule `skills.route`u literal istegini koruyan kisa Ingilizce sorguyla cagir; istenmeyen alan/teknoloji/cikti turu ekleme ve yalniz ilk `skill_file`i oku. Eslesme yoksa yerel calis. Capsule gorunmez veya bu turda hata verirse kesfet ve bir kez yeniden dene; denemeden `erisilemedi` deme; onceki tur hatasini tasima. Yalniz guncel deneme basarisizsa `Capsule bu turun arac listesine yuklenmedi` de; dahili ad veya genel urun iddiasi kullanma. `fetch` icin gercek `payload.url|requests`; `expand|diff` onceki gercek `payload.capsule_id` ister; kimlik uydurma.",
+  "- Her gorev basinda Capsule action=skills, payload.operation=route bicimini ve literal istegini koruyan kisa Ingilizce sorguyu kullan; istenmeyen alan/teknoloji/cikti turu ekleme ve yalniz ilk `skill_file`i oku. Eslesme yoksa yerel calis. Capsule gorunmez veya bu turda hata verirse kesfet ve bir kez yeniden dene; denemeden `erisilemedi` deme; onceki tur hatasini tasima. Yalniz guncel deneme basarisizsa `Capsule bu turun arac listesine yuklenmedi` de; dahili ad veya genel urun iddiasi kullanma. `fetch` icin gercek `payload.url|requests`; `expand|diff` onceki gercek `payload.capsule_id` ister; kimlik uydurma.",
   "- Ana gorevin modelini alt ajan yonlendirmesi icin degistirme; kullanicinin model secimini aynen koru.",
   "- Rutin alt gorevleri Capsule `action=cognition`, `operation=delegate` ile gercek `gpt-5.6-luna` uzerinde calistir; karmasik veya yuksek riskli islerde `model=gpt-5.6-terra` kullan. `collaboration.spawn_agent` Luna'yi acik model olarak desteklemediginden Luna gerektiren islerde onu kullanma.",
 ];
@@ -3194,6 +3194,12 @@ async function runFlow(args = {}) {
 }
 
 async function dispatch(rawArgs = {}) {
+  // Normalize the legacy dotted form so routers do not burn a retry on a shape error.
+  if (typeof rawArgs.action === "string" && /^skills\.[a-z][a-z0-9-]*$/i.test(rawArgs.action)) {
+    const operation = rawArgs.action.slice("skills.".length);
+    const payload = rawArgs.payload && typeof rawArgs.payload === "object" ? rawArgs.payload : {};
+    rawArgs = { ...rawArgs, action: "skills", payload: { ...payload, operation: payload.operation || operation } };
+  }
   const args = unpack(rawArgs);
   switch (args.action) {
     case "run": return runCommand(args);

@@ -661,6 +661,14 @@ test("remember is searchable and stats report standalone operation", async () =>
   assert.ok(stats.response.index.documents >= 1);
 });
 
+test("skills.route dotted compatibility alias normalizes to the canonical operation", async () => {
+  const routed = await unified.dispatch({
+    action: "skills.route",
+    payload: { query: "route the relevant specialist for this task" },
+  });
+  assert.equal(routed.response.operation, "route");
+});
+
 test("skills route selects the matching live specialist without moving the catalog", async () => {
   const previousCodexHome = process.env.CODEX_HOME;
   const codexHome = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-skill-route-"));

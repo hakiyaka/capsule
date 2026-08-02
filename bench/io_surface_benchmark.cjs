@@ -192,7 +192,9 @@ function schemaCase() {
     a_v0_9_contract_chars: previousMeasuredContractChars,
     b_current_contract_chars: current,
     saving_percent: percent(previousMeasuredContractChars, current),
-    action_count: schema[0].inputSchema.properties.action.enum.length,
+    action_count: Array.isArray(schema.actions)
+      ? schema.actions.length
+      : schema[0]?.inputSchema?.properties?.action?.enum?.length || 0,
   };
 }
 

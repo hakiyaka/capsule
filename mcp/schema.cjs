@@ -33,5 +33,5 @@ const tools = [
 // Array properties are not serialized by JSON.stringify, so the complete
 // catalog stays available to local validation without entering tools/list.
 tools.actions = actions;
-tools.instructions = "Start advisor.plan then skills.route; batch independent work; project=code; flow=batch; expand/diff use prior capsule_id.";
+tools.instructions = "Start advisor.plan; skills via action=skills,payload.operation=route; batch; project=code; flow=batch; expand/diff use capsule_id.";
 module.exports = tools;
