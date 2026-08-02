@@ -101,6 +101,7 @@
     "benchmark:guardrails:write": "node bench/guardrail_ab.cjs --write bench/guardrail-results.json",
     "benchmark:project": "node bench/project_compiler_ab.cjs",
     "benchmark:project:write": "node bench/project_compiler_ab.cjs --write bench/project-compiler-results.json",
+    "benchmark:refactor": "node bench/refactor_packet_ab.cjs",
     "benchmark:qpx": "node bench/quota_progress_exchange_ab.cjs",
     "benchmark:qpx:write": "node bench/quota_progress_exchange_ab.cjs --write bench/quota-progress-exchange-results.json",
     "benchmark:roundtrip-contract": "node bench/roundtrip_contract_ab.cjs --summary",

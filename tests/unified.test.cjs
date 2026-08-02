@@ -1186,7 +1186,8 @@ test("capability airlock removes static skill injection and still routes plugin 
     "---",
   ].join("\n"), "utf8");
   const beforeConfig = "model = \"gpt-5.6-sol\"\n";
-  const projectRule = "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|impact|scan|status|gc` kullan; ham dosyalari ancak exact kanit gerektiginde genislet.";
+  const projectRule = "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|refactor|impact|scan|status|gc` kullan; refactor icin sembol-hash etki konisini tercih et; ham dosyalari ancak exact kanit gerektiginde genislet.";
+  const legacyProjectRule = "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|impact|scan|status|gc` kullan; ham dosyalari ancak exact kanit gerektiginde genislet.";
   const beforeAgents = `# Existing rules\n\n- Preserve me.\n\n${projectRule}\n`;
   fs.writeFileSync(path.join(codexHome, "config.toml"), beforeConfig, "utf8");
   fs.writeFileSync(path.join(codexHome, "AGENTS.md"), beforeAgents, "utf8");
@@ -1221,6 +1222,7 @@ test("capability airlock removes static skill injection and still routes plugin 
     assert.match(activeAgents, /denemeden `erisilemedi` deme/);
     assert.match(activeAgents, /gercek `payload\.url\|requests`/);
     assert.match(activeAgents, /kimlik uydurma/);
+    assert.doesNotMatch(activeAgents, new RegExp(legacyProjectRule.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 
     const routed = await unified.dispatch({
       action: "skills",
@@ -1246,7 +1248,7 @@ test("capability airlock removes static skill injection and still routes plugin 
 test("capability airlock refresh preserves external AGENTS and config changes while renewing its managed block", async () => {
   const previousCodexHome = process.env.CODEX_HOME;
   const codexHome = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-airlock-refresh-"));
-  const projectRule = "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|impact|scan|status|gc` kullan; ham dosyalari ancak exact kanit gerektiginde genislet.";
+  const projectRule = "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|refactor|impact|scan|status|gc` kullan; refactor icin sembol-hash etki konisini tercih et; ham dosyalari ancak exact kanit gerektiginde genislet.";
   fs.writeFileSync(path.join(codexHome, "config.toml"), "model = \"gpt-5.6-sol\"\n", "utf8");
   fs.writeFileSync(path.join(codexHome, "AGENTS.md"), "# Existing rules\n\n- Preserve me.\n", "utf8");
   process.env.CODEX_HOME = codexHome;

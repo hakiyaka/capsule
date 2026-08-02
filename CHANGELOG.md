@@ -25,6 +25,9 @@ All notable user-visible changes are recorded here.
 - Added a bounded post-compaction memory ledger and one-shot forgetting probe;
   typed decisions, open work, verification, changed files, and exact Capsule
   IDs survive compaction without persisting raw prompts.
+- Added a refactor proof packet: warm scans reuse mtime/size metadata without
+  rereading unchanged bodies, while refactors receive only symbol spans,
+  hashes, dependency/importer cones, impacted tests, and an exact manifest.
 - Added native Codex lifecycle hooks, a reversible capability airlock, and
   native-editor preference for bounded text changes.
 - Added the automatic Advisor contract: bounded cumulative tool/read budgets,

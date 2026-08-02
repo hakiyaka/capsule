@@ -76,6 +76,12 @@ test("Project Compiler performs cold, warm, and incremental semantic scans", () 
     assert.equal(warm.response.cache_mode, "warm");
     assert.equal(warm.response.changed, 0);
     assert.equal(warm.response.reused, 4);
+    assert.equal(warm.response.metadata_reused, 4);
+    assert.equal(warm.response.hashed, 0);
+    const verified = project.scanProject({ root, fast_cache: false });
+    assert.equal(verified.response.cache_validation, "sha256");
+    assert.equal(verified.response.metadata_reused, 0);
+    assert.equal(verified.response.hashed, 4);
 
     fs.appendFileSync(
       path.join(root, "src", "math.js"),
@@ -86,8 +92,58 @@ test("Project Compiler performs cold, warm, and incremental semantic scans", () 
     assert.equal(incremental.response.cache_mode, "incremental");
     assert.equal(incremental.response.changed, 1);
     assert.equal(incremental.response.reused, 3);
+    assert.equal(incremental.response.metadata_reused, 3);
+    assert.equal(incremental.response.hashed, 1);
     assert.ok(project.loadIndex(fs.realpathSync(root).replace(/\\/g, "/"))
       .files["src/math.js"].symbols.some((symbol) => symbol.name === "roundTotal"));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("refactor proof packet carries symbol spans and hashes without code bodies", () => {
+  const root = fixture();
+  try {
+    const cold = project.dispatch({
+      operation: "refactor",
+      root,
+      target: "computeTotal",
+      depth: 2,
+      max_files: 8,
+      max_chars: 4_000,
+    });
+    assert.equal(cold.route, "project-refactor-proof");
+    assert.ok(cold.response.selected_files.some((file) => file.path === "src/math.js"));
+    assert.ok(cold.response.selected_files.some((file) => file.path === "src/main.js"));
+    assert.ok(cold.response.tests.some((file) => file.path === "tests/invoice.test.js"));
+    assert.ok(cold.response.selected_files.some((file) => file.symbols.some((symbol) => symbol.name === "computeTotal")));
+    assert.match(cold.responseText, /proof=hash\+span\+dependency-cone/);
+    assert.match(cold.responseText, /hash=[a-f0-9]{12}/);
+    assert.doesNotMatch(cold.responseText, /stable implementation note 200/);
+
+    const warm = project.dispatch({
+      operation: "refactor",
+      root,
+      target: "computeTotal",
+      depth: 2,
+      max_files: 8,
+      max_chars: 4_000,
+    });
+    assert.equal(warm.response.cache_mode, "warm");
+    assert.equal(warm.response.metadata_reused, 4);
+    assert.equal(warm.response.hashed, 0);
+    assert.match(warm.responseText, /metadata_reused=4; hashed=0/);
+    assert.equal(warm.response.profit_gate.baseline_kind, "symbol-hash-impact-manifest");
+
+    const bounded = project.dispatch({
+      operation: "refactor",
+      root,
+      target: "computeTotal",
+      max_chars: 2_000,
+      max_tokens: 64,
+    });
+    assert.ok(bounded.response.profit_gate.emitted_tokens <= 64);
+    assert.ok(bounded.responseText.length <= 2_000);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

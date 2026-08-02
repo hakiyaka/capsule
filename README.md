@@ -112,13 +112,20 @@ default, preventing a later folder switch or an overnight continuation from
 reusing stale evidence. Override the lease only when needed with
 `CAPSULE_ADVISOR_TASK_TTL_MS` (bounded to one minute through seven days).
 
-`project` supports `operation: scan|query|impact|status|gc`. A query incrementally
+`project` supports `operation: scan|query|refactor|impact|status|gc`. A query incrementally
 compiles symbols and resolved dependencies, selects a bounded task-specific
 impact cone, and returns exact-expandable evidence. If that packet would be
 larger than the selected raw files, Capsule passes the smaller raw evidence
-through instead. For `scan`, `query`, `impact`, and `status`, `payload.root`
+through instead. For `scan`, `query`, `refactor`, `impact`, and `status`, `payload.root`
 selects the codebase and responses expose its canonical form. Because `gc` is
 global, it rejects a root selector.
+
+`operation:refactor` is the delta-first path: unchanged files are reused by
+mtime/size metadata (use `fast_cache:false` or `CAPSULE_PROJECT_FAST_CACHE=0`
+for hash validation), and the model receives only symbol spans, content hashes,
+dependency/importer edges, impacted tests, and an exact manifest. It does not
+load full file bodies unless an anchor conflicts and the model explicitly
+expands the exact proof capsule.
 
 Project indexes are maintained with a 64-project, 256 MiB, 90-day LRU/TTL
 policy. Exact capsules use content-addressed gzip storage plus a
@@ -209,6 +216,7 @@ npm run audit:source
 npm run audit:public
 npm run benchmark
 npm run benchmark:project
+npm run benchmark:refactor
 ```
 
 Benchmarks report workload-specific measurements, not a universal savings

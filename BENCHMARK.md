@@ -272,6 +272,15 @@ This is input-context exposure, not provider billing or end-to-end answer qualit
 
 The forced-eager rows are sensitivity tests, not the deployment policy: repeatedly charging a nonzero schema against every tiny task creates local regressions. The installed selector avoids that route and returns exact passthrough for those cases.
 
+## Refactor proof packet A/B
+
+`npm run benchmark:refactor` compares the ordinary project evidence packet with
+the delta-first `operation:refactor` path. The latter exposes symbol spans,
+hashes, dependency/importer edges, impacted tests, and one exact manifest rather
+than repeating selected file bodies; its warm scan reuses unchanged mtime/size
+metadata and reports `hashed=0`. The result is target-specific input exposure,
+not a universal provider-token or billing claim.
+
 ## Historical workload audit
 
 A deep sample of 60 recent local root tasks contained 487 turns, 14,735 tool calls, 164.23 million tool-output characters, and 87 compactions. Tool output dominated assistant text by roughly 142:1. Its 28 `view_image` outputs occupied 24.44 million recorded session characters, and 156 of 190 sampled subagent spawns requested full-history forks.

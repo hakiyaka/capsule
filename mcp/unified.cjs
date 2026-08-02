@@ -1840,8 +1840,10 @@ function setStaticSkillInstructions(text, enabled) {
 
 const AIRLOCK_START = "<!-- capsule-capability-airlock:start -->";
 const AIRLOCK_END = "<!-- capsule-capability-airlock:end -->";
-const AIRLOCK_PROJECT_RULE =
+const AIRLOCK_PROJECT_RULE_LEGACY =
   "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|impact|scan|status|gc` kullan; ham dosyalari ancak exact kanit gerektiginde genislet.";
+const AIRLOCK_PROJECT_RULE =
+  "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|refactor|impact|scan|status|gc` kullan; refactor icin sembol-hash etki konisini tercih et; ham dosyalari ancak exact kanit gerektiginde genislet.";
 const AIRLOCK_AGENTS_RULES = [
   AIRLOCK_PROJECT_RULE,
   "- Sinirli metin duzenlemede mevcutsa native `apply_patch|Write|Edit|Update` kullan; gecici Python/PowerShell/Node scripti kullanma. Bulk/uretim/formatter/migration/binary/medya veya native arac yoksa shell serbesttir. Codex'i yalniz kullanici bu tur acikca isterse yeniden baslat.",
@@ -1850,8 +1852,16 @@ const AIRLOCK_AGENTS_RULES = [
   "- Rutin alt gorevleri Capsule `action=cognition`, `operation=delegate` ile gercek `gpt-5.6-luna` uzerinde calistir; karmasik veya yuksek riskli islerde `model=gpt-5.6-terra` kullan. `collaboration.spawn_agent` Luna'yi acik model olarak desteklemediginden Luna gerektiren islerde onu kullanma.",
 ];
 
+function canonicalizeAirlockProjectRule(text) {
+  return String(text || "")
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) => line === AIRLOCK_PROJECT_RULE_LEGACY ? AIRLOCK_PROJECT_RULE : line)
+    .join("\n");
+}
+
 function airlockAgentsBlock(text) {
-  const source = String(text || "").replace(/\r\n/g, "\n");
+  const source = canonicalizeAirlockProjectRule(text);
   const start = source.indexOf(AIRLOCK_START);
   const end = source.indexOf(AIRLOCK_END, start);
   const external = start >= 0 && end >= start
@@ -1863,7 +1873,7 @@ function airlockAgentsBlock(text) {
 }
 
 function addAirlockAgentsBlock(text) {
-  const source = String(text || "").replace(/\r\n/g, "\n");
+  const source = canonicalizeAirlockProjectRule(text);
   const block = airlockAgentsBlock(source);
   if (source.includes(AIRLOCK_START)) {
     const start = source.indexOf(AIRLOCK_START);

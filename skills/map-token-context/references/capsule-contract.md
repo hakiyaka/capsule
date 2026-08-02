@@ -7,7 +7,7 @@ Call one MCP tool named `capsule`. Select `action` and place all action-specific
 | `run` | `command`, `args`, optional `cwd`, `query`, `profile` | One execution, adaptive compact output, exact archive |
 | `batch` | `commands[]`, optional `queries[]`, `concurrency` (1-8) | Parallel captures, auto-index, inline searches |
 | `file` | `path`; optional `operation`, `query`, `start_line`/`end_line`, `baseline_capsule_id`, edits, limits | Compact evidence, bounded exact range, content-hash replay, immutable-baseline edit, exact archive |
-| `project` | `operation: scan|query|impact|status|gc`; `root`, optional query/target, depth and cache limits | Incremental semantic index, task-conditioned impact cone, token-profit gate, exact proof, quota/LRU maintenance |
+| `project` | `operation: scan|query|refactor|impact|status|gc`; `root`, optional query/target, depth and cache limits | Incremental semantic index, symbol-hash refactor cone, token-profit gate, exact proof, quota/LRU maintenance |
 | `index` | `path` or `content`; optional globs, gitignore, symlinks, chunk bounds | Persistent bounded file/content catalog |
 | `search` | `query` or `queries[]`; optional filters, timeline | Porter + trigram RRF, proximity, typo correction, staleness |
 | `remember` | `content`; optional `tag`, `title`, `source` | Persistent searchable memory |

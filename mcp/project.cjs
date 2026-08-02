@@ -556,13 +556,32 @@ function scanProject(args = {}) {
   const locations = projectPaths(root);
   const previous = loadIndex(root);
   const survey = walkProject(root, args);
+  const fastCache = args.fast_cache !== false && process.env.CAPSULE_PROJECT_FAST_CACHE !== "0";
   const files = {};
   let changed = 0;
   let reused = 0;
+  let metadataReused = 0;
+  let hashed = 0;
   for (const candidate of survey.files) {
+    const old = previous?.files?.[candidate.relative];
+    if (
+      fastCache &&
+      old &&
+      Number(old.bytes) === Number(candidate.size) &&
+      Number(old.mtime_ms) === Number(candidate.mtime_ms)
+    ) {
+      files[candidate.relative] = {
+        ...old,
+        bytes: candidate.size,
+        mtime_ms: candidate.mtime_ms,
+      };
+      reused += 1;
+      metadataReused += 1;
+      continue;
+    }
     const content = fs.readFileSync(candidate.absolute, "utf8");
     const contentHash = sha256(content);
-    const old = previous?.files?.[candidate.relative];
+    hashed += 1;
     if (old && old.hash === contentHash) {
       files[candidate.relative] = {
         ...old,
@@ -629,6 +648,9 @@ function scanProject(args = {}) {
     deleted,
     stats: index.stats,
     survey: index.survey,
+    cache_validation: fastCache ? "mtime+size" : "sha256",
+    metadata_reused: metadataReused,
+    hashed,
     exact: archived.response.capsule_id,
     cache_gc: projectGc,
   };
@@ -637,6 +659,243 @@ function scanProject(args = {}) {
     responseText: renderScanReceipt(response),
     capturedChars: archived.capturedChars,
     route: "project-compiler",
+  };
+}
+
+function fitRefactorText(text, maximumChars, maximumTokens) {
+  const source = String(text || "");
+  const characterBound = source.slice(0, Math.max(0, maximumChars));
+  if (core.estimateTokens(characterBound) <= maximumTokens) return characterBound;
+  let low = 0;
+  let high = characterBound.length;
+  let best = "";
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const candidate = characterBound.slice(0, middle);
+    if (core.estimateTokens(candidate) <= maximumTokens) {
+      best = candidate;
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
+  }
+  return best.trimEnd();
+}
+
+function refactorProject(args = {}) {
+  const root = resolveProjectRoot(args);
+  const scan = scanProject({
+    ...args,
+    root,
+    max_files: args.scan_max_files == null ? 50_000 : args.scan_max_files,
+  });
+  const index = loadIndex(root);
+  const target = String(args.target || args.query || args.question || "").trim();
+  if (!target) throw new Error("project refactor requires payload.target, query, or question");
+  const rawTerms = unique(tokenize(target), 32);
+  const terms = rawTerms.filter((term) => !QUERY_STOPWORDS.has(term));
+  const searchTerms = terms.length ? terms : rawTerms;
+  const symbolHits = [];
+  for (const file of Object.values(index.files)) {
+    for (const symbol of file.symbols) {
+      const name = symbol.name.toLowerCase();
+      const exact = searchTerms.some((term) => name === term);
+      const partial = searchTerms.some((term) => name.includes(term));
+      if (exact || partial) {
+        symbolHits.push({
+          path: file.path,
+          symbol,
+          score: (exact ? 40 : 18) + (symbol.kind === "function" ? 4 : 0),
+          exact,
+        });
+      }
+    }
+  }
+  const ranked = Object.values(index.files)
+    .map((file) => ({ file, ...scoreFile(target, searchTerms, file) }))
+    .sort((left, right) => right.score - left.score || left.file.path.localeCompare(right.file.path));
+  const seedLimit = integer(args.seed_limit, 4, 1, 12);
+  const seeds = unique([
+    ...symbolHits.filter((hit) => hit.exact).sort((left, right) => right.score - left.score).map((hit) => hit.path),
+    ...symbolHits.sort((left, right) => right.score - left.score).map((hit) => hit.path),
+    ...ranked.filter((item) => item.score > 0).map((item) => item.file.path),
+  ], seedLimit);
+  if (!seeds.length) throw new Error(`refactor target was not found in the semantic index: ${target}`);
+  const depth = integer(args.depth, 2, 0, 4);
+  const maximumFiles = integer(args.max_files, 12, 1, 48);
+  const direction = ["forward", "reverse", "both"].includes(args.direction)
+    ? args.direction
+    : "both";
+  const distances = cone(
+    index,
+    seeds,
+    depth,
+    direction,
+    Math.min(index.stats.files, Math.max(maximumFiles, maximumFiles * 4)),
+  );
+  const centrality = graphRanks(index, direction);
+  const hitByPath = new Map();
+  for (const hit of symbolHits) {
+    const prior = hitByPath.get(hit.path) || { score: 0, symbols: [] };
+    prior.score = Math.max(prior.score, hit.score);
+    prior.symbols.push(hit.symbol);
+    hitByPath.set(hit.path, prior);
+  }
+  const selectedPaths = [...distances.keys()]
+    .sort((left, right) => {
+      const leftHit = hitByPath.get(left)?.score || 0;
+      const rightHit = hitByPath.get(right)?.score || 0;
+      return distances.get(left) - distances.get(right)
+        || rightHit - leftHit
+        || (centrality.get(right) || 0) - (centrality.get(left) || 0)
+        || left.localeCompare(right);
+    })
+    .slice(0, maximumFiles);
+  const reverse = reverseEdges(index);
+  const selectedSet = new Set(selectedPaths);
+  const selected = selectedPaths.map((relative) => {
+    const file = index.files[relative];
+    const hitSymbols = hitByPath.get(relative)?.symbols || [];
+    const symbols = (hitSymbols.length ? hitSymbols : file.symbols.slice(0, 3))
+      .slice(0, 8)
+      .map((symbol) => ({
+        name: symbol.name,
+        kind: symbol.kind,
+        line: symbol.line,
+        end_line: symbol.end_line || symbol.line,
+        signature: symbol.signature,
+        ...(symbol.span_truncated ? { span_truncated: true } : {}),
+      }));
+    return {
+      path: relative,
+      hash: file.hash,
+      role: file.role,
+      language: file.language,
+      lines: file.lines,
+      via: distances.get(relative) === 0 ? "seed" : `graph:${distances.get(relative)}`,
+      symbols,
+      imports: (index.edges[relative] || []).slice(0, 12),
+      importers: (reverse[relative] || []).slice(0, 12),
+      centrality: Number((centrality.get(relative) || 0).toFixed(8)),
+    };
+  });
+  const tests = Object.values(index.files)
+    .filter((file) => file.role === "test")
+    .map((file) => {
+      const linked = (index.edges[file.path] || []).some((pathName) => selectedSet.has(pathName));
+      const mentions = searchTerms.some((term) => file.path.toLowerCase().includes(term) || file.terms.includes(term));
+      return { file, score: (linked ? 30 : 0) + (mentions ? 18 : 0) + (selectedSet.has(file.path) ? 20 : 0) };
+    })
+    .filter((item) => item.score > 0)
+    .sort((left, right) => right.score - left.score || left.file.path.localeCompare(right.file.path))
+    .slice(0, integer(args.max_tests, 6, 1, 16))
+    .map((item) => ({
+      path: item.file.path,
+      hash: item.file.hash,
+      score: item.score,
+      via: item.score >= 30 ? "dependency" : "term",
+    }));
+  const manifest = {
+    version: 1,
+    operation: "refactor",
+    root,
+    project_id: index.project_id,
+    target,
+    index_exact: scan.response.exact,
+    terms: searchTerms,
+    direction,
+    depth,
+    seeds,
+    files: selected,
+    tests,
+    guardrails: [
+      "edit only hash-matching files",
+      "use symbol line spans as anchors",
+      "run impacted tests before the full suite",
+      "expand exact evidence only when an anchor conflicts",
+    ],
+  };
+  const archived = core.saveCapsule({
+    kind: "project-refactor-plan",
+    source: `project-refactor:${root}:${sha256(target).slice(0, 16)}`,
+    text: JSON.stringify(manifest),
+    question: target,
+    maxChars: integer(args.archive_max_chars, 16_000, 1_000, 64_000),
+    details: {
+      project_id: index.project_id,
+      selected_files: selected.length,
+      tests: tests.length,
+    },
+  });
+  const maximumChars = integer(args.max_chars, 6_000, 800, 24_000);
+  const maximumTokens = integer(args.max_tokens, core.approxTokens(maximumChars), 64, 12_000);
+  const targetLabel = target.length <= 280 ? target : `${target.slice(0, 264)}…#${sha256(target).slice(0, 12)}`;
+  const fileLines = selected.map((file) => {
+    const symbols = file.symbols.map((symbol) => `${symbol.name}@${symbol.line}-${symbol.end_line}`).join(",") || "-";
+    const edges = [...file.imports, ...file.importers].slice(0, 8).join(",") || "-";
+    return `F: ${file.path} [${file.via};${file.role};hash=${file.hash.slice(0, 12)}] S=${symbols} E=${edges}`;
+  });
+  const testLine = tests.length
+    ? `T: ${tests.map((test) => `${test.path}[${test.hash.slice(0, 12)}]`).join(",")}`
+    : "T: no indexed impacted test; search explicitly before editing";
+  const candidateText = fitRefactorText([
+    `[Capsule refactor-plan v1; target=${JSON.stringify(targetLabel)}; cone=${selected.length}/${distances.size}; cache=${scan.response.cache_mode}]`,
+    `R: seeds=${seeds.join(",")}; direction=${direction}; depth=${depth}; metadata_reused=${scan.response.metadata_reused}; hashed=${scan.response.hashed}`,
+    ...fileLines,
+    testLine,
+    "G: edit only hash-matching anchors; run T first; expand exact capsule only on conflict; then full suite.",
+    `X: exact=${archived.response.capsule_id}; manifest_files=${selected.length}; proof=hash+span+dependency-cone`,
+  ].join("\n"), maximumChars, maximumTokens);
+  const baselineText = JSON.stringify({ target, files: selected, tests });
+  const baselineTokens = core.estimateTokens(baselineText);
+  const activationReserve = integer(args.activation_reserve_tokens, 48, 0, 1_000);
+  const profitable = core.tokenSafe(
+    baselineText,
+    candidateText,
+    Number(args.safety_ratio) || 0.98,
+    activationReserve,
+  );
+  const responseText = profitable
+    ? candidateText
+    : `[Capsule refactor-plan passthrough; target=${JSON.stringify(targetLabel)}; ` +
+      `exact=${archived.response.capsule_id}; files=${selected.length}; tests=${tests.length}; ` +
+      "expand exact manifest before editing.]";
+  const emittedTokens = core.estimateTokens(responseText);
+  const packet = {
+    operation: "refactor",
+    root,
+    project_id: index.project_id,
+    target,
+    cache_mode: scan.response.cache_mode,
+    changed: scan.response.changed,
+    reused: scan.response.reused,
+    metadata_reused: scan.response.metadata_reused,
+    hashed: scan.response.hashed,
+    seeds,
+    direction,
+    depth,
+    selected_files: selected,
+    tests,
+    exact: archived.response.capsule_id,
+    index_exact: scan.response.exact,
+    guardrails: manifest.guardrails,
+    profit_gate: {
+      profitable,
+      baseline_kind: "symbol-hash-impact-manifest",
+      baseline_tokens: baselineTokens,
+      emitted_tokens: emittedTokens,
+      avoided_tokens: Math.max(0, baselineTokens - emittedTokens),
+      avoided_ratio: baselineTokens
+        ? Number((Math.max(0, baselineTokens - emittedTokens) / baselineTokens).toFixed(4))
+        : 0,
+      activation_reserve_tokens: activationReserve,
+    },
+  };
+  return {
+    response: packet,
+    responseText,
+    capturedChars: JSON.stringify(manifest).length + archived.capturedChars,
+    route: "project-refactor-proof",
   };
 }
 
@@ -1300,6 +1559,7 @@ function dispatch(args = {}) {
   const operation = String(args.operation || (args.query || args.question ? "query" : "scan"));
   if (operation === "scan") return scanProject(args);
   if (operation === "query") return queryProject(args);
+  if (operation === "refactor") return refactorProject(args);
   if (operation === "impact") {
     if (!args.target && !args.query) throw new Error("project impact requires payload.target or query");
     return queryProject({
@@ -1336,7 +1596,7 @@ function dispatch(args = {}) {
       route: "project-cache-gc",
     };
   }
-  throw new Error("project operation must be scan, query, impact, status, or gc");
+  throw new Error("project operation must be scan, query, refactor, impact, status, or gc");
 }
 
 module.exports = {
@@ -1346,6 +1606,7 @@ module.exports = {
   loadIndex,
   maintainProjectCache,
   queryProject,
+  refactorProject,
   resolveProjectRoot,
   renderQueryPacket,
   scanProject,
