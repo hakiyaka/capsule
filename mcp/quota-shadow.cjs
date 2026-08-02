@@ -2,9 +2,9 @@
 
 const crypto = require("node:crypto");
 
-const DETAIL_RE = /\b(?:verbatim|exhaustive|complete|full(?:\s+report)?|line[- ]by[- ]line|word[- ]for[- ]word|ayrıntılı|detaylı|eksiksiz|satır\s+satır|kelimesi\s+kelimesine|tam\s+metin)\b/i;
-const DELTA_RE = /\b(?:status|current|active|again|same|confirm|verify|measure|how\s+much|why|restarted|şu\s+an|aktif|yeniden\s+başlattım|aynı|teyit|doğrula|ölç|ne\s+kadar|kaç|neden)\b/i;
-const ACTION_RE = /\b(?:implement|build|fix|edit|change|install|research|compare|test|benchmark|yap|düzelt|geliştir|kur|araştır|karşılaştır|ölç)\b/i;
+const DETAIL_RE = /\b(?:verbatim|exhaustive|complete|full(?:\s+report)?|line[- ]by[- ]line|word[- ]for[- ]word)\b/i;
+const DELTA_RE = /\b(?:status|current|active|again|same|confirm|verify|measure|how\s+much|why|restarted)\b/i;
+const ACTION_RE = /\b(?:implement|build|fix|edit|change|install|research|compare|test|benchmark)\b/i;
 
 function promptText(input) {
   if (typeof input === "string") return input;

@@ -763,7 +763,7 @@ function requiresLiteralShellOutput(input) {
     firstString(input, ["intent", "query", "prompt"]),
     firstString(toolInput, ["intent", "query", "description"]),
   ].join(" ");
-  return /\b(?:benchmark|performance|profil(?:e|ing)?|latency|duration|elapsed|timing|wall[ -]?time|verbatim|unabridged|raw output|full output|complete output|exact output)\b|(?:ham|tam|eksiksiz)\s+çıktı/iu.test(
+  return /\b(?:benchmark|performance|profil(?:e|ing)?|latency|duration|elapsed|timing|wall[ -]?time|verbatim|unabridged|raw output|full output|complete output|exact output)\b/iu.test(
     intent
   );
 }
@@ -2572,14 +2572,14 @@ function quote(value) {
 function subagentHistoryNeed(message) {
   const text = String(message || "").trim();
   if (!text) return "recent";
-  if (/\b(?:full|complete|entire)\s+(?:conversation|history|parent context)|\ball\s+(?:prior|previous)\s+(?:context|decisions?)|\bevery decision above\b|(?:tüm|tam)\s+(?:konuşma|geçmiş|bağlam)|yukarıdaki tüm kararlar|toda\s+la\s+(?:conversaci[oó]n|historia)|contexto\s+completo|todas\s+las\s+decisiones\s+anteriores|toute\s+la\s+(?:conversation|historique)|contexte\s+complet|toutes\s+les\s+d[eé]cisions\s+pr[eé]c[eé]dentes|(?:gesamte|vollst[aä]ndige)\s+(?:unterhaltung|verlauf|kontext)|alle\s+vorherigen\s+entscheidungen|(?:conversa|hist[oó]rico|contexto)\s+complet[oa]|todas\s+as\s+decis[oõ]es\s+anteriores|完整(?:对话|上下文)|全部历史|所有之前的决定|会話全体|完全な(?:履歴|コンテキスト)|以前のすべての決定|전체\s*(?:대화|기록|컨텍스트)|이전의\s*모든\s*결정|весь\s+диалог|полная\s+история|полный\s+контекст|все\s+предыдущие\s+решения|المحادثة\s+كاملة|السجل\s+الكامل|السياق\s+الكامل|كل\s+القرارات\s+السابقة|पूरी\s+बातचीत|पूरा\s+(?:इतिहास|संदर्भ)|पिछले\s+सभी\s+निर्णय/i.test(text)) {
+  if (/\b(?:full|complete|entire)\s+(?:conversation|history|parent context)|\ball\s+(?:prior|previous)\s+(?:context|decisions?)|\bevery decision above\b/i.test(text)) {
     return "full";
   }
-  if (/\b(?:above|earlier|previous|prior|conversation|parent context|this (?:task|request)|same (?:task|request)|continue|we discussed|user asked|fix it|do it|use that)\b|(?:yukarıdaki|önceki|geçmiş konuşma|bu görev|bu talep|devam et|konuştuğumuz|onu düzelt|bunu yap)|(?:arriba|anterior|contin[uú]a|esta tarea|lo hablamos)|(?:ci-dessus|pr[eé]c[eé]dent|continue|cette t[aâ]che)|(?:oben|vorherig|weiter|diese aufgabe)|(?:acima|anterior|continue|esta tarefa)|(?:上面的|之前的|继续|这个任务)|(?:上記|以前|続け|このタスク)|(?:위의|이전|계속|이 작업)|(?:выше|предыдущ|продолж|эту задачу)|(?:أعلاه|السابق|تابع|هذه المهمة)|(?:ऊपर|पिछल|जारी|यह कार्य)/i.test(text)) {
+  if (/\b(?:above|earlier|previous|prior|conversation|parent context|this (?:task|request)|same (?:task|request)|continue|we discussed|user asked|fix it|do it|use that)\b/i.test(text)) {
     return "recent";
   }
   if (text.length >= 80 ||
-      /\b(?:inspect|run|search|research|validate|test|summarize|implement|compare|audit|analy[sz]e|read|review|measure|design|find|check|build|inspecciona|ejecuta|busca|prueba|revisa|implementa|compara|inspecte|ex[eé]cute|recherche|teste|r[eé]sume|impl[eé]mente|compare|pr[uü]fe|f[uü]hre|suche|implementiere|vergleiche|inspecione|execute|pesquise|resuma|implemente)\b|(?:检查|运行|搜索|测试|总结|实现|比较|审查|検査|実行|検索|テスト|要約|実装|比較|レビュー|검사|실행|검색|테스트|요약|구현|비교|검토|проверь|запусти|найди|исследуй|тестируй|реализуй|сравни|افحص|شغّل|ابحث|اختبر|لخّص|نفّذ|قارن|जाँच|चलाएँ|खोजें|परीक्षण|सारांश|लागू|तुलना)/i.test(text) ||
+      /\b(?:inspect|run|search|research|validate|test|summarize|implement|compare|audit|analy[sz]e|read|review|measure|design|find|check|build)\b/i.test(text) ||
       /(?:[A-Za-z]:[\\/]|\/[\w.-]+\/|https?:\/\/|`[^`]+`)/.test(text)) {
     return "none";
   }
@@ -2589,7 +2589,7 @@ function subagentHistoryNeed(message) {
 function subagentModel(message, need) {
   const text = String(message || "");
   const terraRequired = need === "full" || text.length >= 1_200 ||
-    /\b(?:architecture|migration|production|security|incident|forensic|root cause|distributed|concurren|race condition|data loss|threat model|cryptograph|legal|medical|financial|cross-platform|end-to-end|mimari|ge[cç]i[sş]|ta[sş][ıi]ma|[üu]retim|g[üu]venlik|olay m[üu]dahalesi|k[öo]k neden|e[sş]zamanl[ıi]|veri kayb[ıi]|tehdit modeli)\b/i.test(text);
+    /\b(?:architecture|migration|production|security|incident|forensic|root cause|distributed|concurren|race condition|data loss|threat model|cryptograph|legal|medical|financial|cross-platform|end-to-end)\b/i.test(text);
   return terraRequired ? "gpt-5.6-terra" : "gpt-5.6-luna";
 }
 

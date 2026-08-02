@@ -1194,8 +1194,8 @@ test("capability airlock removes static skill injection and still routes plugin 
     "---",
   ].join("\n"), "utf8");
   const beforeConfig = "model = \"gpt-5.6-sol\"\n";
-  const projectRule = "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|refactor|impact|scan|status|gc` kullan; refactor icin sembol-hash etki konisini tercih et; ham dosyalari ancak exact kanit gerektiginde genislet.";
-  const legacyProjectRule = "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|impact|scan|status|gc` kullan; ham dosyalari ancak exact kanit gerektiginde genislet.";
+  const projectRule = "- For understanding a project or folder codebase, use `action=project`, `operation=query|refactor|impact|scan|status|gc`; prefer the symbol-hash impact cone for refactors; expand raw files only when exact evidence is required.";
+  const legacyProjectRule = "- For understanding a project or folder codebase, use `action=project`, `operation=query|impact|scan|status|gc`; expand raw files only when exact evidence is required.";
   const beforeAgents = `# Existing rules\n\n- Preserve me.\n\n${projectRule}\n`;
   fs.writeFileSync(path.join(codexHome, "config.toml"), beforeConfig, "utf8");
   fs.writeFileSync(path.join(codexHome, "AGENTS.md"), beforeAgents, "utf8");
@@ -1226,10 +1226,10 @@ test("capability airlock removes static skill injection and still routes plugin 
     assert.equal(plan.response.airlock_anchor_chars, managedBlock.length);
     assert.equal(plan.response.estimated_airlock_anchor_tokens_per_request, Math.ceil(managedBlock.length / 4));
     assert.equal(applied.response.airlock_anchor_chars, managedBlock.length);
-    assert.match(activeAgents, /onceki tur hatasini tasima/);
-    assert.match(activeAgents, /denemeden `erisilemedi` deme/);
-    assert.match(activeAgents, /gercek `payload\.url\|requests`/);
-    assert.match(activeAgents, /kimlik uydurma/);
+    assert.match(activeAgents, /do not carry forward the previous turn's error/);
+    assert.match(activeAgents, /do not claim unavailable without trying/);
+    assert.match(activeAgents, /real `payload\.url\|requests`/);
+    assert.match(activeAgents, /do not invent IDs/);
     assert.doesNotMatch(activeAgents, new RegExp(legacyProjectRule.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 
     const routed = await unified.dispatch({
@@ -1256,7 +1256,7 @@ test("capability airlock removes static skill injection and still routes plugin 
 test("capability airlock refresh preserves external AGENTS and config changes while renewing its managed block", async () => {
   const previousCodexHome = process.env.CODEX_HOME;
   const codexHome = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-airlock-refresh-"));
-  const projectRule = "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|refactor|impact|scan|status|gc` kullan; refactor icin sembol-hash etki konisini tercih et; ham dosyalari ancak exact kanit gerektiginde genislet.";
+  const projectRule = "- For understanding a project or folder codebase, use `action=project`, `operation=query|refactor|impact|scan|status|gc`; prefer the symbol-hash impact cone for refactors; expand raw files only when exact evidence is required.";
   fs.writeFileSync(path.join(codexHome, "config.toml"), "model = \"gpt-5.6-sol\"\n", "utf8");
   fs.writeFileSync(path.join(codexHome, "AGENTS.md"), "# Existing rules\n\n- Preserve me.\n", "utf8");
   process.env.CODEX_HOME = codexHome;
@@ -1291,8 +1291,8 @@ test("capability airlock refresh preserves external AGENTS and config changes wh
     const activeAgents = fs.readFileSync(path.join(codexHome, "AGENTS.md"), "utf8");
     assert.match(activeConfig, /\[custom\][\s\S]*keep = true/);
     assert.match(activeAgents, /Later user rule/);
-    assert.match(activeAgents, /literal istegini koruyan/);
-    assert.match(activeAgents, /bir kez yeniden dene/);
+    assert.match(activeAgents, /preserving the literal request/);
+    assert.match(activeAgents, /retry once/);
     assert.equal(activeAgents.split(projectRule).length - 1, 1);
     const managedStart = activeAgents.indexOf("<!-- capsule-capability-airlock:start -->");
     const managedEnd = activeAgents.indexOf("<!-- capsule-capability-airlock:end -->") +

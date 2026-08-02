@@ -33,7 +33,7 @@ const SECRET_RE = /\b(api[_-]?(?:key|token)|access[_-]?token|auth[_-]?token|auth
 const QUERY_STOPWORDS = new Set([
   "a", "an", "and", "are", "as", "at", "be", "by", "does", "for", "from", "how",
   "in", "is", "it", "of", "on", "or", "that", "the", "this", "to", "what", "where",
-  "which", "with", "ve", "bir", "bu", "icin", "için", "nasil", "nasıl", "nerede",
+  "which", "with", "where",
 ]);
 
 function integer(value, fallback, minimum, maximum) {

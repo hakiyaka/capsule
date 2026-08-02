@@ -281,7 +281,7 @@ test("compaction audit separates unreported generation cost from observable next
     assert.equal(result.observable_context.reduction_percent, 87.73);
     assert.equal(result.events.length, 2);
     assert.ok(result.events[0].replacement_history_chars > 2_000);
-    assert.match(result.caveat, /does not expose|not exposed|göster/i);
+    assert.match(result.caveat, /does not expose|not exposed|show/i);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

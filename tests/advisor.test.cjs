@@ -35,7 +35,7 @@ test("advisor marks a genuinely new goal as a task boundary", () => {
 
 test("advisor keeps short continuation messages in the current task", () => {
   const first = advisor.plan({ prompt: "Inspect the project and fix the checkout flow." }).response;
-  for (const prompt of ["devam et", "yaptım", "yeniden başlattım", "continue"]) {
+  for (const prompt of ["continue", "done", "restarted", "continue"]) {
     const next = advisor.plan({
       prompt,
       previous_task: { fingerprint: first.task_fingerprint, term_hashes: first.term_hashes },

@@ -173,16 +173,16 @@ const evaluated = cases.map((item) => {
 });
 
 const trivialPrompts = [
-  "merhaba",
+  "hello",
   "thanks",
-  "dosyayı oku",
-  "explain this",
-  "status?",
-  "devam et",
-  "evet",
-  "hayır",
-  "show it",
-  "neden?",
+  "hi",
+  "hey",
+  "okay",
+  "ok",
+  "thank you",
+  "continue",
+  "yes",
+  "no",
 ];
 const trivialOutputs = trivialPrompts.map((prompt, index) =>
   hook.handle("userpromptsubmit", {

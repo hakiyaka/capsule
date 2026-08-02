@@ -11,13 +11,11 @@ const compat = require("./compat.cjs");
 const STOP_WORDS = new Set([
   "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "in", "is", "it",
   "of", "on", "or", "the", "then", "this", "to", "with",
-  "ama", "bir", "bu", "da", "de", "icin", "için", "ile", "mi", "mı", "mu", "mü",
-  "ve", "veya",
 ]);
-const ESCROW_ACTION_RE = /\b(add|analy[sz]e|audit|build|change|check|create|debug|design|develop|edit|fix|implement|improve|inspect|install|optimi[sz]e|refactor|research|review|test|verify|yap|düzelt|duzelt|geliştir|gelistir|ekle|incele|kur|araştır|arastir|doğrula|dogrula|tasarla|değiştir|degistir)\b/iu;
-const ESCROW_BRANCH_RE = /\b(all scenarios|alternatives?|compare|decision|every(?:thing|where)|hypotheses|options?|trade-?offs?|devrim(?:sel)?|her şey|her sey|her türlü|her turlu|kıyasla|kiyasla|karşılaştır|karsilastir|çokça düşün|cokca dusun)\b/iu;
-const ESCROW_DETAIL_RE = /\b(exhaustive|full detail|in depth|long form|step by step|verbatim|ayrıntılı|ayrintili|detaylı|detayli|eksiksiz|tam metin|uzun anlat|adım adım|adim adim)\b/iu;
-const ESCROW_TRIVIAL_RE = /^(?:hi|hello|hey|thanks|thank you|ok|okay|merhaba|selam|teşekkürler|tesekkurler|tamam)[.!?\s]*$/iu;
+const ESCROW_ACTION_RE = /\b(add|analy[sz]e|audit|build|change|check|create|debug|design|develop|edit|fix|implement|improve|inspect|install|optimi[sz]e|refactor|research|review|test|verify)\b/iu;
+const ESCROW_BRANCH_RE = /\b(all scenarios|alternatives?|compare|decision|every(?:thing|where)|hypotheses|options?|trade-?offs?)\b/iu;
+const ESCROW_DETAIL_RE = /\b(exhaustive|full detail|in depth|long form|step by step|verbatim)\b/iu;
+const ESCROW_TRIVIAL_RE = /^(?:hi|hello|hey|thanks|thank you|ok|okay)[.!?\s]*$/iu;
 function sha256(value) {
   return crypto.createHash("sha256").update(String(value)).digest("hex");
 }
@@ -300,7 +298,7 @@ class ArithmeticParser {
 
 function arithmeticFromPrompt(prompt) {
   const match = String(prompt).match(
-    /(?:calculate|compute|evaluate|hesapla|işlemi çöz|islemi coz)\s*:?\s*([0-9eE+\-*/%^().\s]+?)(?:[?.!]|$)/iu
+    /(?:calculate|compute|evaluate)\s*:?\s*([0-9eE+\-*/%^().\s]+?)(?:[?.!]|$)/iu
   );
   if (!match) return null;
   const expression = match[1].trim();
@@ -320,13 +318,13 @@ function arithmeticFromPrompt(prompt) {
 function inferredOperation(prompt) {
   const text = String(prompt).toLocaleLowerCase("en-US");
   const rules = [
-    ["assign", /\b(assign|assignment|matching|allocate|allocation|personnel to tasks|ajan ata|gorev ata|eslestir)\b/u],
-    ["knapsack", /\b(knapsack|budget constraint|within budget|maximum value subset|portfolio selection|butce icinde)\b/u],
-    ["path", /\b(shortest path|cheapest route|minimum cost path|en kisa yol|en ucuz rota)\b/u],
-    ["decision", /\b(compare|choose|select|option|alternative|criteria|trade-?off|karşılaştır|karsilastir|seç|sec|alternatif|kriter)\b/u],
-    ["dag", /\b(dependenc|parallel|sequence|order|critical path|schedule|bağımlılık|bagimlilik|paralel|sırala|sirala)\b/u],
-    ["cover", /\b(minimum set|fewest|cover all|all requirements|kanıt kümesi|kanit kumesi|en az araç|en az arac)\b/u],
-    ["hypotheses", /\b(diagnos|root cause|hypothes|next check|information gain|kök neden|kok neden|hipotez|sonraki kontrol)\b/u],
+    ["assign", /\b(assign|assignment|matching|allocate|allocation|personnel to tasks)\b/u],
+    ["knapsack", /\b(knapsack|budget constraint|within budget|maximum value subset|portfolio selection)\b/u],
+    ["path", /\b(shortest path|cheapest route|minimum cost path)\b/u],
+    ["decision", /\b(compare|choose|select|option|alternative|criteria|trade-?off)\b/u],
+    ["dag", /\b(dependenc|parallel|sequence|order|critical path|schedule)\b/u],
+    ["cover", /\b(minimum set|fewest|cover all|all requirements)\b/u],
+    ["hypotheses", /\b(diagnos|root cause|hypothes|next check|information gain)\b/u],
   ];
   return rules.find(([, pattern]) => pattern.test(text))?.[0] || "";
 }
@@ -1548,7 +1546,7 @@ function delegateModel(prompt, requested) {
     return requested;
   }
   const complex = String(prompt || "").length >= 1_200 ||
-    /\b(?:architecture|migration|production|security|incident|forensic|root cause|distributed|concurren|race condition|data loss|threat model|cryptograph|legal|medical|financial|cross-platform|end-to-end|mimari|ge[cç]i[sş]|ta[sş][ıi]ma|[üu]retim|g[üu]venlik|k[öo]k neden|e[sş]zamanl[ıi]|veri kayb[ıi]|tehdit modeli)\b/i.test(String(prompt || ""));
+    /\b(?:architecture|migration|production|security|incident|forensic|root cause|distributed|concurren|race condition|data loss|threat model|cryptograph|legal|medical|financial|cross-platform|end-to-end)\b/i.test(String(prompt || ""));
   return complex ? "gpt-5.6-terra" : "gpt-5.6-luna";
 }
 

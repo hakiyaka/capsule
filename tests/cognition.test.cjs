@@ -18,11 +18,11 @@ test.after(() => {
 });
 
 test("compile emits no context for trivial prompts and resolves bounded arithmetic with a certificate", () => {
-  const trivial = cognition.compile({ prompt: "merhaba" });
+  const trivial = cognition.compile({ prompt: "hello" });
   assert.equal(trivial.response.mode, "bypass");
   assert.equal(trivial.response.context, "");
 
-  const resolved = cognition.compile({ prompt: "Hesapla: ((144 / 12) + 7) * 3" });
+  const resolved = cognition.compile({ prompt: "Calculate: ((144 / 12) + 7) * 3" });
   assert.equal(resolved.response.mode, "resolved");
   assert.equal(resolved.response.answer, "57");
   assert.equal(resolved.response.certificate.solver, "arithmetic-v1");
@@ -30,7 +30,7 @@ test("compile emits no context for trivial prompts and resolves bounded arithmet
 });
 
 test("pre-spend token escrow budgets the first generation without constraining explicit detail", () => {
-  const trivial = cognition.planEscrow({ prompt: "merhaba" }).response;
+  const trivial = cognition.planEscrow({ prompt: "hello" }).response;
   assert.equal(trivial.active, false);
   assert.equal(trivial.context, "");
 
@@ -455,7 +455,7 @@ test("UserPromptSubmit injects token escrow and cognition only when they predict
   assert.deepEqual(hook.handle("userpromptsubmit", {
     cwd: process.cwd(),
     session_id: "cognition-trivial",
-    prompt: "merhaba",
+    prompt: "hello",
   }), {});
 
   const branchy = hook.handle("userpromptsubmit", {
@@ -474,7 +474,7 @@ test("UserPromptSubmit injects token escrow and cognition only when they predict
   const arithmetic = hook.handle("userpromptsubmit", {
     cwd: process.cwd(),
     session_id: "cognition-arithmetic",
-    prompt: "Hesapla: (250 * 4) - 37",
+    prompt: "Calculate: (250 * 4) - 37",
   });
   assert.match(arithmetic.hookSpecificOutput.additionalContext, /963/);
   assert.match(arithmetic.hookSpecificOutput.additionalContext, /certificate/i);

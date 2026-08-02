@@ -2314,28 +2314,28 @@ test("pre-tool hook bounds self-contained subagent context while preserving depe
   assert.equal(recent.hookSpecificOutput.updatedInput.fork_turns, "3");
   assert.equal(recent.hookSpecificOutput.updatedInput.model, "gpt-5.6-luna");
 
-  const multilingualIndependent = hook.handle("pretooluse", {
+  const englishIndependent = hook.handle("pretooluse", {
     tool_name: "collaboration.spawn_agent",
     tool_input: {
-      task_name: "buscar_pruebas",
-      message: "Busca las pruebas fallidas y devuelve sus nombres.",
+      task_name: "find_failed_tests",
+      message: "Find the failed tests and return their names.",
       fork_turns: "all",
     },
     session_id: "fork-guidance",
   });
-  assert.equal(multilingualIndependent.hookSpecificOutput.updatedInput.fork_turns, "none");
-  assert.equal(multilingualIndependent.hookSpecificOutput.updatedInput.model, "gpt-5.6-luna");
+  assert.equal(englishIndependent.hookSpecificOutput.updatedInput.fork_turns, "none");
+  assert.equal(englishIndependent.hookSpecificOutput.updatedInput.model, "gpt-5.6-luna");
 
-  const multilingualFull = hook.handle("pretooluse", {
+  const englishFull = hook.handle("pretooluse", {
     tool_name: "collaboration.spawn_agent",
     tool_input: {
-      task_name: "continuer_historique",
-      message: "Utilise toute la conversation et toutes les décisions précédentes.",
+      task_name: "continue_full_history",
+      message: "Use the full conversation and all previous decisions.",
       fork_turns: "all",
     },
     session_id: "fork-guidance",
   });
-  assert.equal(multilingualFull.hookSpecificOutput.updatedInput.model, "gpt-5.6-terra");
+  assert.equal(englishFull.hookSpecificOutput.updatedInput.model, "gpt-5.6-terra");
 
   const explicit = hook.handle("pretooluse", {
     tool_name: "collaboration.spawn_agent",

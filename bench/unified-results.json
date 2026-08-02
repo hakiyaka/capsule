@@ -497,7 +497,7 @@
       "missing_evidence": []
     },
     {
-      "task": "turkish-unicode-log",
+      "task": "unicode-log",
       "category": "unicode",
       "route": "unified:compressed:generic",
       "invoked": true,

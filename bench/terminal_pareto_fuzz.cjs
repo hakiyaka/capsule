@@ -31,7 +31,7 @@ const words = [
 ];
 
 function structured(caseId, unicode = false) {
-  const prefix = unicode ? "işlem öğe" : "task artifact";
+  const prefix = unicode ? "operation item" : "task artifact";
   return Array.from({ length: 80 + Math.floor(random() * 80) }, (_, index) =>
     prefix + " " + index +
     " file src/module-" + String(index).padStart(4, "0") + ".js" +

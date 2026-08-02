@@ -176,11 +176,11 @@ function completedState(last) {
 function inferredCompletedState(finalMessage) {
   const value = String(finalMessage || "").toLowerCase();
   if (!value || /\b(?:failed|failure|blocked|incomplete|pending|not\s+(?:complete|verified|fixed|resolved))\b/.test(value)) return "";
-  if (/\b(?:verified|tests?\s+passed|all\s+\d+\s+tests?\s+pass|doğruland[ıi]|testler?\s+geçti)\b/u.test(value)) {
+  if (/\b(?:verified|tests?\s+passed|all\s+\d+\s+tests?\s+pass)\b/u.test(value)) {
     return "verified";
   }
-  if (/\b(?:fixed|resolved|çözüldü|düzeltildi)\b/u.test(value)) return "resolved";
-  if (/\b(?:implemented|installed|completed|deployed|uygulandı|kuruldu|tamamlandı)\b/u.test(value)) {
+  if (/\b(?:fixed|resolved)\b/u.test(value)) return "resolved";
+  if (/\b(?:implemented|installed|completed|deployed|applied)\b/u.test(value)) {
     return "completed";
   }
   return "";

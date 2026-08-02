@@ -1841,15 +1841,15 @@ function setStaticSkillInstructions(text, enabled) {
 const AIRLOCK_START = "<!-- capsule-capability-airlock:start -->";
 const AIRLOCK_END = "<!-- capsule-capability-airlock:end -->";
 const AIRLOCK_PROJECT_RULE_LEGACY =
-  "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|impact|scan|status|gc` kullan; ham dosyalari ancak exact kanit gerektiginde genislet.";
+  "- For understanding a project or folder codebase, use `action=project`, `operation=query|impact|scan|status|gc`; expand raw files only when exact evidence is required.";
 const AIRLOCK_PROJECT_RULE =
-  "- Proje veya klasor kod tabanini anlamada `action=project`, `operation=query|refactor|impact|scan|status|gc` kullan; refactor icin sembol-hash etki konisini tercih et; ham dosyalari ancak exact kanit gerektiginde genislet.";
+  "- For understanding a project or folder codebase, use `action=project`, `operation=query|refactor|impact|scan|status|gc`; prefer the symbol-hash impact cone for refactors; expand raw files only when exact evidence is required.";
 const AIRLOCK_AGENTS_RULES = [
   AIRLOCK_PROJECT_RULE,
-  "- Sinirli metin duzenlemede mevcutsa native `apply_patch|Write|Edit|Update` kullan; gecici Python/PowerShell/Node scripti kullanma. Bulk/uretim/formatter/migration/binary/medya veya native arac yoksa shell serbesttir. Codex'i yalniz kullanici bu tur acikca isterse yeniden baslat.",
-  "- Her gorev basinda Capsule action=skills, payload.operation=route bicimini ve literal istegini koruyan kisa Ingilizce sorguyu kullan; istenmeyen alan/teknoloji/cikti turu ekleme ve yalniz ilk `skill_file`i oku. Eslesme yoksa yerel calis. Capsule gorunmez veya bu turda hata verirse kesfet ve bir kez yeniden dene; denemeden `erisilemedi` deme; onceki tur hatasini tasima. Yalniz guncel `mcp__capsule__capsule` cagri sonucu `isError:true` veya `Unknown action` gorulurse arac yoklugunu bildir; tahmin etme; dahili ad veya genel urun iddiasi kullanma. `fetch` icin gercek `payload.url|requests`; `expand|diff` onceki gercek `payload.capsule_id` ister; kimlik uydurma.",
-  "- Ana gorevin modelini alt ajan yonlendirmesi icin degistirme; kullanicinin model secimini aynen koru.",
-  "- Rutin alt gorevleri Capsule `action=cognition`, `operation=delegate` ile gercek `gpt-5.6-luna` uzerinde calistir; karmasik veya yuksek riskli islerde `model=gpt-5.6-terra` kullan. `collaboration.spawn_agent` Luna'yi acik model olarak desteklemediginden Luna gerektiren islerde onu kullanma.",
+  "- For limited text edits, prefer native `apply_patch|Write|Edit|Update` when available; do not use temporary Python/PowerShell/Node scripts. Shell is allowed for bulk generation, formatting, migrations, binaries, media, or when no native tool exists. Restart Codex only when the user explicitly requests it in this turn.",
+  "- At the start of every task, call Capsule with `action=skills`, `payload.operation=route`, and a short English query preserving the literal request; do not add an unwanted domain, technology, or output type, and read only the first `skill_file`. If there is no match, work locally. If Capsule is not visible or errors in this turn, discover it and retry once; do not claim unavailable without trying; do not carry forward the previous turn's error. Report tool unavailability only when the current `mcp__capsule__capsule` call returns `isError:true` or `Unknown action`; do not guess, use internal names, or make general product claims. Use real `payload.url|requests` for `fetch`; `expand|diff` require a previous real `payload.capsule_id`; do not invent IDs.",
+  "- Do not change the main task model for subagent routing; preserve the user's model selection.",
+  "- For routine subtasks, use Capsule `action=cognition`, `operation=delegate` on real `gpt-5.6-luna`; use `model=gpt-5.6-terra` for complex or high-risk work. `collaboration.spawn_agent` does not support Luna as an explicit model, so do not use it when Luna is required.",
 ];
 
 function canonicalizeAirlockProjectRule(text) {

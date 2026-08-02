@@ -98,7 +98,7 @@ the raw prompt. Read-only or planning calls past the task budget are withheld
 unless `capsule_force=true` is explicit; mutations and decisive verification
 remain available. The same budget covers observational terminal reads such as
 `rg`, `git status`, and `Get-Content`. Short continuation messages such as
-`devam et` or `yeniden başlattım` stay in the active task; after the first
+`continue` or `I restarted` stay in the active task; after the first
 successful mutation, the hook requests one grouped transaction/patch and one
 decisive verification. Set `CAPSULE_ADVISOR=0` for a deliberate global
 opt-out; `capsule_force=true` is the narrower escape hatch for one indispensable

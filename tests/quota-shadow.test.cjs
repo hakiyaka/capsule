@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const { compileQuotaShadow, promptText } = require("../mcp/quota-shadow.cjs");
 
 test("Semantic Answer Genome compiles repeat/status work to a delta ABI", () => {
-  const plan = compileQuotaShadow("Yeniden başlattım; şu an aktif mi ve ne kadar tasarruf var?", {
+  const plan = compileQuotaShadow("I restarted; is it active now and how much savings are there?", {
     allocated_output_tokens: 900
   });
   assert.equal(plan.active, true);

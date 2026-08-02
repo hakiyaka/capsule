@@ -5,7 +5,6 @@ const crypto = require("node:crypto");
 const STOPWORDS = new Set([
   "a", "an", "and", "are", "as", "at", "be", "by", "do", "for", "from", "in", "into",
   "is", "it", "of", "on", "or", "that", "the", "this", "to", "with", "you", "your",
-  "bir", "bu", "da", "de", "için", "ile", "mı", "mi", "ve", "ya", "yap", "şu",
 ]);
 
 const INTEGRATIONS = [
@@ -13,8 +12,8 @@ const INTEGRATIONS = [
   ["stripe", /\bstripe\b|paywall|checkout|subscription|webhook|price[_ -]?id/i],
   ["figma", /\bfigma\b|design(?: system| token)?|button(?:s)?|ui|ux/i],
   ["store", /\bapp ?store\b|play ?store|appstore|release notes|store listing/i],
-  ["localization", /locali[sz]ation|i18n|l10n|translation|çeviri|çok dilli/i],
-  ["media", /screenshot|screen shot|ekran görüntüsü|image|video|visual/i],
+  ["localization", /locali[sz]ation|i18n|l10n|translation|multilingual/i],
+  ["media", /screenshot|screen shot|image|video|visual/i],
 ];
 
 function terms(value) {
@@ -65,27 +64,27 @@ function plan(args = {}) {
   const previous = args.previous_task && typeof args.previous_task === "object"
     ? args.previous_task
     : {};
-  const explicitBoundary = /\b(?:new|different|separate|unrelated)\s+(?:task|goal|request)|\b(?:yeni|farklı|başka|ayrı)\s+(?:görev|hedef|talep)\b/i.test(prompt);
+  const explicitBoundary = /\b(?:new|different|separate|unrelated)\s+(?:task|goal|request)\b/i.test(prompt);
   const similarity = overlap(currentTerms, previous.term_hashes);
   // Short acknowledgements and continuation commands are common after a
   // restart or a completed tool call. Keep them in the current task unless
   // the user explicitly declares a new/different goal; otherwise a harmless
   // "continue" would flush useful local evidence and replay context.
-  const continuationCue = /^(?:devam(?:\s+et)?|sürdür(?:\s+et)?|yap(?:\s+artık)?|yaptım|tamam|evet|peki|başlat(?:tım)?|yeniden\s+başlattım|düzelt|geliştir|ölç|çalıştır|continue|proceed|go\s+on|do\s+it|done|yes|okay|ok|restart(?:ed)?|run|fix|improve)\b[.!?\s]*$/i.test(prompt);
+  const continuationCue = /^(?:continue|proceed|go\s+on|do\s+it|done|yes|okay|ok|restart(?:ed)?|run|fix|improve)\b[.!?\s]*$/i.test(prompt);
   const taskBoundary = Boolean(previous.fingerprint) && explicitBoundary ||
     Boolean(previous.fingerprint) && !continuationCue && similarity < 0.34;
   const integrations = detectIntegrations(prompt);
   const complex = prompt.length >= 480 || currentTerms.length >= 14 ||
-    /\b(?:architecture|migration|production|security|incident|root cause|entire|all files|tüm dosyalar|mimari|göç|üretim|güvenlik|kapsamlı)\b/i.test(prompt);
+    /\b(?:architecture|migration|production|security|incident|root cause|entire|all files)\b/i.test(prompt);
   const requested = integer(process.env.CAPSULE_TOOL_CALL_BUDGET, 0, 0, 96);
   const defaultBudget = complex ? 32 : integrations.length ? 24 + Math.min(8, integrations.length * 2) : 18;
   const maxToolCalls = requested || defaultBudget;
   const maxReadCalls = Math.max(6, Math.floor(maxToolCalls * 0.55));
   const maxOutputChars = complex ? 12_000 : 8_000;
-  const explicitWorktree = /\b(?:worktree|git\s+branch|parallel\s+checkout|ayrı\s+dal)\b/i.test(prompt);
-  const explicitAgents = /\b(?:subagent|delegate|delegat|alt ajan|parallel agent|çoklu ajan)\b/i.test(prompt);
+  const explicitWorktree = /\b(?:worktree|git\s+branch|parallel\s+checkout)\b/i.test(prompt);
+  const explicitAgents = /\b(?:subagent|delegate|parallel agent)\b/i.test(prompt);
   const emit = integrations.length > 0 || prompt.length >= 120 ||
-    /\b(?:mcp|tool\s+calls?|many|all\s+files|batch|group|worktree|subagent|limit|quota|expensive|cost|paywall|locali[sz]ation|screenshot|screen|drag|drop|dosyalar?|araç)\b/i.test(prompt);
+    /\b(?:mcp|tool\s+calls?|many|all\s+files|batch|group|worktree|subagent|limit|quota|expensive|cost|paywall|locali[sz]ation|screenshot|screen|drag|drop|files?)\b/i.test(prompt);
   const workflow = [
     "route only the needed skill or integration",
     "batch independent reads and edits",

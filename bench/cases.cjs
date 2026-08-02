@@ -297,17 +297,17 @@ fileCase({
 });
 
 fileCase({
-  name: "turkish-unicode-log",
+  name: "unicode-log",
   category: "unicode",
-  prompt: "Türkçe hata kaydını bul.",
+  prompt: "Find the Unicode error log.",
   text: Array.from(
     { length: 12000 },
     (_, index) => index === 10444
-      ? "KRİTİK TÜRKÇE-İĞÜŞÖÇ-NEEDLE ödeme kilidi çözülemedi"
-      : `olağan işlem satırı ${index + 1}`
+      ? "CRITICAL UNICODE-NEEDLE payment lock could not be resolved"
+      : `ordinary operation line ${index + 1}`
   ).join("\n"),
-  question: "TÜRKÇE-İĞÜŞÖÇ-NEEDLE ödeme kilidi",
-  expected: ["TÜRKÇE-İĞÜŞÖÇ-NEEDLE"],
+  question: "UNICODE-NEEDLE payment lock",
+  expected: ["UNICODE-NEEDLE"],
 });
 
 fileCase({
