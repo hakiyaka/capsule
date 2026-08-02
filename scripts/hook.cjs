@@ -13,6 +13,7 @@ const compat = require("../mcp/compat.cjs");
 const cognition = require("../mcp/cognition.cjs");
 const advisor = require("../mcp/advisor.cjs");
 const compaction = require("../mcp/compaction.cjs");
+const compactionLedger = require("../mcp/compaction-ledger.cjs");
 const quotaProgress = require("../mcp/quota-progress.cjs");
 const unified = require("../mcp/unified.cjs");
 const reasoningResidual = require("../mcp/reasoning-residual.cjs");
@@ -372,6 +373,53 @@ function isShellToolName(toolName) {
   return /(?:^|[._-])(?:local[_-]?shell|shell(?:[_-]?command)?|bash|zsh|fish|sh|powershell|pwsh|cmd|terminal|exec(?:[_-]?command)?|write[_-]?stdin)(?:$|[._-])/i.test(
     String(toolName || "").trim()
   );
+}
+
+function compactionLedgerFile(input) {
+  return hashedHookStateFile(input, "compaction-ledger");
+}
+
+function updateCompactionLedger(input, options = {}) {
+  const progressFile = hashedHookStateFile(input, "execution-progress");
+  const progressState = readHookState(progressFile, {});
+  const phaseState = readHookState(phaseCheckpointFile(input), {});
+  const decisions = (phaseState.entries || [])
+    .slice(-4)
+    .map((entry) => entry.content)
+    .filter(Boolean);
+  const files = [
+    ...(progressState.changed || []),
+    ...Object.keys(progressState.reads || {}),
+  ];
+  const tests = (progressState.tests || [])
+    .map((item) => `${item.tool}:${item.outcome}`);
+  const progress = executionCheckpoint(input);
+  const taskHash = progressState.task_id || "";
+  return compactionLedger.update({
+    file: compactionLedgerFile(input),
+    epoch: executionEpoch(input),
+    task_hash: taskHash,
+    project_hash: projectScope(input) ? crypto.createHash("sha256").update(projectScope(input)).digest("hex") : "",
+    decisions,
+    open: options.open || [],
+    progress,
+    files,
+    tests,
+    capsules: [
+      ...(options.capsules || []),
+      ...decisions,
+      progress,
+    ],
+    probe_required: options.probe_required,
+  });
+}
+
+function compactionLedgerContext(input, options = {}) {
+  return compactionLedger.context({
+    file: compactionLedgerFile(input),
+    max_chars: options.max_chars || 900,
+    probe: Boolean(options.probe),
+  });
 }
 
 function executionStateFallback() {
@@ -981,6 +1029,12 @@ function noteToolIntent(input, toolName) {
   const paths = toolPaths(input);
   let guidance = "";
   let blockReason = "";
+  const ledgerProbe = compactionLedger.emitProbe({
+    file: compactionLedgerFile(input),
+    is_mutation: isMutationTool(normalized) || isNodeReplMutation(input),
+    max_chars: 760,
+  });
+  if (ledgerProbe) guidance = ledgerProbe;
   if (isPollTool(normalized)) {
     state.poll_count = Number(state.poll_count || 0) + 1;
     if ([2, 4, 8].includes(state.poll_count)) {
@@ -1134,6 +1188,7 @@ function noteToolResult(input, toolName) {
     );
   }
   if (!isFailedToolResult(input) && (isMutationTool(normalized) || isNodeReplMutation(input))) {
+    compactionLedger.clearProbe(compactionLedgerFile(input));
     state.epoch = Number(state.epoch || 0) + 1;
     state.no_progress_reads = 0;
     state.plan_count = 0;
@@ -3254,7 +3309,16 @@ function handle(event, input) {
   if (event === "sessionstart") {
     clearMediaReplay(input);
     const source = firstString(input, ["source", "reason", "resume_source"]).toLowerCase();
-    if (source.includes("compact")) return {};
+    if (source.includes("compact")) {
+      const context = compactionLedgerContext(input, { max_chars: 900 });
+      if (!context) return {};
+      return {
+        hookSpecificOutput: {
+          hookEventName: "SessionStart",
+          additionalContext: context,
+        },
+      };
+    }
     clearTextReplay(input);
     return sessionContext(input, "session-start", "SessionStart");
   }
@@ -3283,6 +3347,10 @@ function handle(event, input) {
       ),
       generation_file: `${phaseCheckpointFile(input)}.context-gc.json`,
     }).response;
+    updateCompactionLedger(input, {
+      capsules: seed.capsules || [],
+      probe_required: true,
+    });
     const seededCapsules = new Set(seed.capsules || []);
     const replayOnly = replay.capsuleIds.filter((capsule) => !seededCapsules.has(capsule));
     const capsuleContext = replayOnly.length
@@ -3291,7 +3359,8 @@ function handle(event, input) {
     const imageContext = pressure.retained_image_items > 0
       ? "Capsule image pressure: preserve derived conclusions and file references only; omit inline/base64 media payloads."
       : "";
-    const additionalContext = [seed.context, capsuleContext, imageContext]
+    const ledgerContext = compactionLedgerContext(input, { max_chars: 520 });
+    const additionalContext = [ledgerContext, seed.context, capsuleContext, imageContext]
       .filter(Boolean)
       .join("\n")
       .slice(0, Math.min(1_400, policy.seed_chars + 180));

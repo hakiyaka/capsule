@@ -22,6 +22,9 @@ All notable user-visible changes are recorded here.
 - Added replacement-history pressure detection: large compaction handoffs now
   tighten the next-turn policy before output and subagent fan-out can multiply
   the same context again.
+- Added a bounded post-compaction memory ledger and one-shot forgetting probe;
+  typed decisions, open work, verification, changed files, and exact Capsule
+  IDs survive compaction without persisting raw prompts.
 - Added native Codex lifecycle hooks, a reversible capability airlock, and
   native-editor preference for bounded text changes.
 - Added the automatic Advisor contract: bounded cumulative tool/read budgets,

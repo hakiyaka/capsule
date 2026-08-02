@@ -21,6 +21,7 @@ const state = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-parity-state-"));
 process.env.CAPSULE_STATE = state;
 const compat = require("../mcp/compat.cjs");
 const compaction = require("../mcp/compaction.cjs");
+const compactionLedger = require("../mcp/compaction-ledger.cjs");
 const core = require("../mcp/core.cjs");
 const hook = require("../scripts/hook.cjs");
 const hookCli = require("../scripts/cli.cjs");
@@ -927,6 +928,82 @@ test("PreCompact seed moves its existing directive without increasing context si
     assert.match(second.context, /context-gc g=2/);
     assert.match(third.context, /context-gc g=3/);
     assert.match(oldOrder(second), /G: =@|G: LAYOUT-GOAL-1/);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("post-compaction memory ledger restores state and probes the first mutation", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-memory-ledger-"));
+  const file = path.join(root, "session.jsonl");
+  const session = `memory-ledger-${process.pid}-${Date.now()}`;
+  writePressureSession(file, { input: 85_000, compactions: 1, postInput: 20_000 });
+  const base = { session_file: file, session_id: session, cwd: root };
+  try {
+    hook.handle("stop", {
+      ...base,
+      last_assistant_message: "Decision: retain the content-hash cache key. Tests 11/11 pass. Next: verify restart.",
+    });
+    const compact = hook.handle("precompact", {
+      ...base,
+      summary: "Compact the current implementation phase.",
+    });
+    assert.match(compact.hookSpecificOutput.additionalContext, /memory ledger/i);
+    const resumed = hook.handle("sessionstart", { ...base, source: "compact" });
+    assert.match(resumed.hookSpecificOutput.additionalContext, /memory ledger/i);
+    assert.match(resumed.hookSpecificOutput.additionalContext, /probe=required/i);
+    assert.match(resumed.hookSpecificOutput.additionalContext, /content-hash cache key/i);
+
+    const firstMutation = hook.handle("pretooluse", {
+      ...base,
+      tool_name: "functions.apply_patch",
+      tool_input: { patch: "*** Begin Patch\n*** Update File: marker.txt\n@@\n-old\n+new\n*** End Patch" },
+    });
+    assert.match(firstMutation.hookSpecificOutput.additionalContext, /memory ledger|probe/i);
+    hook.handle("posttooluse", {
+      ...base,
+      tool_name: "functions.apply_patch",
+      tool_input: { patch: "applied" },
+      tool_output: "applied",
+    });
+    const afterProbe = hook.handle("pretooluse", {
+      ...base,
+      tool_name: "functions.apply_patch",
+      tool_input: { patch: "another patch" },
+    });
+    assert.doesNotMatch(afterProbe.hookSpecificOutput?.additionalContext || "", /memory ledger v1|Capsule probe/i);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("memory ledger redacts secrets and starts a fresh epoch on task change", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-memory-ledger-boundary-"));
+  const file = path.join(root, "ledger.json");
+  try {
+    compactionLedger.update({
+      file,
+      epoch: 2,
+      task_hash: "task-a",
+      decisions: ["Keep the cache key; token=super-secret"],
+      progress: "changed=src/a.js",
+      capsules: ["cap_0123456789abcdef"],
+      probe_required: true,
+    });
+    const probe = compactionLedger.emitProbe({ file, is_mutation: true });
+    assert.match(probe, /probe|required/i);
+    assert.doesNotMatch(JSON.stringify(JSON.parse(fs.readFileSync(file, "utf8"))), /super-secret/);
+    compactionLedger.update({
+      file,
+      epoch: 0,
+      task_hash: "task-b",
+      decisions: ["New task"],
+      progress: "changed=src/b.js",
+    });
+    const resumed = compactionLedger.context({ file });
+    assert.match(resumed, /New task/);
+    assert.doesNotMatch(resumed, /cache key|src\/a\.js|0123456789abcdef/);
+    assert.match(resumed, /epoch=0/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

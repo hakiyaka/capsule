@@ -114,6 +114,13 @@ The `PreCompact` hook reads only a bounded tail of the local Codex JSONL. It mea
 
 Assistant finals are stored as secret-redacted 800-character phase checkpoints. Starting with the second compaction, only the latest checkpoint is allowed into the continuation map, capped at 420 characters. This rolling handoff targets progressive amnesia without repeatedly growing the summary. Raw prompts are not added to persistent Capsule storage by this feature.
 
+The continuation also carries a bounded memory ledger with typed decisions,
+open work, progress, changed files, test outcomes, and exact Capsule IDs. After
+compaction the first mutation gets one short forgetting probe that asks the
+model to re-verify a likely stale assumption; a successful mutation clears the
+probe. Task/project hashes isolate epochs, and only redacted summaries are
+persisted. This restores working state without replaying the transcript.
+
 Call `insight` with `compaction:true` plus `session` or `session_file` to audit observable transitions and receive `context_pressure`. The compact default reports aggregates and only the latest event; pass `compaction_events:true` and optional `compaction_event_limit` when exact bounded rows are needed. Codex currently does not expose the compactor model's own generation usage in session telemetry, so a zero adjacent delta is reported as unexposed, never as proof that compaction was free. These figures are context exposure, not billing claims.
 
 When local `token_count` telemetry shows a costly uncached suffix, `UserPromptSubmit` emits one short `[Capsule round-trip tax]` hint per distinct usage sample with the uncached count and cache-hit percentage. The observer can classify a `post-compaction-cache-miss`, `request-input-shrank`, mid-loop cache dropout, or large uncached request. These are heuristic timing/counter correlations from session counters and cannot prove a provider-side cause or prompt-prefix mutation: Capsule cannot set Codex's wire-level `prompt_cache_key` or cache breakpoints, nor control host compaction and retry behavior. This is local exposure telemetry, not a provider billing or direct-savings claim. Set `CAPSULE_ROUNDTRIP_TAX=0` to disable it.

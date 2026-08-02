@@ -30,9 +30,11 @@ function evidence(targetChars) {
 
 function visibleChars(result, rawOutput) {
   const hookOutput = result?.hookSpecificOutput || {};
-  const primary = hookOutput.updatedMCPToolOutput == null
-    ? String(rawOutput)
-    : String(hookOutput.updatedMCPToolOutput);
+  const primary = hookOutput.updatedMCPToolOutput != null
+    ? String(hookOutput.updatedMCPToolOutput)
+    : result?.stopReason && typeof result?.reason === "string"
+    ? result.reason
+    : String(rawOutput);
   return primary.length + String(hookOutput.additionalContext || "").length;
 }
 
@@ -65,13 +67,15 @@ function runCase(rawChars) {
   const treatmentResult = hook.handle("posttooluse", treatmentInput);
   const treatmentVisible = visibleChars(treatmentResult, output) +
     String(precompact?.hookSpecificOutput?.additionalContext || "").length;
-  const replacement = String(treatmentResult?.hookSpecificOutput?.updatedMCPToolOutput || "");
+  const replacement = treatmentResult?.stopReason && typeof treatmentResult?.reason === "string"
+    ? treatmentResult.reason
+    : String(treatmentResult?.hookSpecificOutput?.updatedMCPToolOutput || "");
   return {
     raw_chars: rawChars,
     a_baseline_post_compaction_chars: baselineVisible,
     b_capsule_dictionary_chars: treatmentVisible,
     saving_percent: Number(((baselineVisible - treatmentVisible) / baselineVisible * 100).toFixed(2)),
-    exact_capsule_reference: /\btc_[a-f0-9]{16}\b/i.test(replacement),
+    exact_capsule_reference: /\bcap_[a-f0-9]{16}\b/i.test(replacement),
     marked_after_compaction: /after compaction/i.test(replacement),
   };
 }
@@ -98,13 +102,19 @@ function safetyChecks() {
   const smallAgain = hook.handle("posttooluse", small);
   return {
     exact_large_replay_compact: /after compaction/i.test(
-      String(exact?.hookSpecificOutput?.updatedMCPToolOutput || "")
+      exact?.stopReason && typeof exact?.reason === "string"
+        ? exact.reason
+        : String(exact?.hookSpecificOutput?.updatedMCPToolOutput || "")
     ),
     changed_large_evidence_not_replay: !/tool replay/i.test(
-      String(changed?.hookSpecificOutput?.updatedMCPToolOutput || "")
+      changed?.stopReason && typeof changed?.reason === "string"
+        ? changed.reason
+        : String(changed?.hookSpecificOutput?.updatedMCPToolOutput || "")
     ),
     uncapsuled_small_evidence_not_replay: !/tool replay/i.test(
-      String(smallAgain?.hookSpecificOutput?.updatedMCPToolOutput || "")
+      smallAgain?.stopReason && typeof smallAgain?.reason === "string"
+        ? smallAgain.reason
+        : String(smallAgain?.hookSpecificOutput?.updatedMCPToolOutput || "")
     ),
   };
 }

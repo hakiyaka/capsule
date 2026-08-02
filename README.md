@@ -220,6 +220,13 @@ envelope with an exact local capsule, even when the tool's mutation semantics
 are unknown. Change the bound with `CAPSULE_UNIVERSAL_HARD_CAP_CHARS` or
 disable it only with the explicit `CAPSULE_UNIVERSAL_HARD_CAP=0` opt-out.
 
+After compaction, a bounded memory ledger restores only typed task state:
+decisions, open items, progress, changed files, test outcomes, and exact Capsule
+IDs. The first mutation receives one forgetting probe; a successful mutation
+clears it. The ledger stores task/project hashes and secret-redacted summaries,
+never raw prompts, and a task-hash change starts a fresh ledger epoch. This is
+context-recovery telemetry, not a provider billing or universal savings claim.
+
 ### Prompt-budget overhead audit
 
 The prompt controller uses one compact budget ABI instead of independently
