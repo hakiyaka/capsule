@@ -30,6 +30,7 @@
   "scripts": {
     "audit:source": "node bench/source_integrity_audit.cjs",
     "audit:public": "node scripts/public-readiness.cjs",
+    "audit:sessions": "node scripts/session-audit.cjs",
     "audit:router-history": "node bench/router_history_audit.cjs",
     "test": "node --test",
     "benchmark": "python bench/ab_benchmark.py --summary",

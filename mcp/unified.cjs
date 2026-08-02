@@ -19,6 +19,7 @@ const editTransaction = require("./edit.cjs");
 const terminalNovelty = require("./terminal-novelty.cjs");
 const projectCompiler = require("./project.cjs");
 const jsonOutput = require("./json-output.cjs");
+const sessionAudit = require("./session-audit.cjs");
 const packageMetadata = require("../package.json");
 
 let DatabaseSync = null;
@@ -1499,6 +1500,9 @@ function firstSessionMetadata(file, maxBytes = 2 * 1024 * 1024) {
 }
 
 function historyAudit(args = {}) {
+  if (args.deep === true || args.line_scan === true) {
+    return sessionAudit.scanHistory(args);
+  }
   const roots = [
     path.join(codexHome(), "sessions"),
     path.join(codexHome(), "archived_sessions"),

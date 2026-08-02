@@ -13,6 +13,12 @@ All notable user-visible changes are recorded here.
   batch execution, and exact evidence expansion.
 - Added context-pressure, compaction, polling, reasoning-budget, and
   quota-to-progress controls with explicit measurement caveats.
+- Added an opt-in exhaustive local Codex JSONL audit: every active and
+  archived session line is streamed into hash-only integrity, token, error,
+  repeat, duplicate-output, compaction, and fan-out telemetry without
+  persisting transcript text or modifying session files.
+- Added a universal exact-recoverable hard cap for giant non-failed tool
+  results, covering unknown tool semantics at 1,000,000 characters by default.
 - Added native Codex lifecycle hooks, a reversible capability airlock, and
   native-editor preference for bounded text changes.
 - Added the automatic Advisor contract: bounded cumulative tool/read budgets,

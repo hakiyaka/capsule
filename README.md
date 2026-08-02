@@ -179,6 +179,28 @@ Capsule operations.
 Set `CAPSULE_STATE` to an absolute directory to override the state location.
 Project filter files use `.capsule-filters.json`.
 
+### Complete local Codex session audit
+
+The optional deep history audit reads every discovered `.jsonl` line locally,
+including archived sessions, without placing transcript text in the model
+context or writing it into Capsule state. It reports record/line integrity,
+token counters exposed by Codex, tool-output pressure, repeated calls,
+duplicate outputs, compaction markers, and hash-only hotspots:
+
+```sh
+npm run audit:sessions -- --max-files 100000 --max-bytes 549755813888 \
+  --output capsule-session-audit.json
+```
+
+The MCP equivalent is `insight` with `history:true, deep:true` (or
+`line_scan:true`). The result is diagnostic, not a billing claim: provider
+cache behavior, hidden compactor generation, and generated-answer tokens are
+not observable locally. Damaged tail lines are counted and skipped; no repair
+is performed on the original session files. Use `--no-archived` only when a
+bounded active-session audit is intentional.
+`--output` writes UTF-8 directly and avoids PowerShell's legacy redirected
+stdout encoding.
+
 ## Verification
 
 ```sh
@@ -191,6 +213,12 @@ npm run benchmark:project
 
 Benchmarks report workload-specific measurements, not a universal savings
 guarantee. See [BENCHMARK.md](BENCHMARK.md).
+
+Every non-failed tool result also has a default 1,000,000-character universal
+hard cap. An incompressible giant result becomes a short, redacted evidence
+envelope with an exact local capsule, even when the tool's mutation semantics
+are unknown. Change the bound with `CAPSULE_UNIVERSAL_HARD_CAP_CHARS` or
+disable it only with the explicit `CAPSULE_UNIVERSAL_HARD_CAP=0` opt-out.
 
 ### Prompt-budget overhead audit
 

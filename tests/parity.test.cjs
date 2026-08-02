@@ -523,6 +523,33 @@ test("normal pressure still capsules oversized incompressible read output with e
   }
 });
 
+test("universal hard cap envelopes giant unknown-tool output with exact recovery", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-universal-hard-cap-"));
+  const sessionFile = path.join(root, "normal.jsonl");
+  writePressureSession(sessionFile, { input: 20_000, cached: 19_000 });
+  const output = Array.from({ length: 1_050_000 }, (_, index) =>
+    String.fromCodePoint(0x4e00 + (index * 7919) % 20_000)
+  ).join("");
+  try {
+    const result = hook.handle("posttooluse", {
+      tool_name: "vendor.unknown_mutating_tool",
+      tool_input: { operation: "inspect" },
+      tool_output: output,
+      session_file: sessionFile,
+      session_id: `universal-hard-cap-${process.pid}-${Date.now()}`,
+      cwd: process.cwd(),
+    });
+    const replacement = replacementText(result);
+    assert.ok(replacement.length < 2_200);
+    assert.match(replacement, /universal-hard-cap/i);
+    const capsuleId = replacement.match(/exact=(cap_[a-f0-9]{16})/i)?.[1];
+    assert.ok(capsuleId);
+    assert.equal(core.loadCapsule(capsuleId).text, output);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("successful exec control envelopes shrink while failures and live jobs remain intact", () => {
   const session = `control-envelope-${process.pid}-${Date.now()}`;
   const successOutput = "Exit code: 0\nWall time: 0.2 seconds\nOutput:\nalpha\n";

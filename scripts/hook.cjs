@@ -2942,15 +2942,22 @@ function postToolUseCore(input) {
       : Number.isFinite(configuredAbsolute)
       ? Math.min(1_000_000, Math.max(16_000, Math.trunc(configuredAbsolute)))
       : 32_000;
+    const configuredUniversalCap = Number(process.env.CAPSULE_UNIVERSAL_HARD_CAP_CHARS);
+    const universalHardCap = process.env.CAPSULE_UNIVERSAL_HARD_CAP !== "0" &&
+      visibleOutput.length > (Number.isFinite(configuredUniversalCap)
+        ? Math.min(4_000_000, Math.max(64_000, Math.trunc(configuredUniversalCap)))
+        : 1_000_000);
     const absoluteEligible = process.env.CAPSULE_ABSOLUTE_OUTPUT !== "0" &&
       isReplayEligibleTool(input, name) &&
       !isFailedToolResult(input, output) &&
       visibleOutput.length > absoluteThreshold;
-    const circuitEligible = absoluteEligible || ["critical", "emergency"].includes(pressure.mode) ||
+    const circuitEligible = universalHardCap || absoluteEligible || ["critical", "emergency"].includes(pressure.mode) ||
       (pressure.mode === "high" && output.length > policy.tool_max_chars * 2);
     if (circuitEligible && visibleOutput.length > policy.tool_max_chars) {
       const circuitPressure = transcriptShield
         ? { ...pressure, mode: "session-log-shield" }
+        : universalHardCap && pressure.mode === "normal"
+        ? { ...pressure, mode: "universal-hard-cap" }
         : absoluteEligible && pressure.mode === "normal"
         ? { ...pressure, mode: "absolute-cap" }
         : pressure;
