@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
+const previousState = process.env.CAPSULE_STATE;
 const state = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-media-bench-"));
 process.env.CAPSULE_STATE = state;
 
@@ -12,12 +13,21 @@ const unified = require("../mcp/unified.cjs");
 
 function visibleChars(result) {
   const output = result?.hookSpecificOutput || {};
-  return String(output.updatedMCPToolOutput || "").length +
+  const replacement = Object.hasOwn(output, "updatedMCPToolOutput")
+    ? String(output.updatedMCPToolOutput)
+    : result?.continue === false && typeof result.reason === "string"
+      ? result.reason
+      : "";
+  return replacement.length +
     String(output.additionalContext || "").length;
 }
 
 function hasReplacement(result) {
-  return Boolean(result?.hookSpecificOutput?.updatedMCPToolOutput);
+  const output = result?.hookSpecificOutput || {};
+  return Boolean(
+    (Object.hasOwn(output, "updatedMCPToolOutput") && output.updatedMCPToolOutput) ||
+    (result?.continue === false && typeof result.reason === "string" && result.reason)
+  );
 }
 
 function runCase(rawBytes) {
@@ -133,5 +143,7 @@ try {
   }
 } finally {
   unified.closeSearchDatabase();
+  if (previousState == null) delete process.env.CAPSULE_STATE;
+  else process.env.CAPSULE_STATE = previousState;
   fs.rmSync(state, { recursive: true, force: true });
 }

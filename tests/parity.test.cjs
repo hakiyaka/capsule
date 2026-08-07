@@ -1901,6 +1901,38 @@ test("post-tool hook also preserves serialized media payloads", async () => {
   assert.equal(newCapsules.some((item) => item.source === "view_image"), false);
 });
 
+test("opt-in lossless media lease replaces a visual envelope with exact recovery", () => {
+  const state = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-media-lease-test-"));
+  const previousState = process.env.CAPSULE_STATE;
+  const previousMode = process.env.CAPSULE_MEDIA_ZERO_COPY;
+  process.env.CAPSULE_STATE = state;
+  process.env.CAPSULE_MEDIA_ZERO_COPY = "1";
+  try {
+    const output = {
+      content: [{ type: "image", image_url: `data:image/png;base64,${Buffer.alloc(12_000, 0xab).toString("base64")}` }],
+    };
+    const raw = JSON.stringify(output);
+    const result = hook.handle("posttooluse", {
+      tool_name: "view_image",
+      tool_input: { path: "lossless.png", detail: "original" },
+      tool_output: output,
+      cwd: state,
+      session_id: "media-lease-test",
+    });
+    assert.equal(result.continue, false);
+    const reference = JSON.parse(result.reason);
+    assert.equal(reference.visual_fidelity, "exact-bytes");
+    assert.equal(fs.readFileSync(reference.exact_path, "utf8"), raw);
+    assert.doesNotMatch(result.reason, /data:image\//);
+  } finally {
+    if (previousState == null) delete process.env.CAPSULE_STATE;
+    else process.env.CAPSULE_STATE = previousState;
+    if (previousMode == null) delete process.env.CAPSULE_MEDIA_ZERO_COPY;
+    else process.env.CAPSULE_MEDIA_ZERO_COPY = previousMode;
+    fs.rmSync(state, { recursive: true, force: true });
+  }
+});
+
 test("structured web hook preserves navigation through bounded projection", () => {
   const result = hook.handle("posttooluse", {
     tool_name: "web.run",
@@ -1924,6 +1956,38 @@ test("structured web hook preserves navigation through bounded projection", () =
     Array.from({ length: 16 }, (_, index) => "https://example.test/research/" + index));
   assert.ok(parsed.capsule_web_projection.exact);
   assert.ok(result.reason.length <= 12_000);
+});
+
+test("opt-in lossless web lease replaces first and changed results with exact recovery", () => {
+  const state = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-web-lease-test-"));
+  const previousState = process.env.CAPSULE_STATE;
+  const previousMode = process.env.CAPSULE_WEB_ZERO_COPY;
+  process.env.CAPSULE_STATE = state;
+  process.env.CAPSULE_WEB_ZERO_COPY = "1";
+  try {
+    const output = {
+      content: [{ type: "search_result", title: "Exact result", url: "https://example.test/exact", ref_id: "turn-web-exact", text: `needle ${"evidence ".repeat(800)}` }],
+    };
+    const raw = JSON.stringify(output);
+    const result = hook.handle("posttooluse", {
+      tool_name: "web.run",
+      tool_input: { search_query: [{ q: "needle" }] },
+      tool_output: output,
+      cwd: state,
+      session_id: "web-lease-test",
+    });
+    assert.equal(result.continue, false);
+    const reference = JSON.parse(result.reason);
+    assert.equal(reference.visual_fidelity, "exact-text-and-navigation");
+    assert.equal(fs.readFileSync(reference.exact_path, "utf8"), raw);
+    assert.doesNotMatch(result.reason, /needle/);
+  } finally {
+    if (previousState == null) delete process.env.CAPSULE_STATE;
+    else process.env.CAPSULE_STATE = previousState;
+    if (previousMode == null) delete process.env.CAPSULE_WEB_ZERO_COPY;
+    else process.env.CAPSULE_WEB_ZERO_COPY = previousMode;
+    fs.rmSync(state, { recursive: true, force: true });
+  }
 });
 
 test("post-tool hook omits an exact duplicate image payload within the same user turn", () => {
@@ -2290,7 +2354,8 @@ test("pre-tool hook bounds self-contained subagent context while preserving depe
     session_id: "fork-guidance",
   });
   assert.equal(dependent.hookSpecificOutput.updatedInput.model, "gpt-5.6-terra");
-  assert.match(dependent.hookSpecificOutput.additionalContext, /history-dependent full subagent fork/i);
+  assert.equal(dependent.hookSpecificOutput.updatedInput.fork_turns, "3");
+  assert.match(dependent.hookSpecificOutput.additionalContext, /full-history fork downgraded/i);
 
   const selfContained = hook.handle("pretooluse", {
     tool_name: "collaboration.spawn_agent",
@@ -2314,6 +2379,18 @@ test("pre-tool hook bounds self-contained subagent context while preserving depe
   assert.equal(recent.hookSpecificOutput.updatedInput.fork_turns, "3");
   assert.equal(recent.hookSpecificOutput.updatedInput.model, "gpt-5.6-luna");
 
+  const freshReview = hook.handle("pretooluse", {
+    tool_name: "collaboration.spawn_agent",
+    tool_input: {
+      task_name: "fresh_review",
+      message: "Fresh read-only review of the accumulated diff and verification evidence.",
+      fork_turns: "all",
+    },
+    session_id: "fork-guidance",
+  });
+  assert.equal(freshReview.hookSpecificOutput.updatedInput.fork_turns, "none");
+  assert.match(freshReview.hookSpecificOutput.additionalContext, /fresh review fork bounded/i);
+
   const englishIndependent = hook.handle("pretooluse", {
     tool_name: "collaboration.spawn_agent",
     tool_input: {
@@ -2336,6 +2413,7 @@ test("pre-tool hook bounds self-contained subagent context while preserving depe
     session_id: "fork-guidance",
   });
   assert.equal(englishFull.hookSpecificOutput.updatedInput.model, "gpt-5.6-terra");
+  assert.equal(englishFull.hookSpecificOutput.updatedInput.fork_turns, "3");
 
   const explicit = hook.handle("pretooluse", {
     tool_name: "collaboration.spawn_agent",
@@ -2359,6 +2437,98 @@ test("pre-tool hook bounds self-contained subagent context while preserving depe
     alreadyBounded.hookSpecificOutput?.additionalContext || "",
     /subagent model|bounded_fork|history-dependent/i
   );
+});
+
+test("fan-out fuse caps repeated subagent creation and keeps an explicit escape hatch", () => {
+  const session = `fanout-fuse-${process.pid}-${Date.now()}`;
+  const base = {
+    tool_name: "collaboration.spawn_agent",
+    cwd: process.cwd(),
+    session_id: session,
+  };
+  for (let index = 0; index < 8; index += 1) {
+    const result = hook.handle("pretooluse", {
+      ...base,
+      tool_input: {
+        task_name: `bounded_${index}`,
+        message: "Run the isolated check and return its result.",
+        model: "gpt-5.6-luna",
+        fork_turns: "none",
+      },
+    });
+    assert.notEqual(result.hookSpecificOutput?.permissionDecision, "deny");
+  }
+  const denied = hook.handle("pretooluse", {
+    ...base,
+    tool_input: {
+      task_name: "ninth_spawn",
+      message: "Run the isolated check and return its result.",
+      model: "gpt-5.6-luna",
+      fork_turns: "none",
+    },
+  });
+  assert.equal(denied.hookSpecificOutput.permissionDecision, "deny");
+  assert.match(denied.hookSpecificOutput.permissionDecisionReason, /fan-out fuse/i);
+
+  const forced = hook.handle("pretooluse", {
+    ...base,
+    tool_input: {
+      task_name: "forced_ninth_spawn",
+      message: "Run the indispensable isolated check and return its result.",
+      model: "gpt-5.6-luna",
+      fork_turns: "none",
+      capsule_force: true,
+    },
+  });
+  assert.notEqual(forced.hookSpecificOutput?.permissionDecision, "deny");
+});
+
+test("failed delegation lane blocks unchanged retries while allowing corrected packets", () => {
+  const session = `failed-lane-${process.pid}-${Date.now()}`;
+  const base = {
+    tool_name: "collaboration.spawn_agent",
+    cwd: process.cwd(),
+    session_id: session,
+    tool_input: {
+      task_name: "broken_lane",
+      message: "Run the implementation lane with the current packet.",
+      model: "gpt-5.6-luna",
+      fork_turns: "none",
+    },
+  };
+  hook.handle("posttooluse", {
+    ...base,
+    is_error: true,
+    tool_output: `Error: lane unavailable\n${"routing evidence\n".repeat(80)}`,
+  });
+  const retry = hook.handle("pretooluse", base);
+  assert.equal(retry.hookSpecificOutput.permissionDecision, "deny");
+  assert.match(retry.hookSpecificOutput.permissionDecisionReason, /failed-lane fuse/i);
+
+  const corrected = hook.handle("pretooluse", {
+    ...base,
+    tool_input: {
+      ...base.tool_input,
+      message: "Run the corrected implementation lane after checking the available role.",
+    },
+  });
+  assert.notEqual(corrected.hookSpecificOutput?.permissionDecision, "deny");
+
+  hook.handle("posttooluse", {
+    tool_name: "functions.apply_patch",
+    tool_input: { patch: "*** Update File: src/lane.js\n+fixed\n" },
+    tool_output: "Done",
+    cwd: process.cwd(),
+    session_id: session,
+  });
+  const afterMutation = hook.handle("pretooluse", base);
+  assert.notEqual(afterMutation.hookSpecificOutput?.permissionDecision, "deny");
+
+  const forced = hook.handle("pretooluse", {
+    ...base,
+    tool_input: { ...base.tool_input, capsule_force: true },
+  });
+  assert.notEqual(forced.hookSpecificOutput?.permissionDecision, "deny");
 });
 
 test("automatic hooks do not persist raw user prompts without explicit opt-in", async () => {

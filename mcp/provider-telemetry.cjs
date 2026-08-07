@@ -3,6 +3,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const core = require("./core.cjs");
+const storage = require("./storage.cjs");
 
 function nonnegative(value) {
   const number = Number(value);
@@ -66,7 +67,7 @@ function resolveSessionArgs(args) {
   }
   try {
     const pointerFile = path.join(core.stateRoot(), "hooks", "provider-telemetry-current.json");
-    const pointer = JSON.parse(fs.readFileSync(pointerFile, "utf8"));
+    const pointer = storage.readJson(pointerFile, null);
     if (pointer?.session_file && fs.existsSync(pointer.session_file)) {
       return {
         args: {

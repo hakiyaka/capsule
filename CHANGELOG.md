@@ -2,6 +2,29 @@
 
 All notable user-visible changes are recorded here.
 
+## Unreleased - refactor hardening
+
+- Centralized local state hashing, bounded-number parsing, JSON validation, and
+  collision-resistant atomic writes in `mcp/storage.cjs`; migrated the core,
+  project, memory, polling, compaction, runtime, compatibility, terminal, and
+  quota lanes without changing their public action contracts.
+- Added `npm run verify`, combining tests, source integrity, public readiness,
+  and documentation/link audits for release and CI use.
+- Added storage-helper and documentation-audit regression tests, including
+  malformed-cache behavior, temporary-file cleanup, local-link checks, and
+  retired internal-name checks.
+- Added deterministic memory loadout bindings inspired by TencentDB-Agent-
+  Memory's query-conditioned, bounded asset retrieval: optional tags, sources,
+  layers/asset types, and strict scope are applied before ranking in both
+  `recall` and progressive `index`, while exact `get` recovery remains intact.
+- Added an opt-in two-stage memory strategy: `strategy:"bootstrap"` prefers
+  profile/scenario context and falls back to fact/trace retrieval only when
+  the high-level stage has no match, keeping the lower-level evidence on
+  demand rather than injecting it into every turn.
+- Documented the refactor boundary and verification evidence. Hidden provider
+  reasoning, cache, billing, and subscription counters remain outside local
+  benchmark claims.
+
 ## 1.0.0 - 2026-08-01
 
 - First stable public release of Capsule.
@@ -30,6 +53,10 @@ All notable user-visible changes are recorded here.
   hashes, dependency/importer cones, impacted tests, and an exact manifest.
 - Added native Codex lifecycle hooks, a reversible capability airlock, and
   native-editor preference for bounded text changes.
+- Fixed lazy browser-runtime discovery: an empty pre-bootstrap `globalThis`
+  inventory no longer produces a false missing-browser/Chrome/computer-use
+  report; the runtime is initialized first and only a failed setup or tool
+  call is treated as unavailable.
 - Added the automatic Advisor contract: bounded cumulative tool/read budgets,
   explicit integration lanes, task-boundary memory isolation, short-command
   continuation handling, observational-shell budgeting, grouped-edit guidance,
@@ -39,6 +66,30 @@ All notable user-visible changes are recorded here.
   guardrails without adding the advisor line to the prompt. Task state now
   isolates workspace switches, expires stale leases, and hashes missing-session
   fallbacks instead of sharing one global `unknown` state.
+- Added a task-scoped subagent fan-out fuse and automatic full-history fork
+  bound. The safeguard is based on recent telemetry showing one parent with 31
+  children consuming 18.43 GiB of session history; limits tighten under context
+  pressure and reset only after a real implementation mutation.
+- Added Sol-inspired failed-lane retry blocking and fresh-review isolation:
+  unchanged failed delegation packets are withheld until corrected, while
+  explicit fresh/read-only reviews use `fork_turns:none` and inspect only their
+  supplied evidence.
+- Added the optional layered memory loadout action: explicit L0 trace, L1 fact,
+  L2 scenario, and L3 profile lanes with scope isolation, secret redaction,
+  idempotent deduplication, per-lane budgets, freshness/importance scoring,
+  duplicate suppression, expiry, and auditable pruning. Raw trace retention is
+  opt-in; no transcript is captured implicitly.
+- Added compact environment leases for cross-platform setup friction: one
+  fingerprinted, fifteen-minute snapshot resolves Windows Python launchers,
+  workspace virtual environments, shells, and package managers without
+  emitting raw PATH values; changed PATH, virtual-environment, or workspace
+  state invalidates the lease automatically. Setup-oriented Windows prompts
+  receive the lease once per task/session instead of repeating discovery advice.
+- Added a verifier-output serializer inspired by WrongStack: successful test
+  runs now emit aggregate suites/tests/time lines instead of replaying every
+  `PASS` row, while failed runs retain failure neighborhoods and summaries and
+  omit unrelated passing rows. Exact raw output remains recoverable from its
+  Capsule; small, literal, or ambiguous output still passes through.
 - Added platform-native state handling for Windows, macOS, Linux, and XDG,
   plus public contribution, security, CI, and readiness checks.
 - Published with the `capsule` npm/plugin installation identifier

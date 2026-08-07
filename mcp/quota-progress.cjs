@@ -1,9 +1,9 @@
 "use strict";
 
-const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const core = require("./core.cjs");
+const storage = require("./storage.cjs");
 
 const VERSION = 1;
 const TTL_MS = 7 * 24 * 60 * 60_000;
@@ -23,7 +23,7 @@ function enabled() {
 }
 
 function digest(value) {
-  return crypto.createHash("sha256").update(String(value || "")).digest("hex");
+  return storage.sha256(value);
 }
 
 function finite(value, fallback = 0) {
@@ -69,20 +69,12 @@ function emptyState() {
 
 function readState(file) {
   if (!file) return emptyState();
-  try {
-    const parsed = JSON.parse(fs.readFileSync(file, "utf8"));
-    return parsed && typeof parsed === "object" ? parsed : emptyState();
-  } catch {
-    return emptyState();
-  }
+  const parsed = storage.readJson(file, null);
+  return parsed && typeof parsed === "object" ? parsed : emptyState();
 }
 
 function atomicWrite(file, state) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = file + "." + process.pid + "." + Date.now() + "." +
-    crypto.randomBytes(4).toString("hex") + ".tmp";
-  fs.writeFileSync(temporary, JSON.stringify(state) + "\n", "utf8");
-  fs.renameSync(temporary, file);
+  storage.writeJsonAtomic(file, state);
   pruneStateFiles(file);
 }
 

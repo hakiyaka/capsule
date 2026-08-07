@@ -1,10 +1,9 @@
 "use strict";
 
-const crypto = require("node:crypto");
-const fs = require("node:fs");
 const path = require("node:path");
 const core = require("./core.cjs");
 const compat = require("./compat.cjs");
+const storage = require("./storage.cjs");
 
 const MAX_AGE_MS = 60 * 60_000;
 const MAX_HASHES = 8192;
@@ -15,7 +14,7 @@ const PLACEHOLDER = "cap_0000000000000000";
 const STRUCTURAL_ATOM_RE = /https?:\/\/[^\s"'<>]+|[A-Za-z]:[\\/][^\s"'<>|]+|(?:\.{0,2}[\\/])?(?:[\w.@+-]+[\\/])+[\w.@+/-]+|\b\d{4}-\d{2}-\d{2}(?:[T ][0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?)?\b|\b[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?\b|\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b|\b(?:sha(?:1|256|512):)?[0-9a-f]{12,128}\b|\bv?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?\b|\b\d+(?:\.\d+)?(?:ns|us|µs|ms|s|min|h|d|B|KB|MB|GB|TB|KiB|MiB|GiB)\b|(?<![\w])[-+]?\d+(?:\.\d+)?%?(?![\w])/gi;
 
 function digest(value) {
-  return crypto.createHash("sha256").update(String(value || "")).digest("hex");
+  return storage.sha256(value);
 }
 
 function stateFile(args = {}) {
@@ -27,18 +26,11 @@ function stateFile(args = {}) {
 }
 
 function readState(file) {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    return { version: 1, seen: {} };
-  }
+  return storage.readJson(file, { version: 1, seen: {} });
 }
 
 function writeState(file, state) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = file + "." + process.pid + "." + Date.now() + ".tmp";
-  fs.writeFileSync(temporary, JSON.stringify(state) + "\n", "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, state);
 }
 
 function reset(args = {}) {

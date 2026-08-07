@@ -580,6 +580,40 @@ test("compressText profiles tests, deduplicates logs, and redacts secrets", () =
   assert.doesNotMatch(deduped.output, /super-secret/);
 });
 
+test("successful verifier output keeps aggregates instead of replaying every PASS row", () => {
+  const output = [
+    ...Array.from({ length: 1_200 }, (_, index) => `PASS suite-${index}.test.js`),
+    "Test Suites: 1200 passed, 1200 total",
+    "Tests:       6840 passed, 6840 total",
+    "Snapshots:   0 total",
+    "Time:         42.731 s",
+    "Ran all test suites.",
+  ].join("\n");
+  const compact = unified.compressText(output, { profile: "test", max_chars: 1_400 });
+  assert.equal(compact.route, "compressed");
+  assert.match(compact.output, /Test Suites: 1200 passed/);
+  assert.match(compact.output, /Tests:\s+6840 passed/);
+  assert.doesNotMatch(compact.output, /suite-0\.test\.js/);
+  assert.ok(compact.output.length < output.length * 0.02);
+});
+
+test("failed verifier output preserves failure context but omits unrelated PASS rows", () => {
+  const output = [
+    ...Array.from({ length: 900 }, (_, index) => `PASS unrelated-${index}.test.js`),
+    "FAIL checkout preserves transaction",
+    "  expect(received).toBe(expected)",
+    "Error: expected 2 received 1",
+    "Test Suites: 1 failed, 899 passed, 900 total",
+    "Tests:       1 failed, 899 passed, 900 total",
+  ].join("\n");
+  const compact = unified.compressText(output, { profile: "test", query: "checkout", max_chars: 1_600 });
+  assert.equal(compact.route, "compressed");
+  assert.match(compact.output, /FAIL checkout/);
+  assert.match(compact.output, /1 failed/);
+  assert.doesNotMatch(compact.output, /unrelated-0\.test\.js/);
+  assert.ok(compact.output.length < output.length * 0.08);
+});
+
 test("redaction preserves ordinary token prose while removing assigned credentials", () => {
   const prose = "Capsule reduces reasoning-token growth and token savings vary by workload.";
   const unchanged = unified.compressText(prose, { profile: "generic" });
@@ -1230,6 +1264,8 @@ test("capability airlock removes static skill injection and still routes plugin 
     assert.match(activeAgents, /do not claim unavailable without trying/);
     assert.match(activeAgents, /real `payload\.url\|requests`/);
     assert.match(activeAgents, /do not invent IDs/);
+    assert.match(activeAgents, /Browser integrations are lazy/);
+    assert.match(activeAgents, /empty `globalThis` inventory before setup does not mean browser tools are missing/);
     assert.doesNotMatch(activeAgents, new RegExp(legacyProjectRule.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 
     const routed = await unified.dispatch({

@@ -1,9 +1,9 @@
 "use strict";
 
-const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const core = require("./core.cjs");
+const storage = require("./storage.cjs");
 
 const INDEX_VERSION = 3;
 const EXCLUDED_DIRECTORIES = new Set([
@@ -44,7 +44,7 @@ function integer(value, fallback, minimum, maximum) {
 }
 
 function sha256(value) {
-  return crypto.createHash("sha256").update(value).digest("hex");
+  return storage.sha256(value);
 }
 
 function slash(value) {
@@ -79,18 +79,11 @@ function projectPaths(root) {
 }
 
 function readJson(file, fallback = null) {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    return fallback;
-  }
+  return storage.readJson(file, fallback);
 }
 
 function writeJsonAtomic(file, value) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(value)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, value);
 }
 
 function projectCacheEntries() {

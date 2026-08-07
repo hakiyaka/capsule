@@ -1,6 +1,5 @@
 "use strict";
 
-const crypto = require("node:crypto");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
@@ -8,11 +7,21 @@ const changeMap = require("./change-map.cjs");
 const providerTelemetry = require("./provider-telemetry.cjs");
 const core = require("./core.cjs");
 const zeroInferencePoll = require("./zero-inference-poll.cjs");
+const storage = require("./storage.cjs");
 
 const SECRET_RE = /\b(api[_-]?(?:key|token)|access[_-]?token|auth[_-]?token|authorization|cookie|credential|password|passwd|private[_-]?key|secret|token)\s*([:=])\s*(?:bearer\s+)?[^\s,;]+|\bbearer\s+[a-z0-9._~+/=-]+/ig;
 const ANSI_RE = /\x1b\[[0-?]*[ -/]*[@-~]/g;
 const SIGNAL_RE = /\b(error|exception|fatal|fail(?:ed|ure)?|panic|security|timeout|traceback|warn(?:ing)?|denied)\b/i;
 const SUMMARY_RE = /\b(pass(?:ed)?|fail(?:ed)?|tests?|suites?|errors?|warnings?|finished|completed|duration|time|total|summary|success)\b/i;
+// Verification runners repeat one line per test/file even when the only
+// actionable fact is the final aggregate. Keep failure context, but collapse
+// a successful run to its bounded summary. This mirrors the useful part of
+// WrongStack's result serializer without assuming a provider-side cache or a
+// particular runner implementation.
+const TEST_FAILURE_RE = /(?:^|[\s:])(?:FAIL(?:ED)?\b|✕|×|✗|ERROR\b|Error:|TypeError:|AssertionError:|Exception:|panic:)|\b(?:[1-9]\d*|one)\s+(?:failed|failing|error|errors)\b/i;
+const TEST_SUMMARY_RE = /^\s*(?:test\s+suites?|tests?|specs?|checks?|snapshots?|time|duration|ran\b|total|passed|failed|warnings?|errors?)\s*[:=]/i;
+const TEST_PASS_LINE_RE = /^\s*(?:PASS\b|ok\b|[✓✔])\s*/i;
+const TEST_WARNING_RE = /^\s*(?:warn(?:ing)?\b|⚠)\s*[:：]?/i;
 const INTERACTIVE_RE = /\b(vim|nvim|nano|less|more|top|htop|ssh|ftp|telnet|python|node|pwsh|powershell|cmd)\s*$/i;
 const LARGE_OUTPUT_RE = /\b(diff|find|grep|rg|tree|log|test|build|lint|list|describe|scan|audit|status|show|history|ps|inspect)\b/i;
 const HOOK_READ_ONLY_RE = /^(?:rg|grep|findstr|fd|tree|cat|type|jq|Get-ChildItem|Get-Content|Select-String|git\s+(?:status|diff|log|show|branch|tag|remote)|docker\s+(?:ps|logs|inspect)|kubectl\s+(?:get|describe|logs)|npm\s+(?:list|ls|outdated)|pip\s+(?:list|show)|dotnet\s+(?:list|--info)|cargo\s+(?:tree|metadata)|go\s+(?:list|env))\b/i;
@@ -45,7 +54,7 @@ function int(value, fallback, min, max) {
 }
 
 function sha256(value) {
-  return crypto.createHash("sha256").update(value).digest("hex");
+  return storage.sha256(value);
 }
 
 function statePaths() {
@@ -65,19 +74,11 @@ function ensureState() {
 }
 
 function readJson(file, fallback) {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch (error) {
-    if (error.code === "ENOENT") return fallback;
-    throw error;
-  }
+  return storage.readJson(file, fallback, { onError: "missing" });
 }
 
 function writeJson(file, value) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, value, { pretty: true });
 }
 
 function redact(text) {
@@ -195,6 +196,49 @@ function compactDiagnostics(lines) {
     }
   }
   return ordered.map(({ key, line }) => counts.get(key) > 1 ? `${line}  [x${counts.get(key)}]` : line);
+}
+
+function compactTestOutput(lines) {
+  const nonempty = lines.map((line) => String(line).trimEnd()).filter((line) => line.trim());
+  if (!nonempty.length) return [];
+
+  const failures = nonempty.filter((line) => TEST_FAILURE_RE.test(line));
+  const summaries = nonempty.filter((line) => TEST_SUMMARY_RE.test(line));
+  const warnings = nonempty.filter((line) => TEST_WARNING_RE.test(line));
+
+  // A green run is the common case. Emit only runner aggregates and a small
+  // warning tail; every omitted line remains available through the exact
+  // Capsule created by the caller.
+  if (!failures.length) {
+    if (summaries.length) {
+      return unique([
+        ...warnings.slice(-4),
+        ...summaries.slice(-16),
+      ]).slice(-20);
+    }
+    const passLines = nonempty.filter((line) => TEST_PASS_LINE_RE.test(line));
+    if (passLines.length) {
+      return [
+        `[Capsule test summary] status=passed; checks=${passLines.length}; repetitive runner output omitted`,
+      ];
+    }
+    // Unknown successful-looking output is kept on the conservative path.
+    return compactDiagnostics(nonempty);
+  }
+
+  // On a failing run, retain the failure neighborhood and aggregate lines,
+  // while deliberately excluding the hundreds of unrelated PASS rows.
+  const selected = aroundSignals(
+    nonempty,
+    new RegExp(`${TEST_FAILURE_RE.source}|${TEST_SUMMARY_RE.source}|${TEST_WARNING_RE.source}`, "i"),
+    2,
+  );
+  const fallback = selected.length ? selected : compactDiagnostics(nonempty);
+  return unique([
+    ...nonempty.slice(0, 3).filter((line) => !TEST_PASS_LINE_RE.test(line)),
+    ...fallback,
+    ...nonempty.slice(-4),
+  ]);
 }
 
 function compileRegex(value, flags = "i") {
@@ -426,7 +470,8 @@ function filterText(text, options = {}) {
     if (manifest) return { profile, lines: manifest };
     return { profile, lines: lines.filter((line) => /^(?:diff --git|index |@@|[+-]{3} |[+-](?![+-]))/.test(line)) };
   }
-  if (["test", "diagnostic", "build"].includes(profile)) {
+  if (profile === "test") return { profile, lines: compactTestOutput(lines) };
+  if (["diagnostic", "build"].includes(profile)) {
     return { profile, lines: compactDiagnostics(lines) };
   }
   if (profile === "log") return { profile, lines: unique(lines.filter((line) => line.trim())) };
@@ -972,6 +1017,7 @@ function telemetry(args = {}) {
 module.exports = {
   applyCustomFilter,
   applyFilterPipeline,
+  compactTestOutput,
   discover,
   filterText,
   gain,

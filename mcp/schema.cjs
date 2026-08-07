@@ -1,8 +1,8 @@
 "use strict";
 
 const actions = [
-  "run", "batch", "flow", "file", "project", "index", "search", "remember", "fetch",
-  "execute", "cognition", "jobs", "interrupt", "rewrite", "filters", "gain", "discover", "learn", "telemetry",
+  "run", "batch", "flow", "file", "project", "index", "search", "remember", "memory", "fetch",
+  "execute", "environment", "cognition", "jobs", "interrupt", "rewrite", "filters", "gain", "discover", "learn", "telemetry",
   "pipe", "insight", "advisor", "skills", "purge", "expand", "diff", "list", "stats", "doctor",
   "command", "ledger",
 ];

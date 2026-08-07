@@ -6,6 +6,7 @@ const os = require("node:os");
 const path = require("node:path");
 const zlib = require("node:zlib");
 const { spawnSync } = require("node:child_process");
+const storage = require("./storage.cjs");
 
 const DEFAULT_MAX_CHARS = 800;
 const MAX_RETURN_CHARS = 12000;
@@ -52,7 +53,7 @@ function clampInt(value, fallback, min, max) {
 }
 
 function sha256(value) {
-  return crypto.createHash("sha256").update(value).digest("hex");
+  return storage.sha256(value);
 }
 
 function approxTokens(chars) {
@@ -362,18 +363,11 @@ function reuseResultFuture(future, args) {
 }
 
 function readJson(file, fallback) {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch (error) {
-    if (error && error.code === "ENOENT") return fallback;
-    throw error;
-  }
+  return storage.readJson(file, fallback, { onError: "missing" });
 }
 
 function writeJsonAtomic(file, value) {
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, value, { pretty: true });
 }
 
 function normalizeLines(text) {

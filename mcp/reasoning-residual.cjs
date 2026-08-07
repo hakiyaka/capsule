@@ -1,11 +1,11 @@
 "use strict";
 
-const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const core = require("./core.cjs");
 const compat = require("./compat.cjs");
 const terminal = require("./terminal-novelty.cjs");
+const storage = require("./storage.cjs");
 
 const LIFETIME_MS = 2 * 60 * 60_000;
 const MAX_ENTRIES = 24;
@@ -15,23 +15,18 @@ function stateFile(sessionId) {
   if (!sessionId) return "";
   const root = path.join(core.stateRoot(), "reasoning-residual");
   fs.mkdirSync(root, { recursive: true });
-  const digest = crypto.createHash("sha256").update(sessionId).digest("hex").slice(0, 24);
+  const digest = storage.sha256(sessionId).slice(0, 24);
   return path.join(root, `${digest}.json`);
 }
 
 function writeState(file, state) {
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(state)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, state);
 }
 
 function identity(cwd, command) {
   const resolved = path.resolve(String(cwd || process.cwd()));
   const normalized = process.platform === "win32" ? resolved.toLowerCase() : resolved;
-  return crypto.createHash("sha256")
-    .update(`${normalized}\0${terminal.canonicalCommand(command)}`)
-    .digest("hex")
-    .slice(0, 24);
+  return storage.sha256(`${normalized}\0${terminal.canonicalCommand(command)}`).slice(0, 24);
 }
 
 function normalizeDiagnostic(line) {
@@ -57,7 +52,7 @@ function diagnosticLines(text) {
 function diagnostic(text) {
   const lines = diagnosticLines(text);
   const joined = lines.join("\n");
-  const signature = crypto.createHash("sha256").update(joined).digest("hex").slice(0, 12);
+  const signature = storage.sha256(joined).slice(0, 12);
   const headline = (lines.find((line) =>
     /\b(?:error|fail(?:ed|ure)?|exception|panic|fatal|assert(?:ion)?|expected|actual|received)\b/i.test(line)
   ) || lines[0] || "non-zero validation result").slice(0, 180);
@@ -85,11 +80,7 @@ function reasoningResidual(args = {}) {
 
   const now = Date.now();
   let state = { entries: {} };
-  try {
-    state = JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    state = { entries: {} };
-  }
+  state = storage.readJson(file, { entries: {} });
   const entries = compactState(state, now);
   const key = identity(args.cwd, args.command);
   const prior = entries[key];
@@ -180,11 +171,8 @@ function checkpoint(sessionId) {
   const file = stateFile(String(sessionId || ""));
   if (!file) return "";
   let state;
-  try {
-    state = JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    return "";
-  }
+  state = storage.readJson(file, null);
+  if (!state || typeof state !== "object") return "";
   const latest = Object.values(compactState(state, Date.now()))
     .sort((left, right) => Number(right.at || 0) - Number(left.at || 0))[0];
   if (!latest) return "";

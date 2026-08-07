@@ -1,9 +1,8 @@
 "use strict";
 
-const crypto = require("node:crypto");
-const fs = require("node:fs");
 const path = require("node:path");
 const core = require("./core.cjs");
+const storage = require("./storage.cjs");
 
 const MAX_AGE_MS = 20 * 60_000;
 const MAX_ENTRIES = 64;
@@ -21,13 +20,11 @@ const STATUS_COMMANDS = [
 ];
 
 function clamp(value, fallback, minimum, maximum) {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed)) return fallback;
-  return Math.min(maximum, Math.max(minimum, Math.trunc(parsed)));
+  return Math.trunc(storage.clampNumber(value, fallback, minimum, maximum));
 }
 
 function digest(value) {
-  return crypto.createHash("sha256").update(String(value || "")).digest("hex");
+  return storage.sha256(value);
 }
 
 function normalizedCommand(value) {
@@ -83,18 +80,11 @@ function semanticHash(execution = {}) {
 }
 
 function readJson(file, fallback) {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    return fallback;
-  }
+  return storage.readJson(file, fallback);
 }
 
 function writeJsonAtomic(file, value) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(value)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, value);
 }
 
 function stateFile(args = {}) {

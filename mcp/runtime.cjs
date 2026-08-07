@@ -5,47 +5,336 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawn, spawnSync } = require("node:child_process");
 const core = require("./core.cjs");
+const storage = require("./storage.cjs");
+
+const RUNTIME_PROFILE_TTL_MS = 15 * 60 * 1000;
+const RUNTIME_PROFILE_MAX_ENTRIES = 32;
+const COMMAND_PROBE_MAX_ENTRIES = 256;
+const commandProbeCache = new Map();
+const runtimeProfileCache = new Map();
+
+function cacheSet(cache, key, value, maxEntries) {
+  const now = Date.now();
+  for (const [candidate, entry] of cache) {
+    if (Number(entry?.expires_at) <= now) cache.delete(candidate);
+  }
+  cache.set(key, value);
+  while (cache.size > maxEntries) {
+    const oldest = cache.keys().next().value;
+    if (oldest === undefined) break;
+    cache.delete(oldest);
+  }
+}
 
 function int(value, fallback, min, max) {
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) ? Math.min(max, Math.max(min, parsed)) : fallback;
 }
 
-function commandExists(command) {
-  const result = process.platform === "win32"
-    ? spawnSync("where.exe", [command], { windowsHide: true, stdio: "ignore", timeout: 2_000 })
-    : spawnSync("/bin/sh", ["-lc", `command -v -- ${command}`], { stdio: "ignore", timeout: 2_000 });
-  return result.status === 0;
+function environmentValue(env, name, fallback = "") {
+  if (Object.prototype.hasOwnProperty.call(env || {}, name)) return env[name];
+  const key = Object.keys(env || {}).find((candidate) => candidate.toLowerCase() === name.toLowerCase());
+  return key == null ? fallback : env[key];
 }
 
-function runtimeStatus() {
+function shortHash(value) {
+  return storage.sha256(value).slice(0, 12);
+}
+
+function normalizedCwd(value, platform) {
+  const resolved = path.resolve(value || process.cwd());
+  return platform === "win32" ? resolved.toLowerCase() : resolved;
+}
+
+function pathFingerprint(env, platform = process.platform) {
+  const pathValue = String(environmentValue(env, "PATH", ""));
+  const entries = pathValue.split(platform === "win32" ? ";" : ":").map((item) => item.trim()).filter(Boolean);
+  return {
+    entries: entries.length,
+    hash: shortHash(pathValue),
+  };
+}
+
+function profileKey({ cwd, platform, env }) {
+  const resolvedCwd = path.resolve(cwd || process.cwd());
+  const localPythonPaths = platform === "win32"
+    ? [path.join(".venv", "Scripts", "python.exe"), path.join("venv", "Scripts", "python.exe")]
+    : [path.join(".venv", "bin", "python"), path.join("venv", "bin", "python")];
+  return shortHash(JSON.stringify({
+    cwd: normalizedCwd(resolvedCwd, platform),
+    platform,
+    arch: process.arch,
+    path: environmentValue(env, "PATH", ""),
+    pathext: environmentValue(env, "PATHEXT", ""),
+    shell: environmentValue(env, "ComSpec", environmentValue(env, "SHELL", "")),
+    virtual_env: environmentValue(env, "VIRTUAL_ENV", ""),
+    conda_prefix: environmentValue(env, "CONDA_PREFIX", ""),
+    workspace_python: localPythonPaths.map((relative) => [relative, fs.existsSync(path.join(resolvedCwd, relative))]),
+  }));
+}
+
+function commandExists(command, options = {}) {
+  const platform = options.platform || process.platform;
+  const env = options.env || process.env;
+  const cwd = options.cwd || process.cwd();
+  const cacheKey = `${platform}\0${cwd}\0${command}\0${environmentValue(env, "PATH", "")}\0${environmentValue(env, "PATHEXT", "")}`;
+  const cached = commandProbeCache.get(cacheKey);
+  if (cached && cached.expires_at > Date.now()) return cached.available;
+  let result;
+  try {
+    result = platform === "win32"
+      ? spawnSync("where.exe", [command], { cwd, env, windowsHide: true, stdio: "ignore", timeout: 2_000 })
+      : spawnSync("/bin/sh", ["-lc", `command -v -- ${command}`], { cwd, env, stdio: "ignore", timeout: 2_000 });
+  } catch {
+    result = { status: 1 };
+  }
+  const available = result.status === 0;
+  cacheSet(commandProbeCache, cacheKey, { available, expires_at: Date.now() + RUNTIME_PROFILE_TTL_MS }, COMMAND_PROBE_MAX_ENTRIES);
+  return available;
+}
+
+function runtimeStorePath() {
+  const root = path.join(core.stateRoot(), "runtime");
+  return { root, file: path.join(root, "profiles.json") };
+}
+
+function readRuntimeStore() {
+  const parsed = storage.readJson(runtimeStorePath().file, null);
+  if (parsed && parsed.version === 1 && parsed.profiles && typeof parsed.profiles === "object") return parsed;
+  return { version: 1, profiles: {} };
+}
+
+function writeRuntimeStore(store) {
+  try {
+    writeAtomic(runtimeStorePath().file, store);
+  } catch {
+    // Runtime discovery remains useful when the optional state directory is read-only.
+  }
+}
+
+function profileCommand(command, source, alternatives = []) {
+  return { command, source, ...(alternatives.length ? { alternatives } : {}) };
+}
+
+function runtimeProfile(options = {}) {
+  const platform = options.platform || process.platform;
+  const env = options.env || process.env;
+  const cwd = path.resolve(options.cwd || process.cwd());
+  const key = profileKey({ cwd, platform, env });
+  const now = Date.now();
+  const refresh = options.refresh === true;
+  const injectedProbe = typeof options.probe === "function" ? options.probe : null;
+  const probe = (command) => injectedProbe
+    ? Boolean(injectedProbe(command, { cwd, env, platform }))
+    : commandExists(command, { cwd, env, platform });
+
+  const memoryEntry = runtimeProfileCache.get(key);
+  if (!refresh && memoryEntry && Number(memoryEntry.expires_at) > now) {
+    return formatRuntimeProfile(memoryEntry, { cacheHit: true, now, operation: options.operation || "snapshot" });
+  }
+  const diskStore = readRuntimeStore();
+  const diskEntry = diskStore.profiles[key];
+  if (!refresh && diskEntry && Number(diskEntry.expires_at) > now) {
+    cacheSet(runtimeProfileCache, key, diskEntry, RUNTIME_PROFILE_MAX_ENTRIES);
+    return formatRuntimeProfile(diskEntry, { cacheHit: true, now, operation: options.operation || "snapshot" });
+  }
+
+  const pathInfo = pathFingerprint(env, platform);
+  const exists = typeof options.exists === "function" ? options.exists : fs.existsSync;
+  let probeCount = 0;
+  const check = (command) => {
+    probeCount += 1;
+    return probe(command);
+  };
+  const localPythonPaths = platform === "win32"
+    ? [path.join(".venv", "Scripts", "python.exe"), path.join("venv", "Scripts", "python.exe")]
+    : [path.join(".venv", "bin", "python"), path.join("venv", "bin", "python")];
+  const pythonAlternatives = [];
+  let python = null;
+  for (const relative of localPythonPaths) {
+    const candidate = path.join(cwd, relative);
+    if (exists(candidate)) {
+      python = profileCommand(`.${path.sep}${relative}`, "workspace-venv");
+      break;
+    }
+  }
+  const virtualEnv = environmentValue(env, "VIRTUAL_ENV", "");
+  if (!python && virtualEnv) {
+    const candidate = path.join(virtualEnv, platform === "win32" ? "Scripts" : "bin", "python");
+    if (exists(candidate)) python = profileCommand("python", "VIRTUAL_ENV");
+  }
+  const pythonCandidates = platform === "win32"
+    ? [
+        ["py", "py-launcher", "py -3"],
+        ["python", "PATH", "python"],
+        ["python3", "PATH", "python3"],
+      ]
+    : [
+        ["python3", "PATH", "python3"],
+        ["python", "PATH", "python"],
+      ];
+  for (const [candidate, source, display] of pythonCandidates) {
+    if (check(candidate)) {
+      pythonAlternatives.push(display);
+      if (!python) python = profileCommand(display, source);
+    }
+  }
+  const shellCandidates = platform === "win32"
+    ? [["pwsh", "PowerShell 7"], ["powershell", "Windows PowerShell"]]
+    : [["zsh", "zsh"], ["bash", "bash"], ["sh", "sh"]];
+  let shell = null;
+  for (const [candidate, display] of shellCandidates) {
+    if (check(candidate)) {
+      shell = profileCommand(display, "PATH");
+      break;
+    }
+  }
   const nodeMajor = Number(process.versions.node.split(".")[0]);
   const available = {
     javascript: true,
     typescript: nodeMajor >= 22,
-    shell: process.platform === "win32" ? commandExists("powershell") : commandExists("sh"),
-    python: commandExists("python"),
-    ruby: commandExists("ruby"),
-    php: commandExists("php"),
-    perl: commandExists("perl"),
-    r: commandExists("Rscript"),
-    elixir: commandExists("elixir"),
-    go: commandExists("go"),
-    rust: commandExists("rustc"),
-    csharp: commandExists("dotnet-script"),
+    shell: Boolean(shell),
+    python: Boolean(python),
+    ruby: check("ruby"),
+    php: check("php"),
+    perl: check("perl"),
+    r: check(platform === "win32" ? "Rscript.exe" : "Rscript"),
+    elixir: check("elixir"),
+    go: check("go"),
+    rust: check("rustc"),
+    csharp: check("dotnet-script"),
+  };
+  const managerCandidates = ["git", "npm", "pnpm", "yarn", "bun", "uv", "pip", "poetry", "conda"];
+  const packageManagers = managerCandidates.filter((command) => check(command));
+  const createdAt = new Date(now).toISOString();
+  const entryToStore = {
+    version: 1,
+    key,
+    lease_id: `env_${key}`,
+    created_at: createdAt,
+    expires_at: now + RUNTIME_PROFILE_TTL_MS,
+    platform,
+    arch: process.arch,
+    workspace: path.basename(cwd),
+    path: pathInfo,
+    shell,
+    node: { command: "node", version: process.versions.node },
+    python,
+    python_alternatives: [...new Set(pythonAlternatives)],
+    package_managers: packageManagers,
+    available,
+    probe_count: probeCount,
+  };
+  cacheSet(runtimeProfileCache, key, entryToStore, RUNTIME_PROFILE_MAX_ENTRIES);
+  const nextStore = readRuntimeStore();
+  nextStore.profiles[key] = entryToStore;
+  const entries = Object.entries(nextStore.profiles)
+    .sort((left, right) => Number(right[1].created_at ? Date.parse(right[1].created_at) : 0) - Number(left[1].created_at ? Date.parse(left[1].created_at) : 0))
+    .slice(0, RUNTIME_PROFILE_MAX_ENTRIES);
+  nextStore.profiles = Object.fromEntries(entries);
+  writeRuntimeStore(nextStore);
+  return formatRuntimeProfile(entryToStore, { cacheHit: false, now, operation: options.operation || "snapshot" });
+}
+
+function formatRuntimeProfile(profile, { cacheHit, now, operation = "snapshot" }) {
+  const safe = profile && typeof profile === "object" ? profile : {};
+  const safePath = safe.path && typeof safe.path === "object" ? safe.path : {};
+  const safeNode = safe.node && typeof safe.node === "object"
+    ? { command: String(safe.node.command || "node"), version: String(safe.node.version || "unknown") }
+    : { command: "node", version: "unknown" };
+  const safePython = safe.python && typeof safe.python === "object" ? safe.python : null;
+  const safeShell = safe.shell && typeof safe.shell === "object" ? safe.shell : null;
+  const safeManagers = Array.isArray(safe.package_managers)
+    ? safe.package_managers.filter((item) => typeof item === "string")
+    : [];
+  const safeAlternatives = Array.isArray(safe.python_alternatives)
+    ? safe.python_alternatives.filter((item) => typeof item === "string")
+    : [];
+  const safeAvailable = safe.available && typeof safe.available === "object" ? safe.available : {};
+  const leaseId = String(safe.lease_id || "env_unknown");
+  const platform = String(safe.platform || "unknown");
+  const arch = String(safe.arch || "unknown");
+  const workspace = String(safe.workspace || "unknown");
+  const python = safePython && safePython.command ? String(safePython.command) : "missing";
+  const shell = safeShell && safeShell.command ? String(safeShell.command) : "missing";
+  const managers = safeManagers.length ? safeManagers.join(",") : "none";
+  const pathEntries = Number.isFinite(Number(safePath.entries)) ? Number(safePath.entries) : 0;
+  const pathHash = String(safePath.hash || "unknown");
+  const expiresAt = Number.isFinite(Number(safe.expires_at)) ? Number(safe.expires_at) : 0;
+  const probeCount = Number.isFinite(Number(safe.probe_count)) ? Number(safe.probe_count) : 0;
+  const responseText = [
+    `Environment lease ${leaseId}: ${platform}/${arch}; workspace=${workspace}; shell=${shell}; node=${safeNode.version}; python=${python}; managers=${managers}.`,
+    `PATH entries=${pathEntries}, fingerprint=${pathHash}; cache=${cacheHit ? "hit" : "miss"}; reuse_until=${expiresAt}. Raw PATH and environment values omitted.`,
+  ].join(" ");
+  return {
+    response: {
+      operation,
+      lease_id: leaseId,
+      platform,
+      arch,
+      workspace,
+      shell: safeShell,
+      node: safeNode,
+      python: safePython,
+      python_alternatives: safeAlternatives,
+      package_managers: safeManagers,
+      available: safeAvailable,
+      path: { entries: pathEntries, hash: pathHash },
+      cache_hit: cacheHit,
+      expires_at: expiresAt,
+      probe_count: probeCount,
+      savings: {
+        repeated_probe_calls_avoided: cacheHit ? probeCount : 0,
+        model_visible_chars: responseText.length,
+        note: "Local probes are cached; no provider billing or hidden-reasoning saving is inferred.",
+      },
+    },
+    responseText,
+    route: "environment-lease",
+    capturedChars: 0,
+    ...(now ? { observed_at: new Date(now).toISOString() } : {}),
+  };
+}
+
+function invalidateRuntimeProfile(options = {}) {
+  const platform = options.platform || process.platform;
+  const env = options.env || process.env;
+  const cwd = path.resolve(options.cwd || process.cwd());
+  const key = profileKey({ cwd, platform, env });
+  runtimeProfileCache.delete(key);
+  const store = readRuntimeStore();
+  const removed = Boolean(store.profiles[key]);
+  delete store.profiles[key];
+  if (removed) writeRuntimeStore(store);
+  return { response: { operation: "invalidate", removed, lease_key: `env_${key}` }, capturedChars: 0 };
+}
+
+function environmentProfile(args = {}) {
+  const operation = String(args.operation || args.op || "snapshot").toLowerCase();
+  if (["invalidate", "reset", "clear"].includes(operation)) return invalidateRuntimeProfile(args);
+  if (!["snapshot", "status", "refresh"].includes(operation)) {
+    throw new Error("environment operation must be snapshot, status, refresh, or invalidate");
+  }
+  return runtimeProfile({ ...args, operation, refresh: operation === "refresh" || args.refresh === true });
+}
+
+function runtimeStatus(options = {}) {
+  const profile = runtimeProfile(options).response;
+  const available = {
+    ...profile.available,
   };
   return {
     available,
     available_count: Object.values(available).filter(Boolean).length,
     total: Object.keys(available).length,
+    lease_id: profile.lease_id,
+    cache_hit: profile.cache_hit,
+    probe_count: profile.probe_count,
   };
 }
 
 function writeAtomic(file, value) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, value, { pretty: true });
 }
 
 function jobsPath() {
@@ -55,12 +344,7 @@ function jobsPath() {
 }
 
 function readJobs() {
-  try {
-    return JSON.parse(fs.readFileSync(jobsPath().catalog, "utf8"));
-  } catch (error) {
-    if (error.code === "ENOENT") return { version: 1, jobs: {} };
-    throw error;
-  }
+  return storage.readJson(jobsPath().catalog, { version: 1, jobs: {} }, { onError: "missing" });
 }
 
 function saveJobs(value) {
@@ -411,7 +695,9 @@ function jobs(args = {}) {
 }
 
 module.exports = {
+  environmentProfile,
   executeCode,
   jobs,
+  runtimeProfile,
   runtimeStatus,
 };

@@ -29,3 +29,5 @@ jobs:
         run: npm run audit:source
       - name: Audit public readiness
         run: npm run audit:public
+      - name: Audit documentation
+        run: npm run audit:docs

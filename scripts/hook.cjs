@@ -16,8 +16,12 @@ const compaction = require("../mcp/compaction.cjs");
 const compactionLedger = require("../mcp/compaction-ledger.cjs");
 const quotaProgress = require("../mcp/quota-progress.cjs");
 const unified = require("../mcp/unified.cjs");
+const runtime = require("../mcp/runtime.cjs");
 const reasoningResidual = require("../mcp/reasoning-residual.cjs");
 const terminalGenome = require("../mcp/terminal-genome.cjs");
+
+const DEFAULT_MAX_SUBAGENTS_PER_TASK = 8;
+const MAX_MAX_SUBAGENTS_PER_TASK = 32;
 
 function readInput() {
   try {
@@ -446,6 +450,7 @@ function executionStateFallback() {
     successful_evidence: {},
     context_interest_tokens: 0,
     context_interest_tier: 0,
+    environment_lease_id: "",
   };
 }
 
@@ -500,6 +505,26 @@ function startAdvisorTask(input, prompt) {
     boundary: Boolean(current.task_id && (plan.task_boundary || expired || projectChanged)),
     plan,
   };
+}
+
+function windowsEnvironmentContext(input, prompt) {
+  if (process.platform !== "win32") return "";
+  if (!/(?:\bpython(?:\d+)?\b|\bpip\b|\bvenv\b|\bvirtualenv\b|\bpyproject\b|\bpowershell\b|\bpwsh\b|\bconda\b|\buv\b|path\s+(?:variable|issue)|not\s+recognized|command\s+not\s+found)/i.test(prompt)) {
+    return "";
+  }
+  try {
+    const file = hashedHookStateFile(input, "execution-progress");
+    const state = readHookState(file, executionStateFallback());
+    const profile = runtime.runtimeProfile({ cwd: projectDir(input) });
+    const leaseId = profile.response?.lease_id;
+    if (!leaseId || state.environment_lease_id === leaseId) return "";
+    state.environment_lease_id = leaseId;
+    state.environment_lease_at = Date.now();
+    writeHookState(file, state);
+    return `${profile.responseText} Use this lease; do not repeat PATH/where/Python probes unless execution fails.`;
+  } catch {
+    return "[Capsule environment lease unavailable; avoid repeated PATH/Python discovery and inspect only the failing command.]";
+  }
 }
 
 function isNativeEditToolName(toolName) {
@@ -788,6 +813,18 @@ function isSpawnTool(toolName) {
   return /(?:^|[._-])spawn[_-]?agent(?:$|[._-])/i.test(String(toolName || ""));
 }
 
+function isDelegationLaneTool(input, toolName) {
+  const normalized = String(toolName || "").toLowerCase();
+  if (isSpawnTool(normalized) ||
+      /(?:create[_-]?thread|follow[_-]?up[_-]?task|send[_-]?message[_-]?to[_-]?thread)/i.test(normalized)) {
+    return true;
+  }
+  const toolInput = input.tool_input || input.toolInput || {};
+  return /capsule/.test(normalized) &&
+    String(toolInput.action || "").toLowerCase() === "cognition" &&
+    String(toolInput.operation || toolInput.payload?.operation || "").toLowerCase() === "delegate";
+}
+
 function isMutationTool(toolName) {
   if (isPlanningTool(toolName) || isPollTool(toolName)) return false;
   return /(?:apply[_ -]?patch|write|edit|delete|remove|create|update|move|rename|send)/i.test(
@@ -1044,6 +1081,11 @@ function noteToolIntent(input, toolName) {
   } else if (isSpawnTool(normalized)) {
     state.poll_count = 0;
     state.spawn_count = Number(state.spawn_count || 0) + 1;
+    const fanoutLimit = subagentFanoutLimit(input);
+    if (!blockReason && state.spawn_count > fanoutLimit && !explicitEfficiencyOverride(input)) {
+      blockReason = `[Capsule fan-out fuse: ${state.spawn_count - 1}/${fanoutLimit} subagents already spawned since the last implementation mutation; ` +
+        "reuse an existing agent or make the task self-contained. Set capsule_force=true only for an indispensable additional fork.]";
+    }
     if ([4, 8].includes(state.spawn_count)) {
       guidance = `Capsule fan-out governor: ${state.spawn_count} subagents were spawned ` +
         "since the last implementation mutation. Reuse existing agents, keep new tasks self-contained, " +
@@ -1157,6 +1199,12 @@ function noteToolIntent(input, toolName) {
   }
   const cycleGuidance = sequenceCycleGuidance(input, normalized, state);
   const retryGuidance = failurePreflight(input, normalized);
+  if (!blockReason && retryGuidance && isDelegationLaneTool(input, normalized) &&
+      !explicitEfficiencyOverride(input)) {
+    blockReason = "[Capsule failed-lane fuse: the unchanged delegation request already failed. " +
+      "Change the task packet, lane, or runtime evidence before retrying; set capsule_force=true " +
+      "only for a deliberate retry.]";
+  }
   guidance = [guidance, cycleGuidance, retryGuidance].filter(Boolean).join("\n").slice(0, 1_200);
   state.last_tool = normalized.slice(0, 160);
   state.last_paths = paths;
@@ -1189,6 +1237,7 @@ function noteToolResult(input, toolName) {
   }
   if (!isFailedToolResult(input) && (isMutationTool(normalized) || isNodeReplMutation(input))) {
     compactionLedger.clearProbe(compactionLedgerFile(input));
+    clearFailureReplay(input);
     state.epoch = Number(state.epoch || 0) + 1;
     state.no_progress_reads = 0;
     state.plan_count = 0;
@@ -1460,6 +1509,63 @@ function mediaReplay(input, toolName, rawOutput) {
   }
 }
 
+function mediaZeroCopy(input, toolName, rawOutput) {
+  const toolInput = input && input.tool_input && typeof input.tool_input === "object"
+    ? input.tool_input
+    : {};
+  const enabled = process.env.CAPSULE_MEDIA_ZERO_COPY === "1" || toolInput.capsule_media_zero_copy === true;
+  if (!enabled) return null;
+  let serialized;
+  try {
+    serialized = typeof rawOutput === "string" ? rawOutput : JSON.stringify(rawOutput);
+  } catch {
+    return null;
+  }
+  if (!serialized || !containsMedia(rawOutput)) return null;
+  const hash = require("node:crypto").createHash("sha256").update(serialized, "utf8").digest("hex");
+  const root = path.join(hookRoot(), "media-zero-copy");
+  const exactPath = path.join(root, `media-${hash}.json`);
+  try {
+    fs.mkdirSync(root, { recursive: true });
+    if (!fs.existsSync(exactPath)) {
+      const temporary = `${exactPath}.${process.pid}.${Date.now()}.tmp`;
+      fs.writeFileSync(temporary, serialized, "utf8");
+      fs.renameSync(temporary, exactPath);
+    }
+  } catch {
+    return null;
+  }
+  const reference = {
+    type: "capsule-media-lease-v1",
+    media_id: `media_${hash.slice(0, 16)}`,
+    source: toolName || "view_image",
+    exact_sha256: hash,
+    exact_bytes: Buffer.byteLength(serialized, "utf8"),
+    exact_path: exactPath,
+    visual_fidelity: "exact-bytes",
+    recovery: "Read exact_path before making a visual judgment; no lossy transform was applied.",
+  };
+  const replacement = JSON.stringify(reference);
+  recordHookHistory({
+    command: toolName || "view_image",
+    cwd: projectDir(input),
+    profile: "media-zero-copy",
+    route: "compressed",
+    raw_chars: serialized.length,
+    emitted_chars: replacement.length,
+    exit_code: 0,
+    source: "hook-media-zero-copy",
+  });
+  return {
+    continue: false,
+    reason: replacement,
+    hookSpecificOutput: {
+      hookEventName: "PostToolUse",
+      additionalContext: "Capsule experimental zero-copy media lease: the exact visual payload is retained locally; recover exact_path before visual inspection.",
+    },
+  };
+}
+
 function clearMediaReplay(input) {
   const file = mediaReplayFile(input);
   if (!file) return;
@@ -1599,6 +1705,16 @@ function failureReplayFile(input) {
   const sessionHash = crypto.createHash("sha256").update(id).digest("hex").slice(0, 20);
   const root = path.join(hookRoot(), "failure-replays");
   return path.join(root, `${sessionHash}.json`);
+}
+
+function clearFailureReplay(input) {
+  const file = failureReplayFile(input);
+  if (!file) return;
+  try {
+    fs.rmSync(file, { force: true });
+  } catch {
+    // Ephemeral retry state is advisory; a failed cleanup must not block work.
+  }
 }
 
 function failureRequestHash(input, toolName) {
@@ -2068,6 +2184,56 @@ function matchingExactCapsule(capsuleId, exact) {
   } catch {
     return "";
   }
+}
+
+function webZeroCopy(input, toolName, rawOutput, guidance = "") {
+  const toolInput = input && input.tool_input && typeof input.tool_input === "object"
+    ? input.tool_input
+    : {};
+  const enabled = process.env.CAPSULE_WEB_ZERO_COPY === "1" || toolInput.capsule_web_zero_copy === true;
+  if (!enabled || !isStructuredWebTool(toolName) || rawOutput == null || containsMedia(rawOutput)) return null;
+  let exact;
+  try {
+    exact = typeof rawOutput === "string" ? rawOutput : JSON.stringify(rawOutput);
+  } catch {
+    return null;
+  }
+  if (!exact || /data:(?:image|audio|video)\//i.test(exact)) return null;
+  const hash = crypto.createHash("sha256").update(exact, "utf8").digest("hex");
+  const root = path.join(hookRoot(), "web-zero-copy");
+  const exactPath = path.join(root, `web-${hash}.json`);
+  try {
+    fs.mkdirSync(root, { recursive: true });
+    if (!fs.existsSync(exactPath)) {
+      const temporary = `${exactPath}.${process.pid}.${Date.now()}.tmp`;
+      fs.writeFileSync(temporary, exact, "utf8");
+      fs.renameSync(temporary, exactPath);
+    }
+  } catch {
+    return null;
+  }
+  const reference = {
+    type: "capsule-web-lease-v1",
+    web_id: `web_${hash.slice(0, 16)}`,
+    source: toolName,
+    exact_sha256: hash,
+    exact_bytes: Buffer.byteLength(exact, "utf8"),
+    exact_path: exactPath,
+    visual_fidelity: "exact-text-and-navigation",
+    recovery: "Read exact_path before citing, comparing, or making a final web judgment; no result was dropped.",
+  };
+  const replacement = JSON.stringify(reference);
+  recordHookHistory({
+    command: toolName || "web.run",
+    cwd: projectDir(input),
+    profile: "web-zero-copy",
+    route: "compressed",
+    raw_chars: exact.length,
+    emitted_chars: replacement.length,
+    exit_code: 0,
+    source: "hook-web-zero-copy",
+  });
+  return postToolReplacement(replacement, guidance);
 }
 
 function structuredWebProjection(rawOutput, input, toolName, existingCapsuleId = "") {
@@ -2593,6 +2759,18 @@ function subagentModel(message, need) {
   return terraRequired ? "gpt-5.6-terra" : "gpt-5.6-luna";
 }
 
+function subagentFanoutLimit(input) {
+  const configured = Number(process.env.CAPSULE_MAX_SUBAGENTS_PER_TASK);
+  const base = Number.isFinite(configured)
+    ? Math.min(MAX_MAX_SUBAGENTS_PER_TASK, Math.max(1, Math.trunc(configured)))
+    : DEFAULT_MAX_SUBAGENTS_PER_TASK;
+  const mode = String(pressureState(input).mode || "normal").toLowerCase();
+  if (mode === "emergency") return Math.min(base, 2);
+  if (mode === "critical") return Math.min(base, 4);
+  if (mode === "high") return Math.min(base, 6);
+  return base;
+}
+
 function subagentForkPolicy(input, toolInput, forkTurns) {
   const mode = String(process.env.CAPSULE_FORK_POLICY || "auto").toLowerCase();
   if (mode === "off") return {};
@@ -2600,9 +2778,16 @@ function subagentForkPolicy(input, toolInput, forkTurns) {
   const need = subagentHistoryNeed(message);
   const explicitModel = firstString(toolInput, ["model"]);
   const selectedModel = explicitModel || subagentModel(message, need);
+  const fullHistoryOverride = explicitEfficiencyOverride(input) ||
+    process.env.CAPSULE_ALLOW_FULL_FORK === "1";
+  const independentReview = /\b(?:fresh|independent|context[- ]clean|read[- ]only)\b[\s\S]{0,48}\b(?:review|reviewer|audit|inspection)\b/i.test(message) ||
+    /\b(?:review|reviewer|audit|inspection)\b[\s\S]{0,48}\b(?:fresh|independent|context[- ]clean|read[- ]only)\b/i.test(message);
   const explicitlyBounded = forkTurns === "none" ||
     (typeof forkTurns === "string" && /^\d+$/.test(forkTurns) && Number(forkTurns) <= 5);
-  const target = need === "none" ? "none" : need === "recent" ? "3" : "";
+  const freshReviewBounded = independentReview && !fullHistoryOverride && forkTurns !== "none";
+  const fullHistoryDowngraded = need === "full" && !fullHistoryOverride && forkTurns !== "none";
+  const target = freshReviewBounded ? "none" :
+    need === "none" ? "none" : need === "recent" || fullHistoryDowngraded ? "3" : "";
   const parentTokens = Number(pressureState(input).input_tokens || 0);
   const boundedTarget = !explicitlyBounded && mode === "auto" && target ? target : forkTurns;
   const changed = !explicitModel || boundedTarget !== forkTurns;
@@ -2621,7 +2806,13 @@ function subagentForkPolicy(input, toolInput, forkTurns) {
           ...(!explicitModel ? { model: selectedModel } : {}),
           ...(boundedTarget !== forkTurns ? { fork_turns: boundedTarget } : {}),
         },
-        additionalContext: need === "full"
+        additionalContext: freshReviewBounded
+          ? `[Capsule subagent model=${selectedModel}; fresh review fork bounded to fork_turns:none; ` +
+            "review only the supplied diff/evidence, not the parent conversation."
+          : fullHistoryDowngraded
+          ? `[Capsule subagent model=${selectedModel}; full-history fork downgraded to fork_turns:3; ` +
+            "set capsule_force=true only when the complete parent history is indispensable."
+          : need === "full"
           ? `[Capsule subagent model=${selectedModel}; history-dependent full subagent fork preserved` +
             `${parentTokens ? `; parent_input≈${parentTokens}` : ""}]`
           : `[Capsule subagent model=${selectedModel}; ` +
@@ -2639,7 +2830,12 @@ function subagentForkPolicy(input, toolInput, forkTurns) {
   return {
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
-      additionalContext: need === "full"
+      additionalContext: freshReviewBounded
+        ? "Capsule bounded the fresh review fork to fork_turns:none; review only the supplied diff/evidence."
+        : fullHistoryDowngraded
+        ? "Capsule downgraded an unbounded full-history subagent fork to fork_turns:3; " +
+          "set capsule_force=true only when the complete parent history is indispensable."
+        : need === "full"
         ? "Capsule preserved an explicitly history-dependent full subagent fork" +
           `${parentTokens ? ` (parent input≈${parentTokens} tokens)` : ""}.`
         : `Capsule observed an unbounded subagent fork; recommended fork_turns:${JSON.stringify(target)}.`,
@@ -2736,7 +2932,11 @@ function postToolUseCore(input) {
     repeatedReadGuidance(input, name),
   ].filter(Boolean).join("\n");
   const rawOutput = rawToolOutput(input);
+  const webLease = webZeroCopy(input, name, rawOutput, guidance);
+  if (webLease) return webLease;
   if (containsMedia(rawOutput)) {
+    const zeroCopy = mediaZeroCopy(input, name, rawOutput);
+    if (zeroCopy) return zeroCopy;
     const replay = mediaReplay(input, name, rawOutput);
     if (replay.duplicate) {
       const replacement = "[Capsule media replay: exact duplicate omitted]";
@@ -3260,6 +3460,8 @@ function handle(event, input) {
     const context = [];
     const advisorTask = prompt ? startAdvisorTask(input, prompt) : null;
     if (advisorTask?.plan?.context) context.push(advisorTask.plan.context);
+    const environmentContext = prompt ? windowsEnvironmentContext(input, prompt) : "";
+    if (environmentContext) context.push(`[Capsule Windows setup] ${environmentContext}`);
     const taxGuidance = roundTripTaxGuidance(input);
     if (taxGuidance) context.push(taxGuidance);
     if (prompt && process.env.CAPSULE_COGNITION !== "0") {

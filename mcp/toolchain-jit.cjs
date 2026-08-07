@@ -1,9 +1,9 @@
 "use strict";
 
-const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const core = require("./core.cjs");
+const storage = require("./storage.cjs");
 
 const SAFE_PROFILES = new Set(["file-list", "search", "git-status", "git-diff"]);
 const MAX_AGE_MS = 20 * 60_000;
@@ -11,22 +11,15 @@ const MIN_OBSERVATIONS = 2;
 const MIN_CONFIDENCE = 0.8;
 
 function digest(value) {
-  return crypto.createHash("sha256").update(String(value || "")).digest("hex");
+  return storage.sha256(value);
 }
 
 function readJson(file, fallback) {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    return fallback;
-  }
+  return storage.readJson(file, fallback);
 }
 
 function writeJsonAtomic(file, value) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(value)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, value);
 }
 
 function normalizedCommand(value) {

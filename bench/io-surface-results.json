@@ -14,7 +14,7 @@
       "raw_chars": 65536,
       "repetitions": 5,
       "a_unmediated_chars": 327680,
-      "b_capsule_chars": 880,
+      "b_capsule_chars": 877,
       "saving_percent": 99.73,
       "exact_replays_compacted": true
     },
@@ -22,7 +22,7 @@
       "raw_chars": 262144,
       "repetitions": 5,
       "a_unmediated_chars": 1310720,
-      "b_capsule_chars": 876,
+      "b_capsule_chars": 873,
       "saving_percent": 99.93,
       "exact_replays_compacted": true
     },
@@ -30,7 +30,7 @@
       "raw_chars": 1048576,
       "repetitions": 5,
       "a_unmediated_chars": 5242880,
-      "b_capsule_chars": 886,
+      "b_capsule_chars": 883,
       "saving_percent": 99.98,
       "exact_replays_compacted": true
     }
@@ -39,21 +39,21 @@
     "turns": 2,
     "read_only_tool_identities": 2,
     "a_reloaded_chars": 524288,
-    "b_task_cache_chars": 136,
+    "b_task_cache_chars": 148,
     "saving_percent": 99.97,
     "second_result_is_reference": true
   },
   "progressive_expand": {
-    "a_legacy_default_chars": 6200,
-    "b_progressive_default_chars": 2520,
+    "a_legacy_default_chars": 6201,
+    "b_progressive_default_chars": 2521,
     "saving_percent": 59.35,
     "first_line_preserved": true,
     "continuation_available": true
   },
   "task_history_projection": {
     "a_raw_chars": 480553,
-    "b_projected_chars": 323,
-    "saving_percent": 99.93,
+    "b_projected_chars": 312,
+    "saving_percent": 99.94,
     "preserves_user_decision": true,
     "preserves_final_decision": true,
     "removes_tool_argument": true
@@ -68,8 +68,8 @@
   },
   "mcp_contract": {
     "a_v0_9_contract_chars": 1004,
-    "b_current_contract_chars": 742,
-    "saving_percent": 26.1,
-    "action_count": 27
+    "b_current_contract_chars": 495,
+    "saving_percent": 50.7,
+    "action_count": 33
   }
 }

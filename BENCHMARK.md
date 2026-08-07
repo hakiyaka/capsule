@@ -59,6 +59,43 @@ billing measurement. Refresh also prevented an exact duplicate **163-character /
 about 41-token** block from being re-added; that is duplicate prevention against
 a measured baseline, not a current realized saving.
 
+The layered-memory A/B fixture compares all scoped memory text (A) with a
+query-conditioned L0–L3 loadout (B). At `max_chars` 600/1,200/2,400, the
+fixture fell from **6,981** characters to **600/1,200/2,400**, or **91.41% /
+82.81% / 65.62%** character reduction, with duplicate suppression and lane
+budgets enabled. Reproduce it with `npm run benchmark:memory`. These are
+bounded fixture measurements; they are not provider billing, hidden
+reasoning, cache, or universal task savings.
+
+The same fixture now also measures a TencentDB-inspired local loadout binding:
+tags and strict project scope are applied before ranking, so unrelated assets
+never become candidates. This is a relevance/isolation optimization, not a
+claim that every workload will improve by the same percentage; it remains
+deterministic and keeps exact recovery available through `get`.
+
+It also measures opt-in `strategy:"bootstrap"`: profile/scenario records are
+used as a short context bootstrap, and fact/trace records are considered only
+when that stage has no match. The fallback is deterministic and exact recovery
+is still tested; this is context exposure, not hidden reasoning or billing.
+
+The Windows environment A/B fixture compares a repeated PATH/Python/launcher
+discovery transcript with one cached environment lease. Reproduce it with
+`npm run benchmark:environment`. It measures setup-friction context only; it
+does not establish that Windows universally consumes more tokens than macOS or
+Linux, and it does not measure provider billing or hidden reasoning. In the
+current Windows run, one representative discovery fell from **1,631 to 288
+characters (82.34%)**; ten repeats fell from **16,310 to 2,871 (82.40%)**.
+The first snapshot used 21 local probes and a cached repeat used **0**.
+
+The WrongStack-inspired verifier serializer was measured on deterministic
+frequent-run fixtures. A 1,200-row successful test transcript fell from
+**27,828 to 117 characters (99.58%)** while retaining suite/test/time
+aggregates. A 900-row failing transcript fell from **24,378 to 251 characters
+(98.97%)**, retaining the failure neighborhood and aggregate counts while
+dropping unrelated `PASS` rows. These are output-projection fixtures only; the
+exact raw result remains in a Capsule and no provider-wire or hidden-reasoning
+saving is inferred.
+
 ## Quota-to-Progress Exchange and Context Antimatter
 
 Fifty-four current searches (18 GitHub, 16 Reddit/X, and 20 official OpenAI searches) converged on a gap that raw compression cannot solve: credits can be dominated by generated output/reasoning, long threads can repeatedly re-read state after compaction, and stale resolved state can re-enter the continuation. User reports are treated as reports; only official or maintainer statements are used as product facts.
@@ -256,11 +293,23 @@ The weighted five-view sequence saving was **79.95% of serialized media-envelope
 
 This microbenchmark does not estimate provider image tokens, billing, latency, or visual quality. Its percentage applies only when an exact replay occurs; a task with no byte-identical visual replay receives **0% from this feature**.
 
+### Experimental lossless media lease
+
+`npm run benchmark:media:zero-copy` enables the explicit `CAPSULE_MEDIA_ZERO_COPY=1`
+lane. It replaces the model-visible image envelope with a content-addressed
+lease while retaining the original serialized payload byte-for-byte in the
+local Capsule state. The first image, final image, repeated image, new-turn
+image, and detail escalation each measured **99.82% envelope-character saving**
+with exact SHA-256 recovery. This is an exact-recovery/envelope measurement,
+not a claim about provider image-token billing; recover `exact_path` before
+visual inspection. The normal hook remains conservative unless this lane is
+explicitly enabled.
+
 ## Model-I/O boundary A/B
 
-`npm run benchmark:io` exercises eight deterministic hook/schema scenarios. Five identical read-only results saved **99.51% to 99.97%** of exposed characters across 64 KiB, 256 KiB, and 1 MiB payloads. Reloading identical 256 KiB evidence across two user turns and different read-only tools saved **99.93%**. Progressive exact expansion saved **59.35%** against the former 6,000-character default while returning a continuation cursor.
+`npm run benchmark:io` exercises eight deterministic hook/schema scenarios; the current run reports `safety_pass: true`. Five identical read-only results saved **99.73% to 99.98%** of exposed characters across 64 KiB, 256 KiB, and 1 MiB payloads. Reloading identical 256 KiB evidence across two user turns and different read-only tools saved **99.97%**. Progressive exact expansion saved **59.35%** against the former 6,000-character page while returning a continuation cursor.
 
-A task-history fixture containing a 480,553-character tool argument/result saved **99.93%** while retaining the user request and final decision. A synthetic 20-turn self-contained subagent fork saved **84.18%** by retaining three turns. The MCP contract is **742 characters** with all 27 actions.
+A task-history fixture containing a 480,553-character tool argument/result saved **99.94%** while retaining the user request and final decision. A synthetic 20-turn self-contained subagent fork saved **99.04%** by retaining no inherited turns for this independent task. The current MCP contract is **495 characters** with all 33 actions.
 
 The history and repeated-read rows measure actual hook replacements. The subagent row is a controlled context fixture, not provider telemetry. Changed evidence, mutating tools, new user turns, explicit task-output requests, and history-dependent forks are safety controls.
 
@@ -280,6 +329,23 @@ hashes, dependency/importer edges, impacted tests, and one exact manifest rather
 than repeating selected file bodies; its warm scan reuses unchanged mtime/size
 metadata and reports `hashed=0`. The result is target-specific input exposure,
 not a universal provider-token or billing claim.
+
+## Refactor integrity and release verification
+
+The refactor consolidates repeated local-state primitives into
+`mcp/storage.cjs`. The shared writer uses a same-directory temporary file with
+a unique suffix, exclusive creation, rename-on-success, and cleanup on every
+failure path. JSON readers retain each lane's previous malformed-cache policy:
+optional caches cold-start, while required state can still surface corruption.
+This is a correctness and maintainability change; it is not counted as direct
+token savings.
+
+Run `npm run verify` to execute all Node tests, the source-integrity audit, the
+portable public-readiness audit, and the public documentation/link audit. The
+storage regression cases cover integer bounds, deterministic SHA-256 hashes,
+parent-directory creation, malformed JSON policy, and temporary-file cleanup.
+The suite does not claim that local atomic writes alter provider billing,
+hidden reasoning, or subscription limits.
 
 ## Historical workload audit
 

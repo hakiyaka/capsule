@@ -1,10 +1,10 @@
 "use strict";
 
-const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const cognition = require("./cognition.cjs");
 const core = require("./core.cjs");
+const storage = require("./storage.cjs");
 
 const SECRET_RE = /\b(api[_-]?key|authorization|cookie|credential|password|passwd|private[_-]?key|secret|token)\s*[:=]\s*[^\s,;]+|\bbearer\s+[a-z0-9._~-]+/ig;
 const CAPSULE_RE = /\bcap_[a-f0-9]{16}\b/ig;
@@ -194,22 +194,15 @@ function clean(value, limit = 480) {
 }
 
 function digest(value) {
-  return crypto.createHash("sha256").update(String(value || "")).digest("hex");
+  return storage.sha256(value);
 }
 
 function readJson(file, fallback = null) {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    return fallback;
-  }
+  return storage.readJson(file, fallback);
 }
 
 function writeJsonAtomic(file, value) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(value)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, value);
 }
 
 function uniqueSorted(values) {

@@ -16,11 +16,17 @@ function percent(before, after) {
   return Number(((before - after) / before * 100).toFixed(2));
 }
 
+function replacementText(result) {
+  return result?.continue === false && typeof result.reason === "string"
+    ? result.reason
+    : "";
+}
+
 function exposedChars(result, original) {
   const output = result?.hookSpecificOutput || {};
   const body = Object.hasOwn(output, "updatedMCPToolOutput")
     ? String(output.updatedMCPToolOutput)
-    : String(original);
+    : replacementText(result) || String(original);
   return body.length + String(output.additionalContext || "").length;
 }
 
@@ -45,7 +51,7 @@ function repeatedTextCase(rawChars) {
     b_capsule_chars: after,
     saving_percent: percent(before, after),
     exact_replays_compacted: results.slice(1).every((result) =>
-      /\[Capsule replay\b/i.test(result?.hookSpecificOutput?.updatedMCPToolOutput || "")
+      /\[Capsule replay\b/i.test(replacementText(result) || result?.hookSpecificOutput?.updatedMCPToolOutput || "")
     ),
   };
 }
@@ -79,7 +85,7 @@ function threadCase() {
     cwd: process.cwd(),
     session_id: "io-thread-session",
   });
-  const projected = String(result?.hookSpecificOutput?.updatedMCPToolOutput || raw);
+  const projected = replacementText(result) || String(result?.hookSpecificOutput?.updatedMCPToolOutput || raw);
   return {
     a_raw_chars: raw.length,
     b_projected_chars: projected.length,
@@ -119,7 +125,7 @@ function crossTurnTextCase() {
     b_task_cache_chars: after,
     saving_percent: percent(before, after),
     second_result_is_reference: /\[Capsule replay\b/i.test(
-      second?.hookSpecificOutput?.updatedMCPToolOutput || ""
+      replacementText(second) || second?.hookSpecificOutput?.updatedMCPToolOutput || ""
     ),
   };
 }
@@ -145,6 +151,11 @@ function progressiveExpandCase() {
     capsule_id: saved.response.capsule_id,
     start_line: 1,
     end_line: 1_000,
+    // Keep the treatment page bounded so this compares the old 6,000-character
+    // page with the current progressive 2,400-character page. Leaving max_chars
+    // unset asks Capsule for the full explicit range and measures expansion,
+    // not savings.
+    max_chars: 2_400,
   }).response;
   const before = JSON.stringify(legacy).length;
   const after = JSON.stringify(progressive).length;
@@ -152,7 +163,7 @@ function progressiveExpandCase() {
     a_legacy_default_chars: before,
     b_progressive_default_chars: after,
     saving_percent: percent(before, after),
-    first_line_preserved: /1 \| exact evidence line 1/.test(progressive.excerpt),
+    first_line_preserved: /^\s*1 \| exact evidence line 1/m.test(progressive.excerpt),
     continuation_available: Number(progressive.next_start_line) > 1 &&
       progressive.next_end_line === 1_000,
   };
@@ -214,7 +225,7 @@ try {
     progressiveExpand.continuation_available &&
     fork.selected_fork_turns === "none" &&
     fork.task_message_unchanged &&
-    contract.action_count === 27;
+    contract.action_count === schema.actions.length && schema.actions.includes("memory");
   const result = {
     method: {
       scope: "Deterministic characters exposed at hook/tool-schema boundaries.",

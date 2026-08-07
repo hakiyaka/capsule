@@ -20,6 +20,8 @@ const terminalNovelty = require("./terminal-novelty.cjs");
 const projectCompiler = require("./project.cjs");
 const jsonOutput = require("./json-output.cjs");
 const sessionAudit = require("./session-audit.cjs");
+const memoryLayers = require("./memory-layers.cjs");
+const storage = require("./storage.cjs");
 const packageMetadata = require("../package.json");
 
 let DatabaseSync = null;
@@ -613,20 +615,12 @@ function closeSearchDatabase() {
 function readCatalog() {
   const state = indexPaths();
   fs.mkdirSync(state.root, { recursive: true });
-  try {
-    return JSON.parse(fs.readFileSync(state.catalog, "utf8"));
-  } catch (error) {
-    if (error.code === "ENOENT") return { version: 1, documents: {} };
-    throw error;
-  }
+  return storage.readJson(state.catalog, { version: 1, documents: {} }, { onError: "missing" });
 }
 
 function writeCatalog(catalog) {
   const state = indexPaths();
-  fs.mkdirSync(state.root, { recursive: true });
-  const temp = `${state.catalog}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temp, `${JSON.stringify(catalog, null, 2)}\n`, "utf8");
-  fs.renameSync(temp, state.catalog);
+  return storage.writeJsonAtomic(state.catalog, catalog, { pretty: true });
 }
 
 function withCatalogLock(callback, timeoutMs = 10_000) {
@@ -1306,19 +1300,11 @@ function fetchCachePath() {
 }
 
 function readFetchCache() {
-  try {
-    return JSON.parse(fs.readFileSync(fetchCachePath(), "utf8"));
-  } catch {
-    return { version: 1, entries: {} };
-  }
+  return storage.readJson(fetchCachePath(), { version: 1, entries: {} });
 }
 
 function writeFetchCache(cache) {
-  fs.mkdirSync(indexPaths().root, { recursive: true });
-  const target = fetchCachePath();
-  const temp = `${target}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temp, `${JSON.stringify(cache, null, 2)}\n`, "utf8");
-  fs.renameSync(temp, target);
+  return storage.writeJsonAtomic(fetchCachePath(), cache, { pretty: true });
 }
 
 function decodeHtmlEntities(value) {
@@ -1744,20 +1730,13 @@ function capabilityAirlockFile() {
 }
 
 function readCapabilityAirlock() {
-  try {
-    const parsed = JSON.parse(fs.readFileSync(capabilityAirlockFile(), "utf8"));
-    return parsed && typeof parsed === "object" ? parsed : null;
-  } catch {
-    return null;
-  }
+  const parsed = storage.readJson(capabilityAirlockFile(), null);
+  return parsed && typeof parsed === "object" ? parsed : null;
 }
 
 function writeCapabilityAirlock(state) {
   const file = capabilityAirlockFile();
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(state, null, 2)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, state, { pretty: true });
 }
 
 function sha256Text(text) {
@@ -1847,7 +1826,7 @@ const AIRLOCK_PROJECT_RULE =
 const AIRLOCK_AGENTS_RULES = [
   AIRLOCK_PROJECT_RULE,
   "- For limited text edits, prefer native `apply_patch|Write|Edit|Update` when available; do not use temporary Python/PowerShell/Node scripts. Shell is allowed for bulk generation, formatting, migrations, binaries, media, or when no native tool exists. Restart Codex only when the user explicitly requests it in this turn.",
-  "- At the start of every task, call Capsule with `action=skills`, `payload.operation=route`, and a short English query preserving the literal request; do not add an unwanted domain, technology, or output type, and read only the first `skill_file`. If there is no match, work locally. If Capsule is not visible or errors in this turn, discover it and retry once; do not claim unavailable without trying; do not carry forward the previous turn's error. Report tool unavailability only when the current `mcp__capsule__capsule` call returns `isError:true` or `Unknown action`; do not guess, use internal names, or make general product claims. Use real `payload.url|requests` for `fetch`; `expand|diff` require a previous real `payload.capsule_id`; do not invent IDs.",
+  "- At the start of every task, call Capsule with `action=skills`, `payload.operation=route`, and a short English query preserving the literal request; do not add an unwanted domain, technology, or output type, and read only the first `skill_file`. If there is no match, work locally. If Capsule is not visible or errors in this turn, discover it and retry once; do not claim unavailable without trying; do not carry forward the previous turn's error. Report tool unavailability only when the current `mcp__capsule__capsule` call returns `isError:true` or `Unknown action`; do not guess, use internal names, or make general product claims. Use real `payload.url|requests` for `fetch`; `expand|diff` require a previous real `payload.capsule_id`; do not invent IDs. Browser integrations are lazy: an empty `globalThis` inventory before setup does not mean browser tools are missing; for a browser task, use the visible `mcp__node_repl__js` with the installed absolute `browser-client.mjs`, initialize once, then select `agent.browsers.get*`; report unavailable only after that setup or tool call fails.",
   "- Do not change the main task model for subagent routing; preserve the user's model selection.",
   "- For routine subtasks, use Capsule `action=cognition`, `operation=delegate` on real `gpt-5.6-luna`; use `model=gpt-5.6-terra` for complex or high-risk work. `collaboration.spawn_agent` does not support Luna as an explicit model, so do not use it when Luna is required.",
 ];
@@ -2678,6 +2657,9 @@ function doctor() {
     ok: true,
     value: `${runtimes.available_count}/${runtimes.total} available`,
     available: runtimes.available,
+    environment_lease: runtimes.lease_id,
+    cache_hit: runtimes.cache_hit,
+    probe_count: runtimes.probe_count,
   });
   try {
     const hookStatus = require("../scripts/install-hooks.cjs").status();
@@ -3210,6 +3192,7 @@ async function dispatch(rawArgs = {}) {
     case "index": return indexContent(args);
     case "search": return searchIndex(args);
     case "remember": return remember(args);
+    case "memory": return memoryLayers.dispatch(args);
     case "fetch": return fetchAndIndex(args);
     case "expand": return core.expandAnchor(args);
     case "diff": return core.diffCapsules(args);
@@ -3224,6 +3207,7 @@ async function dispatch(rawArgs = {}) {
       compressText,
       searchIndex,
     });
+    case "environment": return runtime.environmentProfile(args);
     case "jobs": return runtime.jobs(args);
     case "interrupt": return semanticInterrupt.semanticInterrupt(args);
     case "rewrite": return compat.rewriteCommand(args);

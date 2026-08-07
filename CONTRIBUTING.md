@@ -11,15 +11,19 @@ operation is explicitly lossy.
 3. Run:
 
    ```sh
-   npm test
-   npm run audit:source
-   npm run audit:public
+   npm run verify
    ```
 
 4. Document user-visible changes in `CHANGELOG.md`.
 
 Do not commit credentials, local state, generated capsules, machine-specific
 absolute paths, user prompts, session databases, or personal benchmark data.
+
+Use the shared primitives in `mcp/storage.cjs` for new local JSON state. Do not
+reintroduce ad-hoc temporary-file names, direct state writes, or a second
+general-purpose compression/router surface. Native `apply_patch`/Write/Edit/
+Update remains preferred for small repository edits; temporary scripts are not
+required for ordinary text changes.
 
 Keep the user-facing and MCP name `Capsule`. The package/plugin identifiers
 `capsule` and `capsule@personal` remain compatibility

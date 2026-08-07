@@ -33,7 +33,8 @@ if (!String(plugin.version).startsWith(`${packageJson.version}+`)) {
 if (packageJson.private !== true) {
   failures.push("package must remain private until a repository URL and release owner are chosen");
 }
-if (!packageJson.scripts?.test || !packageJson.scripts?.["audit:source"]) {
+if (!packageJson.scripts?.test || !packageJson.scripts?.["audit:source"] ||
+    !packageJson.scripts?.["audit:docs"] || !packageJson.scripts?.verify) {
   failures.push("required verification scripts are missing");
 }
 

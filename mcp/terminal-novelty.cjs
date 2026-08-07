@@ -1,10 +1,10 @@
 "use strict";
 
-const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const core = require("./core.cjs");
 const compat = require("./compat.cjs");
+const storage = require("./storage.cjs");
 
 const MINIMUM_CHARS = 600;
 const MAXIMUM_CHARS = 2_000_000;
@@ -79,14 +79,12 @@ function stateFile(sessionId) {
   if (!sessionId) return "";
   const root = path.join(core.stateRoot(), "terminal-novelty");
   fs.mkdirSync(root, { recursive: true });
-  const digest = crypto.createHash("sha256").update(sessionId).digest("hex").slice(0, 24);
+  const digest = storage.sha256(sessionId).slice(0, 24);
   return path.join(root, `${digest}.json`);
 }
 
 function writeState(file, state) {
-  const temporary = `${file}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(temporary, `${JSON.stringify(state)}\n`, "utf8");
-  fs.renameSync(temporary, file);
+  return storage.writeJsonAtomic(file, state);
 }
 
 function terminalNovelty(args = {}) {
@@ -100,17 +98,12 @@ function terminalNovelty(args = {}) {
   }
 
   const cwd = path.resolve(String(args.cwd || process.cwd()));
-  const identity = crypto.createHash("sha256")
-    .update(`${process.platform === "win32" ? cwd.toLowerCase() : cwd}\0${canonicalCommand(args.command)}`)
-    .digest("hex")
-    .slice(0, 24);
+  const identity = storage.sha256(
+    `${process.platform === "win32" ? cwd.toLowerCase() : cwd}\0${canonicalCommand(args.command)}`
+  ).slice(0, 24);
   const now = Date.now();
   let state = { entries: {} };
-  try {
-    state = JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
-    state = { entries: {} };
-  }
+  state = storage.readJson(file, { entries: {} });
   const entries = Object.fromEntries(
     Object.entries(state?.entries || {})
       .filter(([, item]) => now - Number(item.at || 0) <= LIFETIME_MS)
