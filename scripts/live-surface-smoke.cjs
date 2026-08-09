@@ -94,6 +94,8 @@ async function main() {
   check(byPath["/feed.xml"], () => /guide\/faq\.html/i.test(feed), "FAQ RSS item");
   check(byPath["/feed.xml"], () => /releases\/tag\/v1\.0\.0/i.test(feed), "release RSS item");
   check(byPath["/llms.txt"], () => /guide\/faq\.html/i.test(llms), "FAQ machine-readable link");
+  check(byPath["/llms.txt"], () => /releases\/download\/v1\.0\.0\/capsule-1\.0\.0-source\.zip/i.test(llms), "release archive machine-readable link");
+  check(byPath["/llms.txt"], () => /releases\/download\/v1\.0\.0\/capsule-1\.0\.0-source\.zip\.sha256/i.test(llms), "release checksum machine-readable link");
   for (const guidePath of guidePaths) {
     const escaped = guidePath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     check(byPath["/sitemap.xml"], () => new RegExp(`<loc>https:\/\/hakiyaka\\.github\\.io\/capsule${escaped}<\\/loc>`, "i").test(sitemap), `${guidePath}: live sitemap URL`);

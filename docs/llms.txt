@@ -13,6 +13,8 @@
 - Terminal guide: https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html
 - Methodology source: https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md
 - Releases: https://github.com/hakiyaka/capsule/releases
+- v1.0.0 source archive: https://github.com/hakiyaka/capsule/releases/download/v1.0.0/capsule-1.0.0-source.zip
+- v1.0.0 SHA-256 sidecar: https://github.com/hakiyaka/capsule/releases/download/v1.0.0/capsule-1.0.0-source.zip.sha256
 
 ## Scope
 
