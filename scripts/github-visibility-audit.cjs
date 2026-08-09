@@ -54,6 +54,7 @@ try {
     watchers: Number(metadata.subscribers_count ?? metadata.watchers_count) || 0,
     open_issues: Number(metadata.open_issues_count) || 0,
     topics: Array.isArray(metadata.topics) ? metadata.topics.length : 0,
+    topic_names: Array.isArray(metadata.topics) ? metadata.topics.map((topic) => String(topic)).sort() : [],
     releases: Array.isArray(releases) ? releases.length : 0,
     description_chars: String(metadata.description || "").length,
     has_issues: Boolean(metadata.has_issues),
