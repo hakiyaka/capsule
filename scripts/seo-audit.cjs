@@ -31,6 +31,7 @@ const robots = read("robots.txt");
 const sitemap = read("sitemap.xml");
 const socialCard = read("social-card.svg");
 const feed = read("feed.xml");
+const llms = read("llms.txt");
 const guides = [
   "guide/codex-token-efficiency.html",
   "guide/mcp-context-compression.html",
@@ -43,6 +44,9 @@ requireMatch(socialCard, /^\s*<svg\b[^>]*width="1200"[^>]*height="630"/i, "socia
 requireMatch(feed, /<rss\b[^>]*version="2\.0"/i, "RSS version");
 requireMatch(feed, new RegExp(`<link>${escapeRegExp(canonical)}</link>`, "i"), "RSS canonical link");
 requireMatch(feed, /<item>[\s\S]*<guid\s+isPermaLink="true">https:\/\/hakiyaka\.github\.io\/capsule\/guide\//i, "RSS item");
+requireMatch(llms, /^# Capsule\b/m, "machine-readable summary heading");
+requireMatch(llms, new RegExp(escapeRegExp("https://github.com/hakiyaka/capsule"), "i"), "machine-readable repository link");
+requireMatch(llms, new RegExp(escapeRegExp("https://hakiyaka.github.io/capsule/"), "i"), "machine-readable site link");
 requireMatch(html, /<title>[^<]{20,160}<\/title>/i, "descriptive title");
 requireMatch(html, /<meta\s+name=["']description["'][^>]+content="[^"]{80,220}"/i, "meta description");
 requireMatch(html, new RegExp(`<link\\s+rel=["']canonical["'][^>]+href=["']${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} ["']`, "i"), "canonical URL");
@@ -102,7 +106,7 @@ for (const relative of guides) {
 const report = {
   audit: "seo",
   canonical,
-  files: ["docs/index.html", ...guides.map((file) => `docs/${file}`), "docs/robots.txt", "docs/sitemap.xml", "docs/feed.xml", "docs/social-card.svg"],
+  files: ["docs/index.html", ...guides.map((file) => `docs/${file}`), "docs/robots.txt", "docs/sitemap.xml", "docs/feed.xml", "docs/llms.txt", "docs/social-card.svg"],
   json_ld_blocks: jsonLdBlocks,
   failures,
   passed: failures.length === 0,

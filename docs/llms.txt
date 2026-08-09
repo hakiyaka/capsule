@@ -1,0 +1,20 @@
+# Capsule
+
+> Capsule is a local-first Codex plugin and MCP server for token reduction through exact-recoverable evidence compression.
+
+## Canonical resources
+
+- Repository: https://github.com/hakiyaka/capsule
+- Project site: https://hakiyaka.github.io/capsule/
+- Installation: https://hakiyaka.github.io/capsule/guide/install-capsule.html
+- Benchmarks: https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html
+- Methodology source: https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md
+- Releases: https://github.com/hakiyaka/capsule/releases
+
+## Scope
+
+Capsule compacts repetitive terminal, file, project, web, memory, and context output while preserving local exact recovery. It passes through failures, unsafe or ambiguous requests, explicit full-output requests, and token-negative candidates.
+
+## Measurement caveat
+
+Published percentages are workload-specific model-visible observations. They do not claim control over hidden provider reasoning, provider caching, billing, or subscription quotas.

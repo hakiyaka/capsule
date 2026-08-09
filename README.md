@@ -261,6 +261,8 @@ ranking decisions, so submission is a discovery signal rather than a ranking
 guarantee.
 The same site exposes a small [RSS feed](https://hakiyaka.github.io/capsule/feed.xml)
 for release and guide updates so real users and aggregators can follow changes.
+An intentionally concise [machine-readable summary](https://hakiyaka.github.io/capsule/llms.txt)
+keeps the canonical links and measurement caveat available to indexing tools.
 
 ## Repository map
 
