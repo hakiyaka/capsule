@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
-const { compareSearchSnapshots, ratio, summarizeReleases, summarizeReferrers, summarizeTrafficWindow } = require("../scripts/github-visibility-metrics.cjs");
+const { compareSearchSnapshots, ratio, summarizeReleases, summarizeReferrers, summarizeTrafficWindow, validSearchEntry } = require("../scripts/github-visibility-metrics.cjs");
 const { collectPaginated, formatError, normalizeRepository } = require("../scripts/github-visibility-helpers.cjs");
 
 test("normalizes repository overrides and rejects API-path injection", () => {
@@ -95,6 +95,7 @@ test("keeps unavailable or missing aggregate values unknown", () => {
   assert.match(source, /draft_releases_omitted/);
   assert.match(source, /releaseTotalsComparable/);
   assert.match(source, /metrics_semantics_version/);
+  assert.match(source, /is:public/);
   assert.match(source, /metric semantics differ/);
   assert.match(source, /report\.search_deltas = null/);
   assert.match(source, /traffic windows differ/);
@@ -114,12 +115,12 @@ test("uses the GitHub popular referrers endpoint", () => {
 
 test("compares repository-search snapshots without inventing missing ranks", () => {
   const current = { queries: [
-    {query: "codex token efficiency", rank_in_first_100: 12, total_count: 40},
-    {query: "mcp context compression", rank_in_first_100: null, total_count: 118},
+    {query: "codex token efficiency", rank_in_first_100: 12, total_count: 40, incomplete_results: false},
+    {query: "mcp context compression", rank_in_first_100: null, total_count: 118, incomplete_results: false},
   ]};
   const baseline = { queries: [
-    {query: "codex token efficiency", rank_in_first_100: 20, total_count: 34},
-    {query: "mcp context compression", rank_in_first_100: 99, total_count: 117},
+    {query: "codex token efficiency", rank_in_first_100: 20, total_count: 34, incomplete_results: false},
+    {query: "mcp context compression", rank_in_first_100: 99, total_count: 117, incomplete_results: false},
   ]};
   assert.deepEqual(compareSearchSnapshots(current, baseline), [
     {query: "codex token efficiency", rank_improvement: 8, present_in_first_100_delta: 0, total_count_delta: 6},
@@ -130,19 +131,20 @@ test("compares repository-search snapshots without inventing missing ranks", () 
 test("does not convert errored or incomplete search snapshots into rank loss", () => {
   assert.deepEqual(compareSearchSnapshots(
     {queries: [{query: "codex", error: "rate limit"}]},
-    {queries: [{query: "codex", rank_in_first_100: 4, total_count: 8}]},
+    {queries: [{query: "codex", rank_in_first_100: 4, total_count: 8, incomplete_results: false}]},
   ), [{query: "codex", rank_improvement: null, present_in_first_100_delta: null, total_count_delta: null}]);
   assert.deepEqual(compareSearchSnapshots(
     {queries: [{query: "codex", rank_in_first_100: 4, total_count: null, incomplete_results: true}]},
     {queries: [{query: "codex", rank_in_first_100: 7, total_count: 8}]},
   ), [{query: "codex", rank_improvement: null, present_in_first_100_delta: null, total_count_delta: null}]);
+  assert.equal(validSearchEntry({ query: "codex", rank_in_first_100: 2, total_count: 8 }), false);
 });
 
 test("rejects impossible repository-search ranks", () => {
   assert.deepEqual(compareSearchSnapshots(
-    {queries: [{query: "codex", rank_in_first_100: 0, total_count: 8}]},
-    {queries: [{query: "codex", rank_in_first_100: 101, total_count: 8}]},
-  ), [{query: "codex", rank_improvement: null, present_in_first_100_delta: 0, total_count_delta: 0}]);
+    {queries: [{query: "codex", rank_in_first_100: 0, total_count: 8, incomplete_results: false}]},
+    {queries: [{query: "codex", rank_in_first_100: 101, total_count: 8, incomplete_results: false}]},
+  ), [{query: "codex", rank_improvement: null, present_in_first_100_delta: null, total_count_delta: null}]);
 });
 
 test("keeps Windows-safe search snapshot helpers and rejects unknown flags", () => {

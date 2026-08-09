@@ -41,7 +41,7 @@ const schemaVersion = 2;
 // Bump this when the meaning of an existing metric changes without changing
 // the outer report shape. Older artifacts remain readable, but are not used
 // for ratios or search deltas until a like-for-like snapshot exists.
-const metricsSemanticsVersion = 2;
+const metricsSemanticsVersion = 3;
 const configuredMaxBuffer = Number(process.env.CAPSULE_GITHUB_MAX_BUFFER_BYTES);
 const apiMaxBuffer = Number.isSafeInteger(configuredMaxBuffer) && configuredMaxBuffer >= 64 * 1024
   ? configuredMaxBuffer
@@ -84,11 +84,12 @@ function isRecord(value) {
 
 function searchSnapshot(query) {
   try {
-    const result = api(`search/repositories?q=${encodeURIComponent(query)}&per_page=100`);
+    const result = api(`search/repositories?q=${encodeURIComponent(`${query} is:public`)}&per_page=100`);
     const items = Array.isArray(result.items) ? result.items : [];
     const rank = items.findIndex((item) => String(item?.full_name || "").toLowerCase() === repo.toLowerCase());
     return {
       query,
+      search_scope: "public repositories",
       total_count: Number.isFinite(result.total_count) ? Number(result.total_count) : null,
       incomplete_results: result.incomplete_results === true,
       rank_in_first_100: rank >= 0 ? rank + 1 : null,

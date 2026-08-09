@@ -14,6 +14,8 @@ All notable user-visible changes are recorded here.
 - Add metric-semantics compatibility markers so older snapshots remain
   inspectable without producing unlike-for-like ratios, and re-check the
   remote tag immediately before publishing a release.
+- Scope repository-search measurements to public repositories so authenticated
+  private results cannot change a public discoverability rank.
 - Add install-surface plugin metadata parity, a visible privacy policy, newest-first
   RSS ordering checks, and a post-Pages live-surface workflow.
 - Add a scenario-led Codex plugin/MCP packaging checklist covering the manifest,

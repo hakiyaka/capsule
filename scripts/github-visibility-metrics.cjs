@@ -59,6 +59,13 @@ function ratio(current, baseline) {
   return Number((currentNumber / baselineNumber).toFixed(2));
 }
 
+function validSearchEntry(entry) {
+  if (!entry || typeof entry.query !== "string" || entry.error || entry.incomplete_results !== false) return false;
+  if (entry.rank_in_first_100 !== null && (!Number.isInteger(entry.rank_in_first_100) || entry.rank_in_first_100 < 1 || entry.rank_in_first_100 > 100)) return false;
+  if (entry.total_count !== null && (!Number.isInteger(entry.total_count) || entry.total_count < 0)) return false;
+  return true;
+}
+
 function compareSearchSnapshots(current, baseline) {
   const currentQueries = Array.isArray(current?.queries) ? current.queries : [];
   const baselineByQuery = new Map(
@@ -69,10 +76,10 @@ function compareSearchSnapshots(current, baseline) {
   return currentQueries.map((entry) => {
     const query = typeof entry?.query === "string" ? entry.query : "";
     const previous = baselineByQuery.get(query);
-    const currentValid = entry && !entry.error && entry.incomplete_results !== true;
-    const previousValid = previous && !previous.error && previous.incomplete_results !== true;
-    const currentRank = currentValid && Number.isInteger(entry.rank_in_first_100) && entry.rank_in_first_100 >= 1 && entry.rank_in_first_100 <= 100 ? entry.rank_in_first_100 : null;
-    const previousRank = previousValid && Number.isInteger(previous.rank_in_first_100) && previous.rank_in_first_100 >= 1 && previous.rank_in_first_100 <= 100 ? previous.rank_in_first_100 : null;
+    const currentValid = validSearchEntry(entry);
+    const previousValid = validSearchEntry(previous);
+    const currentRank = currentValid && entry.rank_in_first_100 !== null ? entry.rank_in_first_100 : null;
+    const previousRank = previousValid && previous.rank_in_first_100 !== null ? previous.rank_in_first_100 : null;
     const currentPresent = currentRank !== null;
     const previousPresent = previousRank !== null;
     const currentTotal = currentValid && Number.isFinite(entry?.total_count) ? Number(entry.total_count) : null;
@@ -87,4 +94,4 @@ function compareSearchSnapshots(current, baseline) {
   });
 }
 
-module.exports = { compareSearchSnapshots, ratio, summarizeReleases, summarizeReferrers, summarizeTrafficWindow };
+module.exports = { compareSearchSnapshots, ratio, summarizeReleases, summarizeReferrers, summarizeTrafficWindow, validSearchEntry };
