@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
-const { compareSearchSnapshots, summarizeReleases, summarizeReferrers, summarizeTrafficWindow } = require("../scripts/github-visibility-metrics.cjs");
+const { compareSearchSnapshots, ratio, summarizeReleases, summarizeReferrers, summarizeTrafficWindow } = require("../scripts/github-visibility-metrics.cjs");
 const { collectPaginated, formatError, normalizeRepository } = require("../scripts/github-visibility-helpers.cjs");
 
 test("normalizes repository overrides and rejects API-path injection", () => {
@@ -82,6 +82,18 @@ test("records the observed traffic window and reports API lag explicitly", () =>
   });
 });
 
+test("keeps unavailable or missing aggregate values unknown", () => {
+  assert.equal(ratio(null, 10), null);
+  assert.equal(ratio(10, null), null);
+  assert.equal(ratio(20, 10), 2);
+  const source = fs.readFileSync(path.join(__dirname, "..", "scripts", "github-visibility-audit.cjs"), "utf8");
+  assert.match(source, /unique_viewers_14d: viewsResult\.available \? finiteNumber\(views\.uniques\) : null/);
+  assert.match(source, /unique_cloners_14d: clonesResult\.available \? finiteNumber\(clones\.uniques\) : null/);
+  assert.match(source, /referrer_domains_14d: null/);
+  assert.match(source, /popular_paths_14d: null/);
+  assert.match(source, /traffic windows differ/);
+});
+
 test("uses the GitHub popular referrers endpoint", () => {
   const source = fs.readFileSync(path.join(__dirname, "..", "scripts", "github-visibility-audit.cjs"), "utf8");
   assert.match(source, /traffic\/popular\/referrers/);
@@ -127,4 +139,14 @@ test("keeps Windows-safe search snapshot helpers and rejects unknown flags", () 
   const result = spawnSync(process.execPath, [path.join(__dirname, "..", "scripts", "github-visibility-audit.cjs"), "--unknown"], {encoding: "utf8"});
   assert.notEqual(result.status, 0);
   assert.match(`${result.stderr}${result.stdout}`, /Unknown argument/);
+});
+
+test("visibility workflow compares against the previous retained artifact", () => {
+  const workflow = fs.readFileSync(path.join(__dirname, "..", ".github", "workflows", "visibility.yml"), "utf8");
+  assert.match(workflow, /actions:\s*read/);
+  assert.match(workflow, /gh run list --workflow visibility\.yml/);
+  assert.match(workflow, /gh run download/);
+  assert.match(workflow, /--baseline previous\/visibility\.json/);
+  assert.match(workflow, /--search --baseline previous\/visibility-search\.json/);
+  assert.match(workflow, /github-visibility-\$\{\{ github\.run_id \}\}/);
 });

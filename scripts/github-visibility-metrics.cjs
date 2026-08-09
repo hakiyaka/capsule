@@ -49,6 +49,16 @@ function summarizeTrafficWindow(rows, measuredAt = Date.now()) {
   };
 }
 
+function ratio(current, baseline) {
+  // A missing endpoint value is unknown, not zero. Do not let Number(null)
+  // manufacture a false 0x ratio in a baseline comparison.
+  if (current === null || current === undefined || baseline === null || baseline === undefined) return null;
+  const currentNumber = Number(current);
+  const baselineNumber = Number(baseline);
+  if (!Number.isFinite(currentNumber) || !Number.isFinite(baselineNumber) || baselineNumber <= 0) return null;
+  return Number((currentNumber / baselineNumber).toFixed(2));
+}
+
 function compareSearchSnapshots(current, baseline) {
   const currentQueries = Array.isArray(current?.queries) ? current.queries : [];
   const baselineByQuery = new Map(
@@ -77,4 +87,4 @@ function compareSearchSnapshots(current, baseline) {
   });
 }
 
-module.exports = { compareSearchSnapshots, summarizeReleases, summarizeReferrers, summarizeTrafficWindow };
+module.exports = { compareSearchSnapshots, ratio, summarizeReleases, summarizeReferrers, summarizeTrafficWindow };

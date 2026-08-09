@@ -5,7 +5,7 @@
 // written to Capsule state or benchmark artifacts.
 
 const { spawnSync } = require("node:child_process");
-const { compareSearchSnapshots, summarizeReleases, summarizeReferrers, summarizeTrafficWindow } = require("./github-visibility-metrics.cjs");
+const { compareSearchSnapshots, ratio, summarizeReleases, summarizeReferrers, summarizeTrafficWindow } = require("./github-visibility-metrics.cjs");
 const { collectPaginated, formatError, normalizeRepository } = require("./github-visibility-helpers.cjs");
 
 const argv = process.argv.slice(2);
@@ -68,9 +68,10 @@ function sum(rows, key) {
   return Array.isArray(rows) ? rows.reduce((total, row) => total + (Number(row?.[key]) || 0), 0) : 0;
 }
 
-function ratio(current, baseline) {
-  if (!Number.isFinite(Number(baseline)) || Number(baseline) <= 0) return null;
-  return Number((Number(current) / Number(baseline)).toFixed(2));
+function finiteNumber(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
 }
 
 function searchSnapshot(query) {
@@ -119,10 +120,28 @@ try {
   const pagesResult = optionalApi(`repos/${repo}/pages`, null);
   const community = communityResult.value;
   const pages = pagesResult.value;
-  const referrerSummary = summarizeReferrers(referrers);
+  const referrerSummary = referrerResult.available
+    ? summarizeReferrers(referrers)
+    : {
+        referrer_domains_14d: null,
+        referrer_views_14d: null,
+        referrer_uniques_sum_14d: null,
+        top_referrer: null,
+      };
   const releaseSummary = summarizeReleases(releases);
   const viewsWindow = summarizeTrafficWindow(views.views, measuredAt.getTime());
   const clonesWindow = summarizeTrafficWindow(clones.clones, measuredAt.getTime());
+  const pathSummary = popularPathResult.available
+    ? {
+        popular_paths_14d: Array.isArray(popularPaths) ? popularPaths.length : 0,
+        top_path: Array.isArray(popularPaths) && popularPaths[0] ? String(popularPaths[0].path || "") : "",
+        top_path_views_14d: Array.isArray(popularPaths) && popularPaths[0] ? Number(popularPaths[0].count) || 0 : 0,
+      }
+    : {
+        popular_paths_14d: null,
+        top_path: null,
+        top_path_views_14d: null,
+      };
   const current = {
     schema_version: schemaVersion,
     measured_at: new Date().toISOString(),
@@ -130,7 +149,10 @@ try {
     stars: Number(metadata.stargazers_count) || 0,
     forks: Number(metadata.forks_count) || 0,
     watch_subscribers: Number(metadata.subscribers_count) || 0,
+    // GitHub's REST API keeps watchers_count as a legacy alias for stars.
+    // Actual watch subscriptions are reported separately above.
     watchers_count: Number(metadata.watchers_count) || 0,
+    watchers_count_semantics: "REST legacy alias for stargazers_count; not active watcher subscriptions",
     open_issues: Number(metadata.open_issues_count) || 0,
     topics: Array.isArray(metadata.topics) ? metadata.topics.length : 0,
     topic_names: Array.isArray(metadata.topics) ? metadata.topics.map((topic) => String(topic)).sort() : [],
@@ -143,11 +165,13 @@ try {
     has_discussions: Boolean(metadata.has_discussions),
     has_pages: Boolean(metadata.has_pages),
     has_wiki: Boolean(metadata.has_wiki),
-    community_health: Number.isFinite(Number(community?.health_percentage)) ? Number(community.health_percentage) : null,
+    community_health: finiteNumber(community?.health_percentage),
     community_available: communityResult.available,
     community_error: communityResult.error,
     views_14d: viewsResult.available ? Number(views.count) || sum(views.views, "count") : null,
-    unique_viewers_14d: viewsResult.available ? Number(views.uniques) || sum(views.views, "uniques") : null,
+    // GitHub's top-level uniques is already the endpoint's aggregate. If it is
+    // omitted, summing daily uniques would double-count people across days.
+    unique_viewers_14d: viewsResult.available ? finiteNumber(views.uniques) : null,
     views_available: viewsResult.available,
     views_error: viewsResult.error,
     views_observed_start: viewsWindow.observed_start,
@@ -155,7 +179,7 @@ try {
     views_observed_points: viewsWindow.observed_points,
     views_lag_days: viewsWindow.lag_days,
     clones_14d: clonesResult.available ? Number(clones.count) || sum(clones.clones, "count") : null,
-    unique_cloners_14d: clonesResult.available ? Number(clones.uniques) || sum(clones.clones, "uniques") : null,
+    unique_cloners_14d: clonesResult.available ? finiteNumber(clones.uniques) : null,
     clones_available: clonesResult.available,
     clones_error: clonesResult.error,
     clones_observed_start: clonesWindow.observed_start,
@@ -167,16 +191,14 @@ try {
     referrers_error: referrerResult.error,
     popular_paths_available: popularPathResult.available,
     popular_paths_error: popularPathResult.error,
-    popular_paths_14d: Array.isArray(popularPaths) ? popularPaths.length : 0,
-    top_path: Array.isArray(popularPaths) && popularPaths[0] ? String(popularPaths[0].path || "") : "",
-    top_path_views_14d: Array.isArray(popularPaths) && popularPaths[0] ? Number(popularPaths[0].count) || 0 : 0,
+    ...pathSummary,
     homepage: metadata.homepage || "",
     pages_url: pages?.html_url || "",
     pages_build_type: pages?.build_type || "",
     pages_available: pagesResult.available,
     pages_error: pagesResult.error,
   };
-  const report = { audit: "github-visibility", schema_version: schemaVersion, current, baseline: null, ratios: null, caveat: "Traffic endpoints cover a rolling 14-day window; referrer uniques are summed per-domain values rather than global uniques; stars, forks, releases, and topics are cumulative or point-in-time metadata. This measures discoverability inputs, not guaranteed search ranking." };
+  const report = { audit: "github-visibility", schema_version: schemaVersion, current, baseline: null, ratios: null, caveat: "Traffic endpoints cover a rolling 14-day window; API aggregate uniques are preserved and missing aggregates remain unknown; referrer uniques are summed per-domain values rather than global uniques; REST watchers_count is a legacy stars alias; stars, forks, releases, and topics are cumulative or point-in-time metadata. This measures discoverability inputs, not guaranteed search ranking." };
   if (searchEnabled) {
     report.search = {
       schema_version: schemaVersion,
@@ -196,6 +218,20 @@ try {
     }
     if (baselineCurrent.repo && baselineCurrent.repo.toLowerCase() !== repo.toLowerCase()) {
       report.baseline_warnings.push(`repository differs: baseline=${baselineCurrent.repo}, current=${repo}`);
+    }
+    for (const prefix of ["views", "clones"]) {
+      const currentStart = current[`${prefix}_observed_start`];
+      const currentEnd = current[`${prefix}_observed_end`];
+      const baselineStart = report.baseline[`${prefix}_observed_start`];
+      const baselineEnd = report.baseline[`${prefix}_observed_end`];
+      if (currentStart && currentEnd && baselineStart && baselineEnd && (currentStart !== baselineStart || currentEnd !== baselineEnd)) {
+        report.baseline_warnings.push(`${prefix} traffic windows differ: baseline=${baselineStart}..${baselineEnd}, current=${currentStart}..${currentEnd}`);
+      }
+      const currentLag = finiteNumber(current[`${prefix}_lag_days`]);
+      const baselineLag = finiteNumber(report.baseline[`${prefix}_lag_days`]);
+      if ((currentLag !== null && currentLag > 0) || (baselineLag !== null && baselineLag > 0)) {
+        report.baseline_warnings.push(`${prefix} traffic API is lagging: baseline_lag_days=${baselineLag}, current_lag_days=${currentLag}`);
+      }
     }
     report.ratios = Object.fromEntries(["stars", "forks", "topics", "releases", "release_assets", "release_downloads", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "referrer_uniques_sum_14d", "top_path_views_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
     if (report.search && baseline.search) {

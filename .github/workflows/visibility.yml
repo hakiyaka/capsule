@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   snapshot:
@@ -24,11 +25,50 @@ jobs:
         with:
           node-version: 18
 
+      - name: Find the previous successful visibility run
+        id: previous
+        shell: bash
+        run: |
+          set -euo pipefail
+          previous="$(gh run list --workflow visibility.yml --branch "$GITHUB_REF_NAME" --status success --limit 20 --json databaseId --jq '.[0].databaseId // empty' || true)"
+          printf 'run_id=%s\n' "$previous" >> "$GITHUB_OUTPUT"
+          if [[ -n "$previous" ]]; then
+            echo "Using previous successful visibility run $previous as the comparison source."
+          else
+            echo "No previous successful visibility run; this snapshot establishes the baseline."
+          fi
+
+      - name: Download the previous snapshot when available
+        if: steps.previous.outputs.run_id != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          previous="${{ steps.previous.outputs.run_id }}"
+          mkdir -p previous
+          if ! gh run download "$previous" --name "github-visibility-$previous" --dir previous; then
+            echo "The previous artifact is unavailable or expired; continuing without a baseline."
+            rm -rf previous
+          fi
+
       - name: Capture metadata, traffic, and referral signals
-        run: npm run audit:github-visibility:write -- visibility.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -s previous/visibility.json ]]; then
+            node scripts/github-visibility-audit.cjs --baseline previous/visibility.json --write visibility.json
+          else
+            node scripts/github-visibility-audit.cjs --write visibility.json
+          fi
 
       - name: Capture the fixed repository-search snapshot
-        run: npm run audit:github-visibility:search:write -- visibility-search.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -s previous/visibility-search.json ]]; then
+            node scripts/github-visibility-audit.cjs --search --baseline previous/visibility-search.json --write visibility-search.json
+          else
+            node scripts/github-visibility-audit.cjs --search --write visibility-search.json
+          fi
 
       - name: Validate snapshot provenance
         shell: bash

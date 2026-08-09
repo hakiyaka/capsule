@@ -278,7 +278,8 @@ save the read-only report for the next comparison. It also records aggregate
 referrer and popular-path counts so future outreach can be tied to observed
 traffic; traffic data is not written to Capsule state. Referrers come from
 GitHub's `traffic/popular/referrers` endpoint. If that endpoint is unavailable,
-the audit records an empty list and does not infer that traffic was zero.
+the audit marks its aggregate fields unknown and does not infer that traffic
+was zero.
 For a fork or another public repository, set `CAPSULE_GITHUB_REPO=owner/name`
 or invoke `node scripts/github-visibility-audit.cjs --repo owner/name`;
 otherwise the documented default is `hakiyaka/capsule`. Do not rely on
@@ -340,10 +341,12 @@ documents the repeatable metadata, traffic, referral, release, and repository-se
 An intentionally concise [machine-readable summary](https://hakiyaka.github.io/capsule/llms.txt)
 keeps the canonical links and measurement caveat available to indexing tools.
 The repository also has a weekly and manually dispatchable read-only visibility
-workflow; it stores timestamped JSON snapshots as short-lived Actions artifacts,
-never comments, stars, forks, or edits the repository. Semver tags trigger the
-release workflow, which rebuilds the source archive and checksum from the exact
-tag before publishing them.
+workflow; it retrieves the previous retained artifact when available and emits
+null-safe baseline ratios and search deltas before storing the new timestamped
+JSON snapshots as short-lived Actions artifacts. It never comments, stars,
+forks, or edits the repository. Semver tags trigger the release workflow, which
+rebuilds the source archive and checksum from the exact tag before publishing
+them.
 Run `npm run audit:live` after a Pages deployment to verify the public HTML,
 FAQ metadata, PNG social card, sitemap, robots directive, RSS item, and
 machine-readable links over HTTPS. It is a smoke test, not proof of ranking.

@@ -2,6 +2,15 @@
 
 All notable user-visible changes are recorded here.
 
+## Unreleased
+
+- Make unavailable referral/path endpoints, missing aggregate uniques, and
+  null baseline values remain explicitly unknown instead of becoming false
+  zeroes; label the REST watcher field as the legacy stars alias and warn when
+  rolling traffic windows or API lag make a comparison non-equivalent.
+- Make the weekly/manual visibility workflow retrieve its previous retained
+  artifact and emit reproducible baseline ratios and repository-search deltas.
+
 ## 1.0.3 - 2026-08-09
 
 - Added a tag-driven release workflow that rebuilds and path-checks the source
