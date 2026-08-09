@@ -14,6 +14,16 @@ function summarizeReferrers(rows) {
   };
 }
 
+function summarizeReleases(releases) {
+  const list = Array.isArray(releases) ? releases : [];
+  const assets = list.flatMap((release) => Array.isArray(release?.assets) ? release.assets : []);
+  return {
+    release_assets: assets.length,
+    release_downloads: assets.reduce((total, asset) => total + (Number(asset?.download_count) || 0), 0),
+    release_asset_names: assets.map((asset) => String(asset?.name || "")).filter(Boolean).sort(),
+  };
+}
+
 function compareSearchSnapshots(current, baseline) {
   const currentQueries = Array.isArray(current?.queries) ? current.queries : [];
   const baselineByQuery = new Map(
@@ -38,4 +48,4 @@ function compareSearchSnapshots(current, baseline) {
   });
 }
 
-module.exports = { compareSearchSnapshots, summarizeReferrers };
+module.exports = { compareSearchSnapshots, summarizeReleases, summarizeReferrers };

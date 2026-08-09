@@ -1,0 +1,9 @@
+[
+  {
+    "tag_name": "v1.0.0",
+    "assets": [
+      {"name":"capsule-1.0.0-source.zip","download_count":7},
+      {"name":"capsule-1.0.0-source.zip.sha256","download_count":2}
+    ]
+  }
+]

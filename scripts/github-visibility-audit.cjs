@@ -5,7 +5,7 @@
 // written to Capsule state or benchmark artifacts.
 
 const { spawnSync } = require("node:child_process");
-const { compareSearchSnapshots, summarizeReferrers } = require("./github-visibility-metrics.cjs");
+const { compareSearchSnapshots, summarizeReleases, summarizeReferrers } = require("./github-visibility-metrics.cjs");
 
 const argv = process.argv.slice(2);
 const repoIndex = argv.indexOf("--repo");
@@ -72,6 +72,7 @@ try {
     try { return api(`repos/${repo}/pages`); } catch { return null; }
   })();
   const referrerSummary = summarizeReferrers(referrers);
+  const releaseSummary = summarizeReleases(releases);
   const current = {
     measured_at: new Date().toISOString(),
     repo,
@@ -82,6 +83,7 @@ try {
     topics: Array.isArray(metadata.topics) ? metadata.topics.length : 0,
     topic_names: Array.isArray(metadata.topics) ? metadata.topics.map((topic) => String(topic)).sort() : [],
     releases: Array.isArray(releases) ? releases.length : 0,
+    ...releaseSummary,
     description_chars: String(metadata.description || "").length,
     has_issues: Boolean(metadata.has_issues),
     has_discussions: Boolean(metadata.has_discussions),
@@ -113,7 +115,7 @@ try {
     const baseline = JSON.parse(fs.readFileSync(baselineFile, "utf8"));
     const baselineCurrent = baseline.current || baseline;
     report.baseline = baselineCurrent;
-    report.ratios = Object.fromEntries(["stars", "forks", "topics", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "unique_referrers_14d", "top_path_views_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
+    report.ratios = Object.fromEntries(["stars", "forks", "topics", "releases", "release_assets", "release_downloads", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "unique_referrers_14d", "top_path_views_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
     if (report.search && baseline.search) {
       report.search_deltas = compareSearchSnapshots(report.search, baseline.search);
     }

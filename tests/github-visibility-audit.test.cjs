@@ -4,7 +4,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { compareSearchSnapshots, summarizeReferrers } = require("../scripts/github-visibility-metrics.cjs");
+const { compareSearchSnapshots, summarizeReleases, summarizeReferrers } = require("../scripts/github-visibility-metrics.cjs");
 
 test("summarizes GitHub popular referrer rows", () => {
   const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "github-traffic-referrers.json"), "utf8"));
@@ -13,6 +13,15 @@ test("summarizes GitHub popular referrer rows", () => {
     referrer_views_14d: 46,
     unique_referrers_14d: 4,
     top_referrer: "github.com",
+  });
+});
+
+test("summarizes release assets and downloads", () => {
+  const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "github-releases.json"), "utf8"));
+  assert.deepEqual(summarizeReleases(fixture), {
+    release_assets: 2,
+    release_downloads: 9,
+    release_asset_names: ["capsule-1.0.0-source.zip", "capsule-1.0.0-source.zip.sha256"],
   });
 });
 
