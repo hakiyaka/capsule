@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Capsule Benchmarks and Methodology | Measure Token Efficiency</title>
+    <meta name="description" content="Run Capsule's reproducible A/B benchmarks, compare model-visible payloads by workload, and interpret exact-recovery and provider-telemetry limits correctly.">
+    <link rel="canonical" href="https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html">
+    <meta property="og:type" content="article"><meta property="og:title" content="Capsule Benchmarks and Methodology | Measure Token Efficiency"><meta property="og:description" content="A workload-first method for measuring Capsule's model-visible reductions without claiming universal provider billing savings."><meta property="og:url" content="https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html"><meta property="og:image" content="https://hakiyaka.github.io/capsule/social-card.svg"><meta property="og:image:alt" content="Capsule exact-recoverable context compression for Codex"><meta property="og:image:type" content="image/svg+xml"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://hakiyaka.github.io/capsule/social-card.svg">
+    <link rel="stylesheet" href="../styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Capsule Benchmarks and Methodology","description":"A workload-first method for measuring Capsule's model-visible reductions and exact-recovery limits.","url":"https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html","isPartOf":{"@id":"https://hakiyaka.github.io/capsule/#website"}}</script>
+  </head>
+  <body><main>
+    <nav aria-label="Primary navigation"><a href="../">Capsule home</a><a href="https://github.com/hakiyaka/capsule">GitHub source</a><a href="https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md">Benchmark source</a></nav>
+    <p class="eyebrow">Reproducible measurement</p>
+    <h1>Measure the workload you actually run.</h1>
+    <p class="lead">Capsule can reduce the model-visible representation of repeated or oversized evidence, but the result depends on the action, payload, query, repetition, and safety gates. The benchmark suite makes those conditions explicit.</p>
+    <h2>Start with a paired baseline</h2>
+    <ol>
+      <li>Choose a real workload such as a terminal log, a large file read, a project query, or a web result.</li>
+      <li>Run the same input through the baseline and Capsule paths with the same environment and output requirement.</li>
+      <li>Compare model-visible bytes or token estimates, recovery correctness, and latency. Keep failures and passthrough cases in the sample.</li>
+      <li>Repeat after a warm replay when the feature supports content-addressed or unchanged-result reuse.</li>
+    </ol>
+    <h2>Workload map</h2>
+    <table>
+      <thead><tr><th>Workload</th><th>Command</th><th>What it measures</th><th>Important limit</th></tr></thead>
+      <tbody>
+        <tr><td>Web result lease</td><td><code>npm run benchmark:web:zero-copy</code></td><td>First-call and exact-recovery payload size.</td><td>It does not observe provider-side cache or billing counters.</td></tr>
+        <tr><td>Get-Content replay</td><td><code>npm run benchmark:get-content:history</code></td><td>Safe native selection, unchanged-file replay, and recovery.</td><td>Small, unsafe, or explicit full reads intentionally pass through.</td></tr>
+        <tr><td>Project context</td><td><code>npm run benchmark:project</code></td><td>Symbol/dependency evidence versus broad file exploration.</td><td>Results vary with repository shape and query specificity.</td></tr>
+        <tr><td>Terminal output</td><td><code>npm run benchmark:io</code></td><td>Deduplication, filtering, and exact archived output.</td><td>Failures and low-confidence projections retain more context.</td></tr>
+      </tbody>
+    </table>
+    <h2>Interpret the result honestly</h2>
+    <div class="panel"><p>A percentage is a property of one measured model-visible payload. It is not automatically a percentage of hidden reasoning tokens, subscription limits, provider cache behavior, or invoice cost. Report the workload, Capsule version, command, sample size, and fallback rate beside the number.</p></div>
+    <p>Use the repository's <a href="https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md">benchmark methodology</a> and inspect the corresponding <a href="https://github.com/hakiyaka/capsule/tree/main/bench">benchmark source</a>. For GitHub discovery measurements, run <code>npm run audit:github-visibility -- --write path/to/snapshot.json</code> and compare a later snapshot with <code>--baseline</code>.</p>
+    <h2>Evidence and recovery</h2>
+    <p>Capsule stores the original result locally before emitting a compact view. A positive benchmark therefore needs two assertions: the visible payload is smaller for that case, and the exact result remains recoverable when requested. If either condition fails, the conservative path wins.</p>
+    <footer><a href="../">Capsule</a> · <a href="https://github.com/hakiyaka/capsule/releases">Releases</a> · <a href="https://github.com/hakiyaka/capsule/discussions">Discussions</a></footer>
+  </main></body>
+</html>

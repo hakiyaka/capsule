@@ -2,12 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://hakiyaka.github.io/capsule/</loc>
+    <lastmod>2026-08-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-  <url><loc>https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://hakiyaka.github.io/capsule/guide/get-content-token-savings.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://hakiyaka.github.io/capsule/guide/install-capsule.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://hakiyaka.github.io/capsule/guide/share-and-cite.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://hakiyaka.github.io/capsule/guide/get-content-token-savings.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://hakiyaka.github.io/capsule/guide/install-capsule.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://hakiyaka.github.io/capsule/guide/share-and-cite.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html</loc><lastmod>2026-08-09</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>

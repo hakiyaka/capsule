@@ -148,9 +148,5 @@
     "airlock:apply": "node scripts/skill-router.cjs airlock-apply --confirm",
     "airlock:refresh": "node scripts/skill-router.cjs airlock-refresh --confirm",
     "airlock:restore": "node scripts/skill-router.cjs airlock-restore --confirm"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "license": "MIT"
+  }
 }
