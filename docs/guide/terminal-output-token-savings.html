@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Terminal Output Token Savings | Capsule run, batch, and flow</title>
+    <meta name="description" content="Measure Capsule terminal output token savings with run, batch, and flow projections that keep failures, novel evidence, JSON, diffs, and exact recovery available.">
+    <link rel="canonical" href="https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html">
+    <meta property="og:type" content="article"><meta property="og:title" content="Terminal Output Token Savings | Capsule run, batch, and flow"><meta property="og:description" content="A conservative guide to smaller terminal payloads, preserved failures, and exact local recovery with Capsule."><meta property="og:url" content="https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html"><meta property="og:image" content="https://hakiyaka.github.io/capsule/social-card.svg"><meta property="og:image:alt" content="Capsule exact-recoverable context compression for Codex"><meta property="og:image:type" content="image/svg+xml"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary"><meta name="twitter:image" content="https://hakiyaka.github.io/capsule/social-card.svg">
+    <link rel="stylesheet" href="../styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Terminal Output Token Savings with Capsule","description":"A conservative guide to smaller terminal payloads, preserved failures, and exact local recovery.","url":"https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html","isPartOf":{"@id":"https://hakiyaka.github.io/capsule/#website"}}</script>
+  </head>
+  <body><main>
+    <nav aria-label="Primary navigation"><a href="../">Capsule home</a><a href="https://github.com/hakiyaka/capsule">GitHub source</a><a href="../guide/benchmarks-and-methodology.html">Methodology</a></nav>
+    <p class="eyebrow">Terminal evidence without boilerplate replay</p>
+    <h1>Show the new terminal evidence, not the same log again.</h1>
+    <p class="lead">Capsule projects command results only when the visible evidence can be smaller without hiding failures or weakening recovery. The frequent paths are <code>run</code>, <code>batch</code>, and <code>flow</code>.</p>
+    <h2>What the projection keeps</h2>
+    <div class="grid">
+      <article class="card"><h3>Failures first</h3><p>Exit status, stderr, failed tests, and critical diagnostics stay visible. A failed command is not treated as disposable boilerplate.</p></article>
+      <article class="card"><h3>Novel lines</h3><p>Repeated successful rows, duplicated prefixes, and stable noise can collapse while changed evidence remains in the view.</p></article>
+      <article class="card"><h3>Structured output</h3><p>JSON records, diffs, and paths use shape-aware projections that preserve identity and can be expanded exactly.</p></article>
+      <article class="card"><h3>Exact archive</h3><p>The original stdout and stderr are archived before projection, with a real capsule identifier for recovery.</p></article>
+    </div>
+    <h2>Measure before and after</h2>
+    <pre><code>npm run benchmark:io; npm run benchmark:terminal; npm run benchmark:terminal-real</code></pre>
+    <p>Use the same command, environment, and output requirement for the baseline and Capsule arms. Compare model-visible bytes or token estimates, exit/failure preservation, recovery success, and latency. Include small and explicit-full cases: if the wrapper would be larger, Capsule passes the literal result through.</p>
+    <h2>Safe command families</h2>
+    <table><thead><tr><th>Action</th><th>Useful for</th><th>Fallback trigger</th></tr></thead><tbody><tr><td><code>run</code></td><td>One command with bounded stdout/stderr evidence.</td><td>Unsafe shell semantics, failed classification, or explicit raw output.</td></tr><tr><td><code>batch</code></td><td>Independent commands with bounded concurrency and stable input order.</td><td>Dependency-sensitive steps or a result that needs full detail.</td></tr><tr><td><code>flow</code></td><td>Dependent command sequences with exact receipts between stages.</td><td>Missing dependency evidence, mutation risk, or a failed prerequisite.</td></tr></tbody></table>
+    <div class="panel"><p>A terminal reduction is a workload-specific model-visible measurement. It does not prove a fixed reduction in hidden reasoning, provider billing, provider cache usage, or subscription limits.</p></div>
+    <p>For file-specific reads, use the <a href="../guide/get-content-token-savings.html">Get-Content guide</a>. For broad MCP workflows, see <a href="../guide/mcp-context-compression.html">MCP context compression</a>; report reproductions in the <a href="https://github.com/hakiyaka/capsule/discussions/1">measurement discussion</a>.</p>
+    <footer><a href="../">Capsule</a> · <a href="https://github.com/hakiyaka/capsule/releases">Releases</a> · <a href="https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md">Benchmarks</a></footer>
+  </main></body>
+</html>
