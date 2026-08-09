@@ -21,6 +21,7 @@ const projectCompiler = require("./project.cjs");
 const jsonOutput = require("./json-output.cjs");
 const sessionAudit = require("./session-audit.cjs");
 const memoryLayers = require("./memory-layers.cjs");
+const getContent = require("./get-content.cjs");
 const storage = require("./storage.cjs");
 const packageMetadata = require("../package.json");
 
@@ -224,6 +225,41 @@ function attachArchive(compact, capsuleId, details = {}) {
 
 function runCommand(args = {}) {
   if (!args.command || typeof args.command !== "string") throw new Error("command is required");
+  const fast = getContent.fastPath(args);
+  if (fast) {
+    const operation = {
+      response: {
+        route: "compressed",
+        profile: fast.profile,
+        fast_path: "get-content-native-file-read",
+        capsule_id: fast.capsule_id || null,
+        exact_expand: Boolean(fast.capsule_id),
+        original_chars: fast.exactText.length,
+        output: fast.output,
+        path: fast.path,
+        command: fast.plan.command,
+        encoding: fast.encoding,
+        source_bytes: fast.source_bytes,
+        source_lines: fast.source_lines,
+        exit_code: 0,
+        elapsed_ms: fast.elapsed_ms,
+      },
+      route: "compressed",
+      capturedChars: fast.exactText.length,
+    };
+    compat.recordHistory({
+      command: fast.plan.command,
+      args: [],
+      cwd: args.cwd || process.cwd(),
+      profile: fast.profile,
+      route: "compressed",
+      raw_chars: fast.exactText.length,
+      emitted_chars: core.renderOperation(operation).length,
+      exit_code: 0,
+      source: "mcp-get-content-fast-path",
+    });
+    return operation;
+  }
   const capture = core.surveyCommand(args);
   const capsuleId = capture.response.capsule_id;
   const archived = core.loadCapsule(capsuleId);

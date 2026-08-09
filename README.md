@@ -35,6 +35,9 @@ result through.
 
 - **Terminal:** `run`, `batch`, and `flow` projections remove repeated,
   low-value stdout/stderr while preserving failures and critical lines.
+  Plain PowerShell `Get-Content` reads use a verified local file fast path,
+  query-focused evidence, and unchanged-file replay; unsafe or complex syntax
+  falls back to the normal shell.
 - **Files:** bounded reads, replay detection, immutable-baseline edits, and
   exact range expansion.
 - **Projects:** incremental symbol/dependency indexing, impact cones, and
@@ -194,6 +197,8 @@ npm run verify
 npm run benchmark:web:zero-copy
 npm run benchmark:project
 npm run benchmark:refactor
+npm run benchmark:get-content
+npm run benchmark:get-content:history
 ```
 
 `npm run verify` runs the complete Node test suite, source-integrity audit,
@@ -201,6 +206,10 @@ public-readiness audit, and documentation audit. Run the broader suites with
 `npm run benchmark:full`. All benchmark results
 are workload-specific; they are not a promise of a fixed saving on every
 prompt or a substitute for provider billing telemetry.
+
+The historical Get-Content replay benchmark is bounded by
+`CAPSULE_HISTORY_MAX_BYTES` (2 GB by default) and reports only aggregate,
+hash-safe measurements; it does not export session text.
 
 See [BENCHMARK.md](BENCHMARK.md) for methodology and [CHANGELOG.md](CHANGELOG.md)
 for release history. The 100-project research ledger is in

@@ -10,6 +10,7 @@ const terminalNovelty = require("../mcp/terminal-novelty.cjs");
 const reasoningResidual = require("../mcp/reasoning-residual.cjs");
 const toolchainJit = require("../mcp/toolchain-jit.cjs");
 const zeroInferencePoll = require("../mcp/zero-inference-poll.cjs");
+const getContent = require("../mcp/get-content.cjs");
 
 function payloadPath() {
   const index = process.argv.indexOf("--payload");
@@ -101,6 +102,26 @@ function bounded(value, limit = 480) {
 
 async function runOne(payload, command, profile, executor = execute) {
   const started = Date.now();
+  const fast = getContent.fastPath({
+    command,
+    cwd: payload.cwd,
+    query: payload.query,
+    max_chars: payload.max_chars,
+    passthrough_chars: payload.passthrough_chars,
+  });
+  if (fast) {
+    const text = `# stdout\n${fast.exactText}\n# stderr\n`;
+    return {
+      command,
+      profile: fast.profile,
+      output: fast.output,
+      text,
+      capsule_id: fast.capsule_id,
+      exit_code: 0,
+      elapsed_ms: Date.now() - started,
+      fast_path: "get-content-native-file-read",
+    };
+  }
   const result = await executor(
     command,
     path.resolve(payload.cwd || process.cwd()),

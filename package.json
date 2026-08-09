@@ -51,6 +51,8 @@
     "benchmark:threads:write": "node bench/recent_thread_efficiency_ab.cjs --write bench/recent-thread-efficiency-results.json",
     "benchmark:io": "node bench/io_surface_benchmark.cjs",
     "benchmark:memory": "node bench/memory_layers_ab.cjs",
+    "benchmark:get-content": "node bench/get_content_ab.cjs",
+    "benchmark:get-content:history": "node bench/get_content_history_ab.cjs",
     "benchmark:environment": "node bench/windows_environment_ab.cjs",
     "benchmark:io:write": "node bench/io_surface_benchmark.cjs --write bench/io-surface-results.json",
     "benchmark:skills": "python bench/skill_router_benchmark.py",

@@ -21,6 +21,10 @@ All notable user-visible changes are recorded here.
   profile/scenario context and falls back to fact/trace retrieval only when
   the high-level stage has no match, keeping the lower-level evidence on
   demand rather than injecting it into every turn.
+- Added a guarded native `Get-Content` fast path for one-file UTF-8 reads:
+  query-focused evidence and content-hash replay avoid the PowerShell stdout
+  envelope, while pipelines, wildcards, waits, non-UTF-8 encodings, and
+  unknown flags retain the normal shell path.
 - Documented the refactor boundary and verification evidence. Hidden provider
   reasoning, cache, billing, and subscription counters remain outside local
   benchmark claims.

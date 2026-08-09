@@ -130,6 +130,43 @@ The original activation fixtures remain useful only as upper-bound feature tests
 
 These measurements cover model-visible local hook output, not hidden prompts, hidden reasoning, provider caching, subscription quota accounting, or billing. Short, unstructured, failed, literal-evidence, critical-heavy, and token-negative results intentionally pass through.
 
+## Get-Content native file fast path A/B
+
+`npm run benchmark:get-content` compares a plain `Get-Content` command passed
+through the PowerShell stdout envelope and generic projector with Capsule's
+safe local file path. The parser accepts only one literal UTF-8 file and
+rejects pipelines, wildcards, variables, waits, range switches, and unknown
+flags. In the current fixture, first-read output fell from **142 to 106
+characters (25.35% below the existing projector)** while preserving the exact
+capsule; unchanged replay fell to **56 characters (60.56% below the baseline)**
+and changed content bypassed replay. Against the raw 130,888-character file,
+first/repeat exposure fell **99.92% / 99.96%**. These are local
+model-visible character/token proxies, not provider billing or hidden reasoning.
+
+### Historical Get-Content replay A/B
+
+`npm run benchmark:get-content:history` streams Codex JSONL sessions, extracts
+only tool-input fields containing a plain safe `Get-Content`/`gc` command, and
+replays the command against files that still exist. It does not print or save
+session text. On a 20,000,000,000-byte historical sample (38 session files,
+33 with hits), 636 safe calls were found; 352 calls were still replayable and
+206 referenced files had been deleted or moved. The native path preserved **352/352 exact
+recoveries**, produced **0 regressions**, and used the generic projector as a
+monotonic fallback for 78 cases.
+
+Across replayable calls plus those conservative fallbacks, model-visible
+characters fell from **881,070 to 132,705 (84.94%)** and the local token
+estimate fell from **315,357 to 42,120 (86.64%)**. First reads (229 calls,
+including fallbacks) saved **82.96% characters / 85.27% tokens**; unchanged
+replays (201 calls) saved **93.32% / 94.21%**. Against the raw file payload,
+the corresponding reductions were **96.34% characters / 96.15% tokens**.
+
+This is a historical replay proxy, not provider billing, hidden reasoning, or
+subscription quota telemetry. Files changed or deleted since the original
+session are counted as non-replayable. Increase or bound the scan explicitly
+with `CAPSULE_HISTORY_MAX_BYTES`; the default is 2 GB to keep an audit local
+and predictable.
+
 ## Terminal Lattice and Universal Terminal Genome synthetic activation A/B
 
 The original Terminal Lattice fixture repeats one generated line grammar under ten shell-family labels; it is synthetic activation evidence, not ten independently captured shell formats. Under the corrected implementation, all **10/10** cases activate and pass, and exact `o200k_base` output falls from **34,694 to 1,358 tokens: 96.09% saved**.
