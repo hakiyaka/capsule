@@ -233,8 +233,9 @@ It reports stars, forks, releases, topics, repository surface flags, community
 health, Pages status, and the rolling 14-day views/clones window. Pass
 `--baseline path/to/snapshot.json` to compute
 ratios against a prior snapshot, or add `--write path/to/snapshot.json` to
-save the read-only report for the next comparison; traffic data is not written
-to Capsule state.
+save the read-only report for the next comparison. It also records aggregate
+referrer and popular-path counts so future outreach can be tied to observed
+traffic; traffic data is not written to Capsule state.
 
 For a consistent public reference, use the [share and cite guide](https://hakiyaka.github.io/capsule/guide/share-and-cite.html),
 the canonical [GitHub repository](https://github.com/hakiyaka/capsule), or

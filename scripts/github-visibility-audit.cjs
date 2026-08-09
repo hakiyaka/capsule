@@ -33,6 +33,12 @@ try {
   const metadata = api(`repos/${repo}`);
   const views = api(`repos/${repo}/traffic/views`);
   const clones = api(`repos/${repo}/traffic/clones`);
+  const referrers = (() => {
+    try { return api(`repos/${repo}/traffic/referrers`); } catch { return []; }
+  })();
+  const popularPaths = (() => {
+    try { return api(`repos/${repo}/traffic/popular/paths`); } catch { return []; }
+  })();
   const releases = api(`repos/${repo}/releases?per_page=100`);
   const community = (() => {
     try { return api(`repos/${repo}/community/profile`); } catch { return null; }
@@ -59,6 +65,13 @@ try {
     unique_viewers_14d: Number(views.uniques) || sum(views.views, "uniques"),
     clones_14d: Number(clones.count) || sum(clones.clones, "count"),
     unique_cloners_14d: Number(clones.uniques) || sum(clones.clones, "uniques"),
+    referrer_domains_14d: Array.isArray(referrers) ? referrers.length : 0,
+    referrer_views_14d: sum(referrers, "count"),
+    unique_referrers_14d: sum(referrers, "uniques"),
+    top_referrer: Array.isArray(referrers) && referrers[0] ? String(referrers[0].referrer || "") : "",
+    popular_paths_14d: Array.isArray(popularPaths) ? popularPaths.length : 0,
+    top_path: Array.isArray(popularPaths) && popularPaths[0] ? String(popularPaths[0].path || "") : "",
+    top_path_views_14d: Array.isArray(popularPaths) && popularPaths[0] ? Number(popularPaths[0].count) || 0 : 0,
     homepage: metadata.homepage || "",
     pages_url: pages?.html_url || "",
     pages_build_type: pages?.build_type || "",
@@ -68,7 +81,7 @@ try {
     const fs = require("node:fs");
     const baseline = JSON.parse(fs.readFileSync(baselineFile, "utf8"));
     report.baseline = baseline.current || baseline;
-    report.ratios = Object.fromEntries(["stars", "forks", "topics", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
+    report.ratios = Object.fromEntries(["stars", "forks", "topics", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "unique_referrers_14d", "top_path_views_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
   }
   if (writeFile) {
     const fs = require("node:fs");
