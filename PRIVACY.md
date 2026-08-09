@@ -13,6 +13,13 @@ explicitly selects an external operation.
   authenticated `gh` CLI. It writes only aggregate repository metadata,
   traffic/referral summaries, release metadata, and repository-search snapshots;
   it does not store GitHub credentials or prompt/session text.
+- Automatic hook event, phase, and final-memory capture is disabled by default.
+  Set `CAPSULE_CAPTURE_MEMORY=1` only when you intentionally want sanitized,
+  bounded excerpts stored in local memory; this setting never sends them to a
+  Capsule-controlled service.
+- Hook failure diagnostics keep only an error class, optional code, bounded
+  length, and a short message fingerprint; stack traces, paths, and error text
+  are not persisted by the hook logger.
 - GitHub Pages, GitHub Actions, and any other hosting provider process their own
   access logs under their policies. Those services are not Capsule telemetry.
 
@@ -21,7 +28,8 @@ explicitly selects an external operation.
 Capsule may store bounded caches, exact-recovery capsules, hashes, and
 hash-only audit records in the user's local Codex state. The user controls that
 directory and may remove it using the documented local-state and cache cleanup
-commands. Raw session text is not implicitly copied into Capsule state.
+commands. Raw session text and automatic final/phase excerpts are not implicitly
+copied into Capsule state; content memory requires the explicit opt-in above.
 
 If a future release changes these data flows, this policy and the release notes
 will be updated before the change is presented as a default behavior.

@@ -216,25 +216,34 @@ test("public index writes wait for a short competing SQLite writer", { skip: !Da
 });
 
 test("session continuity injects a bounded set of unique memories", async () => {
-  for (const term of ["decision", "error", "blocker", "plan", "user prompt"]) {
-    for (let index = 0; index < 2; index += 1) {
-      hook.handle("stop", {
-        last_assistant_message: `${term.toUpperCase()}-${index} ${(`${term} evidence `).repeat(80)}`,
-        cwd: process.cwd(),
-        session_id: `budget-${term.replace(" ", "-")}-${index}`,
-      });
+  const previousCapture = process.env.CAPSULE_CAPTURE_MEMORY;
+  process.env.CAPSULE_CAPTURE_MEMORY = "1";
+  try {
+    for (const term of ["decision", "error", "blocker", "plan", "user prompt"]) {
+      for (let index = 0; index < 2; index += 1) {
+        hook.handle("stop", {
+          last_assistant_message: `${term.toUpperCase()}-${index} ${(`${term} evidence `).repeat(80)}`,
+          cwd: process.cwd(),
+          session_id: `budget-${term.replace(" ", "-")}-${index}`,
+        });
+      }
     }
+    const resumed = hook.handle("sessionstart", {
+      cwd: process.cwd(),
+      session_id: "bounded-session",
+    });
+    const context = resumed.hookSpecificOutput.additionalContext;
+    assert.ok(context.length <= 600, `session context was ${context.length} chars`);
+    assert.ok((context.match(/^- /gm) || []).length <= 1);
+  } finally {
+    if (previousCapture == null) delete process.env.CAPSULE_CAPTURE_MEMORY;
+    else process.env.CAPSULE_CAPTURE_MEMORY = previousCapture;
   }
-  const resumed = hook.handle("sessionstart", {
-    cwd: process.cwd(),
-    session_id: "bounded-session",
-  });
-  const context = resumed.hookSpecificOutput.additionalContext;
-  assert.ok(context.length <= 600, `session context was ${context.length} chars`);
-  assert.ok((context.match(/^- /gm) || []).length <= 1);
 });
 
 test("session continuity never injects one project's memory into another project", () => {
+  const previousCapture = process.env.CAPSULE_CAPTURE_MEMORY;
+  process.env.CAPSULE_CAPTURE_MEMORY = "1";
   const projectA = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-project-a-"));
   const projectB = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-project-b-"));
   const needle = `PROJECT-SCOPED-DECISION-${process.pid}-${Date.now()}`;
@@ -258,6 +267,8 @@ test("session continuity never injects one project's memory into another project
   } finally {
     fs.rmSync(projectA, { recursive: true, force: true });
     fs.rmSync(projectB, { recursive: true, force: true });
+    if (previousCapture == null) delete process.env.CAPSULE_CAPTURE_MEMORY;
+    else process.env.CAPSULE_CAPTURE_MEMORY = previousCapture;
   }
 });
 
@@ -874,6 +885,8 @@ test("repeated compaction carries a sanitized prior phase checkpoint", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-phase-checkpoint-"));
   const file = path.join(root, "session.jsonl");
   const session = `phase-checkpoint-${process.pid}-${Date.now()}`;
+  const previousCapture = process.env.CAPSULE_CAPTURE_MEMORY;
+  process.env.CAPSULE_CAPTURE_MEMORY = "1";
   writePressureSession(file, { input: 85_000, compactions: 1, postInput: 20_000 });
   try {
     hook.handle("stop", {
@@ -895,6 +908,8 @@ test("repeated compaction carries a sanitized prior phase checkpoint", () => {
     assert.match(context, /11\/11/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
+    if (previousCapture == null) delete process.env.CAPSULE_CAPTURE_MEMORY;
+    else process.env.CAPSULE_CAPTURE_MEMORY = previousCapture;
   }
 });
 
@@ -937,6 +952,8 @@ test("post-compaction memory ledger restores state and probes the first mutation
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-memory-ledger-"));
   const file = path.join(root, "session.jsonl");
   const session = `memory-ledger-${process.pid}-${Date.now()}`;
+  const previousCapture = process.env.CAPSULE_CAPTURE_MEMORY;
+  process.env.CAPSULE_CAPTURE_MEMORY = "1";
   writePressureSession(file, { input: 85_000, compactions: 1, postInput: 20_000 });
   const base = { session_file: file, session_id: session, cwd: root };
   try {
@@ -974,6 +991,8 @@ test("post-compaction memory ledger restores state and probes the first mutation
     assert.doesNotMatch(afterProbe.hookSpecificOutput?.additionalContext || "", /memory ledger v1|Capsule probe/i);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
+    if (previousCapture == null) delete process.env.CAPSULE_CAPTURE_MEMORY;
+    else process.env.CAPSULE_CAPTURE_MEMORY = previousCapture;
   }
 });
 
@@ -2556,23 +2575,97 @@ test("automatic hooks do not persist raw user prompts without explicit opt-in", 
   }
 });
 
+test("automatic event memory is disabled without explicit opt-in", async () => {
+  const previous = process.env.CAPSULE_CAPTURE_MEMORY;
+  delete process.env.CAPSULE_CAPTURE_MEMORY;
+  const marker = `EVENT-MEMORY-OPT-IN-${process.pid}-${Date.now()}`;
+  try {
+    hook.handle("stop", {
+      last_assistant_message: `Private event ${marker} must not be indexed by default.`,
+      cwd: process.cwd(),
+      session_id: "event-memory-opt-in",
+    });
+    const searched = await unified.dispatch({
+      action: "search",
+      payload: { query: marker, kind: "memory", snippet_chars: 500 },
+    });
+    assert.equal(
+      searched.response.searches[0].results.some((item) => item.snippet.includes(marker)),
+      false
+    );
+  } finally {
+    if (previous == null) delete process.env.CAPSULE_CAPTURE_MEMORY;
+    else process.env.CAPSULE_CAPTURE_MEMORY = previous;
+  }
+});
+
+test("automatic final and phase memory are disabled without explicit opt-in", () => {
+  const previous = process.env.CAPSULE_CAPTURE_MEMORY;
+  delete process.env.CAPSULE_CAPTURE_MEMORY;
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-memory-default-off-"));
+  const file = path.join(root, "session.jsonl");
+  const marker = `FINAL-MEMORY-OPT-IN-${process.pid}-${Date.now()}`;
+  const prompt = `Choose a verified implementation for ${marker} and preserve the evidence.`;
+  const session = `final-memory-default-off-${process.pid}-${Date.now()}`;
+  writePressureSession(file, { input: 85_000, compactions: 1, postInput: 20_000 });
+  try {
+    hook.handle("userpromptsubmit", {
+      prompt,
+      cwd: root,
+      session_file: file,
+      session_id: session,
+    });
+    hook.handle("stop", {
+      last_assistant_message: `Completed ${marker}; verified with the bounded fixture.`,
+      cwd: root,
+      session_file: file,
+      session_id: session,
+    });
+    const replay = hook.handle("userpromptsubmit", {
+      prompt,
+      cwd: root,
+      session_file: file,
+      session_id: `${session}-target`,
+    });
+    assert.doesNotMatch(JSON.stringify(replay), new RegExp(marker));
+    const compact = hook.handle("precompact", {
+      summary: "Compact the current implementation phase.",
+      cwd: root,
+      session_file: file,
+      session_id: session,
+    });
+    assert.doesNotMatch(JSON.stringify(compact), new RegExp(marker));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+    if (previous == null) delete process.env.CAPSULE_CAPTURE_MEMORY;
+    else process.env.CAPSULE_CAPTURE_MEMORY = previous;
+  }
+});
+
 test("automatic session memories redact echoed credentials before indexing", async () => {
+  const previousCapture = process.env.CAPSULE_CAPTURE_MEMORY;
+  process.env.CAPSULE_CAPTURE_MEMORY = "1";
   const marker = `SANITIZED-MEMORY-DECISION-${process.pid}-${Date.now()}`;
   const password = "test-fixture-passphrase-91!";
-  hook.handle("stop", {
-    last_assistant_message: `Decision ${marker}: Capsule limits reasoning-token growth; connect to 203.0.113.42 root ${password} with api_key=SyntheticApiKey778899.`,
-    cwd: process.cwd(),
-    session_id: "sanitized-memory",
-  });
-  const searched = await unified.dispatch({
-    action: "search",
-    payload: { query: marker, kind: "memory", snippet_chars: 1_000 },
-  });
-  const rendered = JSON.stringify(searched.response.searches[0].results);
-  assert.doesNotMatch(rendered, new RegExp(password.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-  assert.doesNotMatch(rendered, /SyntheticApiKey778899/);
-  assert.match(rendered, /\[REDACTED\]/);
-  assert.match(rendered, /Capsule limits reasoning-token growth/);
+  try {
+    hook.handle("stop", {
+      last_assistant_message: `Decision ${marker}: Capsule limits reasoning-token growth; connect to 203.0.113.42 root ${password} with api_key=SyntheticApiKey778899.`,
+      cwd: process.cwd(),
+      session_id: "sanitized-memory",
+    });
+    const searched = await unified.dispatch({
+      action: "search",
+      payload: { query: marker, kind: "memory", snippet_chars: 1_000 },
+    });
+    const rendered = JSON.stringify(searched.response.searches[0].results);
+    assert.doesNotMatch(rendered, new RegExp(password.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    assert.doesNotMatch(rendered, /SyntheticApiKey778899/);
+    assert.match(rendered, /\[REDACTED\]/);
+    assert.match(rendered, /Capsule limits reasoning-token growth/);
+  } finally {
+    if (previousCapture == null) delete process.env.CAPSULE_CAPTURE_MEMORY;
+    else process.env.CAPSULE_CAPTURE_MEMORY = previousCapture;
+  }
 });
 
 test("doctor adapts to a user's skill catalog without changing it", async () => {
@@ -2774,17 +2867,24 @@ test("fetch batches requests, normalizes HTML, and honors the TTL cache", async 
 });
 
 test("automatic hooks wrap large shell commands and preserve unrelated hooks on install", () => {
-  hook.handle("stop", {
-    last_assistant_message: "Decision: use the HOOK-SESSION-SAPPHIRE-LANE.",
-    cwd: process.cwd(),
-    session_id: "parity-session",
-  });
-  const resumed = hook.handle("sessionstart", {
-    cwd: process.cwd(),
-    session_id: "parity-session-next",
-  });
-  assert.equal(resumed.hookSpecificOutput.hookEventName, "SessionStart");
-  assert.match(resumed.hookSpecificOutput.additionalContext, /HOOK-SESSION-SAPPHIRE-LANE/);
+  const previousCapture = process.env.CAPSULE_CAPTURE_MEMORY;
+  process.env.CAPSULE_CAPTURE_MEMORY = "1";
+  try {
+    hook.handle("stop", {
+      last_assistant_message: "Decision: use the HOOK-SESSION-SAPPHIRE-LANE.",
+      cwd: process.cwd(),
+      session_id: "parity-session",
+    });
+    const resumed = hook.handle("sessionstart", {
+      cwd: process.cwd(),
+      session_id: "parity-session-next",
+    });
+    assert.equal(resumed.hookSpecificOutput.hookEventName, "SessionStart");
+    assert.match(resumed.hookSpecificOutput.additionalContext, /HOOK-SESSION-SAPPHIRE-LANE/);
+  } finally {
+    if (previousCapture == null) delete process.env.CAPSULE_CAPTURE_MEMORY;
+    else process.env.CAPSULE_CAPTURE_MEMORY = previousCapture;
+  }
 
   const pre = hook.handle("pretooluse", {
     tool_name: "shell_command",

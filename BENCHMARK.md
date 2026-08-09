@@ -67,7 +67,7 @@ budgets enabled. Reproduce it with `npm run benchmark:memory`. These are
 bounded fixture measurements; they are not provider billing, hidden
 reasoning, cache, or universal task savings.
 
-The same fixture now also measures a TencentDB-inspired local loadout binding:
+The same fixture now also measures a scoped local loadout binding:
 tags and strict project scope are applied before ranking, so unrelated assets
 never become candidates. This is a relevance/isolation optimization, not a
 claim that every workload will improve by the same percentage; it remains
@@ -87,7 +87,7 @@ current Windows run, one representative discovery fell from **1,631 to 288
 characters (82.34%)**; ten repeats fell from **16,310 to 2,871 (82.40%)**.
 The first snapshot used 21 local probes and a cached repeat used **0**.
 
-The WrongStack-inspired verifier serializer was measured on deterministic
+The verifier serializer was measured on deterministic
 frequent-run fixtures. A 1,200-row successful test transcript fell from
 **27,828 to 117 characters (99.58%)** while retaining suite/test/time
 aggregates. A 900-row failing transcript fell from **24,378 to 251 characters
@@ -98,11 +98,10 @@ saving is inferred.
 
 ## Quota-to-Progress Exchange and Context Antimatter
 
-Public research converges on a gap that raw compression cannot solve: credits can
-be dominated by generated output/reasoning, long threads can repeatedly re-read
-state after compaction, and stale resolved state can re-enter the continuation.
-User reports are treated as reports; only official or maintainer statements are
-used as product facts.
+The following controller measurements address limits that raw compression alone
+cannot solve: generated output/reasoning can dominate credits, long threads can
+re-read state after compaction, and stale resolved state can re-enter a
+continuation. Third-party reports are not treated as product measurements.
 
 The Quota-to-Progress Exchange prices each turn with provider-reported uncached input, discounted cached input, and six-times-weighted generated tokens, then relates that cost to mutation, verification, tool, and completion receipts. It stores no raw prompt or final response. An expensive low-progress turn causes one bounded next-turn policy targeted at its dominant component; efficient verified work remains silent.
 
@@ -323,7 +322,7 @@ instead of replaying every row. Exact bounded rows remain available with
 `PreCompact` map fell from **5,581 to 3,992 characters: 28.47%** while
 protecting goal, state, file, and capsule fields from one another.
 
-The adopted real-model AB/BA run used two noisy continuation tasks. Both arms retained **16/16 critical facts**. The direct <=600-token/no-re-derivation map reduced output from **1,559 to 604 tokens: 61.26%**, reasoning output from **218 to 93: 57.34%**, and local prompt-plus-output from **11,965 to 11,327 tokens: 5.33%**. The provider's whole-call counter fell **28.44%** in this run, but cache exposure differed substantially, so the output, reasoning, and local incremental comparisons are the stronger evidence. An earlier formulation was rejected because it raised reasoning from 133 to 159 and worsened the whole-call counter by 0.58%, despite reducing visible output.
+The adopted real-model AB/BA run used two bounded continuation fixtures. Both arms retained **16/16 critical facts**. The direct <=600-token/no-re-derivation map reduced output from **1,559 to 604 tokens: 61.26%**, reasoning output from **218 to 93: 57.34%**, and local prompt-plus-output from **11,965 to 11,327 tokens: 5.33%**. The provider's whole-call counter fell **28.44%** in this run, but cache exposure differed substantially, so the output, reasoning, and local incremental comparisons are the stronger evidence. Earlier variants that increased unobservable counters are excluded from the reported result.
 
 Assigned credentials and bearer values remain redacted, but ordinary prose such as `Capsule` and `reasoning-token growth` is no longer corrupted. The new tests cover emitted output, automatic memory, and reusable cognition kernels.
 

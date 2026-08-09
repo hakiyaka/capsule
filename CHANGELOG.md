@@ -21,10 +21,13 @@ All notable user-visible changes are recorded here.
 - Add a scenario-led Codex plugin/MCP packaging checklist covering the manifest,
   `mcpServers` contract, runtime verification, and relative-path
   compatibility boundaries.
+- Disable automatic hook event, phase, and final-memory persistence by default;
+  require `CAPSULE_CAPTURE_MEMORY=1` for sanitized, bounded excerpts and align
+  the privacy and contract documentation with that opt-in behavior.
 
 ## 1.0.4 - 2026-08-09
 
-- Removed internal research ledgers and raw benchmark/session identifiers from
+- Removed non-public research artifacts and raw benchmark/session identifiers from
   public documentation and receipts while retaining the runtime contracts.
 - Added a crawlable guide link mesh and factual citation abstract, with an
   audit requiring one visible guide-hub link for every leaf guide.
@@ -71,10 +74,10 @@ All notable user-visible changes are recorded here.
 - Added storage-helper and documentation-audit regression tests, including
   malformed-cache behavior, temporary-file cleanup, local-link checks, and
   retired internal-name checks.
-- Added deterministic memory loadout bindings inspired by TencentDB-Agent-
-  Memory's query-conditioned, bounded asset retrieval: optional tags, sources,
-  layers/asset types, and strict scope are applied before ranking in both
-  `recall` and progressive `index`, while exact `get` recovery remains intact.
+- Added deterministic memory loadout bindings with query-conditioned, bounded
+  asset retrieval: optional tags, sources, layers/asset types, and strict scope
+  are applied before ranking in both `recall` and progressive `index`, while
+  exact `get` recovery remains intact.
 - Added an opt-in two-stage memory strategy: `strategy:"bootstrap"` prefers
   profile/scenario context and falls back to fact/trace retrieval only when
   the high-level stage has no match, keeping the lower-level evidence on
@@ -129,13 +132,11 @@ All notable user-visible changes are recorded here.
   isolates workspace switches, expires stale leases, and hashes missing-session
   fallbacks instead of sharing one global `unknown` state.
 - Added a task-scoped subagent fan-out fuse and automatic full-history fork
-  bound. The safeguard is based on recent telemetry showing one parent with 31
-  children consuming 18.43 GiB of session history; limits tighten under context
-  pressure and reset only after a real implementation mutation.
-- Added Sol-inspired failed-lane retry blocking and fresh-review isolation:
-  unchanged failed delegation packets are withheld until corrected, while
-  explicit fresh/read-only reviews use `fork_turns:none` and inspect only their
-  supplied evidence.
+  bound. Limits tighten under context pressure and reset only after a real
+  implementation mutation.
+- Added failed-lane retry blocking and fresh-review isolation: unchanged failed
+  delegation packets are withheld until corrected, while explicit fresh/read-
+  only reviews use `fork_turns:none` and inspect only their supplied evidence.
 - Added the optional layered memory loadout action: explicit L0 trace, L1 fact,
   L2 scenario, and L3 profile lanes with scope isolation, secret redaction,
   idempotent deduplication, per-lane budgets, freshness/importance scoring,
@@ -147,11 +148,11 @@ All notable user-visible changes are recorded here.
   emitting raw PATH values; changed PATH, virtual-environment, or workspace
   state invalidates the lease automatically. Setup-oriented Windows prompts
   receive the lease once per task/session instead of repeating discovery advice.
-- Added a verifier-output serializer inspired by WrongStack: successful test
-  runs now emit aggregate suites/tests/time lines instead of replaying every
-  `PASS` row, while failed runs retain failure neighborhoods and summaries and
-  omit unrelated passing rows. Exact raw output remains recoverable from its
-  Capsule; small, literal, or ambiguous output still passes through.
+- Added a verifier-output serializer: successful test runs now emit aggregate
+  suites/tests/time lines instead of replaying every `PASS` row, while failed
+  runs retain failure neighborhoods and summaries and omit unrelated passing
+  rows. Exact raw output remains recoverable from its Capsule; small, literal,
+  or ambiguous output still passes through.
 - Added platform-native state handling for Windows, macOS, Linux, and XDG,
   plus public contribution, security, CI, and readiness checks.
 - Published with the `capsule` npm/plugin installation identifier

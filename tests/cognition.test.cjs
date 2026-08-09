@@ -482,24 +482,31 @@ test("UserPromptSubmit injects token escrow and cognition only when they predict
 
 test("Stop distills a prompt fingerprint and final into a cross-session decision replay", () => {
   const prompt = "Compare alpha beta and gamma for latency cost security and choose the winner";
-  hook.handle("userpromptsubmit", {
-    cwd: process.cwd(),
-    session_id: "cognition-kernel-source",
-    prompt,
-  });
-  hook.handle("stop", {
-    cwd: process.cwd(),
-    session_id: "cognition-kernel-source",
-    last_assistant_message: "Winner beta. Verified with npm test: 75 passing.",
-  });
-  const replay = hook.handle("userpromptsubmit", {
-    cwd: process.cwd(),
-    session_id: "cognition-kernel-target",
-    prompt,
-  });
-  assert.match(replay.hookSpecificOutput.additionalContext, /cognition replay/i);
-  assert.match(replay.hookSpecificOutput.additionalContext, /Winner beta/);
-  assert.match(replay.hookSpecificOutput.additionalContext, /state and evidence are unchanged/i);
+  const previousCapture = process.env.CAPSULE_CAPTURE_MEMORY;
+  process.env.CAPSULE_CAPTURE_MEMORY = "1";
+  try {
+    hook.handle("userpromptsubmit", {
+      cwd: process.cwd(),
+      session_id: "cognition-kernel-source",
+      prompt,
+    });
+    hook.handle("stop", {
+      cwd: process.cwd(),
+      session_id: "cognition-kernel-source",
+      last_assistant_message: "Winner beta. Verified with npm test: 75 passing.",
+    });
+    const replay = hook.handle("userpromptsubmit", {
+      cwd: process.cwd(),
+      session_id: "cognition-kernel-target",
+      prompt,
+    });
+    assert.match(replay.hookSpecificOutput.additionalContext, /cognition replay/i);
+    assert.match(replay.hookSpecificOutput.additionalContext, /Winner beta/);
+    assert.match(replay.hookSpecificOutput.additionalContext, /state and evidence are unchanged/i);
+  } finally {
+    if (previousCapture == null) delete process.env.CAPSULE_CAPTURE_MEMORY;
+    else process.env.CAPSULE_CAPTURE_MEMORY = previousCapture;
+  }
 });
 
 test("cognition is available through the single capsule dispatch surface", async () => {

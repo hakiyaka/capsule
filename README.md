@@ -316,10 +316,12 @@ capsule/
 ## Privacy
 
 Automatic decisions store bounded counters and keyed fingerprints, not raw
-prompts. Explicit `index`, `remember`, and `memory capture` operations store
-only the content requested by the caller. State lives in the platform-appropriate
-local data directory. See the full [privacy policy](PRIVACY.md) for the
-explicit web-search and GitHub-audit boundaries.
+prompts. Automatic event, phase, and final-memory capture is off by default; set
+`CAPSULE_CAPTURE_MEMORY=1` only when you explicitly want sanitized, bounded
+excerpts stored locally. Explicit `index`, `remember`, and `memory capture`
+operations store only the content requested by the caller. State lives in the
+platform-appropriate local data directory. See the full [privacy policy](PRIVACY.md)
+for the explicit web-search and GitHub-audit boundaries.
 
 Set `CAPSULE_STATE` to an absolute directory to choose a different local state
 root. Use the supported `purge` operation to remove cached projects or

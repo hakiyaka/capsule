@@ -71,10 +71,15 @@ function hookRoot() {
 
 function logError(event, error) {
   try {
+    const message = error && typeof error.message === "string" ? error.message : String(error || "");
+    const digest = crypto.createHash("sha256").update(message).digest("hex").slice(0, 20);
     const line = JSON.stringify({
       at: new Date().toISOString(),
       event,
-      error: error && error.stack ? error.stack : String(error),
+      error: error?.name || "Error",
+      code: error?.code || null,
+      detail_sha256: digest,
+      detail_chars: message.length,
     });
     fs.appendFileSync(path.join(hookRoot(), "errors.jsonl"), `${line}\n`, "utf8");
   } catch {
@@ -178,6 +183,10 @@ function sanitizeAutomaticMemory(content) {
 }
 
 function rememberEvent(input, event, content, title = event) {
+  // Automatic hook memory can contain user/tool text. Keep it disabled unless
+  // the user explicitly opts in; counters and keyed fingerprints remain
+  // available through their separate state lanes.
+  if (process.env.CAPSULE_CAPTURE_MEMORY !== "1") return;
   if (!content) return;
   const sanitized = sanitizeAutomaticMemory(content);
   if (!sanitized) return;
@@ -240,6 +249,7 @@ function phaseCheckpointFile(input) {
 }
 
 function writePhaseCheckpoint(input, content) {
+  if (process.env.CAPSULE_CAPTURE_MEMORY !== "1") return;
   const sanitized = sanitizeAutomaticMemory(content).replace(/\s+/g, " ").trim().slice(0, 800);
   if (!sanitized) return;
   const file = phaseCheckpointFile(input);
@@ -260,6 +270,7 @@ function writePhaseCheckpoint(input, content) {
 }
 
 function latestPhaseCheckpoint(input) {
+  if (process.env.CAPSULE_CAPTURE_MEMORY !== "1") return "";
   try {
     const state = JSON.parse(fs.readFileSync(phaseCheckpointFile(input), "utf8"));
     const entries = Array.isArray(state.entries) ? state.entries : [];
@@ -3602,7 +3613,9 @@ function handle(event, input) {
         epoch: executionEpoch(input),
         final_message: finalMessage,
       });
-      cognition.commitSession({ session: sessionId(input), solution: finalMessage });
+      if (process.env.CAPSULE_CAPTURE_MEMORY === "1") {
+        cognition.commitSession({ session: sessionId(input), solution: finalMessage });
+      }
     }
     return {};
   }

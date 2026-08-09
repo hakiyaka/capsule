@@ -15,9 +15,8 @@ const SIGNAL_RE = /\b(error|exception|fatal|fail(?:ed|ure)?|panic|security|timeo
 const SUMMARY_RE = /\b(pass(?:ed)?|fail(?:ed)?|tests?|suites?|errors?|warnings?|finished|completed|duration|time|total|summary|success)\b/i;
 // Verification runners repeat one line per test/file even when the only
 // actionable fact is the final aggregate. Keep failure context, but collapse
-// a successful run to its bounded summary. This mirrors the useful part of
-// WrongStack's result serializer without assuming a provider-side cache or a
-// particular runner implementation.
+// a successful run to its bounded summary without assuming a provider-side
+// cache or a particular runner implementation.
 const TEST_FAILURE_RE = /(?:^|[\s:])(?:FAIL(?:ED)?\b|✕|×|✗|ERROR\b|Error:|TypeError:|AssertionError:|Exception:|panic:)|\b(?:[1-9]\d*|one)\s+(?:failed|failing|error|errors)\b/i;
 const TEST_SUMMARY_RE = /^\s*(?:test\s+suites?|tests?|specs?|checks?|snapshots?|time|duration|ran\b|total|passed|failed|warnings?|errors?)\s*[:=]/i;
 const TEST_PASS_LINE_RE = /^\s*(?:PASS\b|ok\b|[✓✔])\s*/i;
