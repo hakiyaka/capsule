@@ -19,6 +19,7 @@ const paths = [
   "/robots.txt",
   "/sitemap.xml",
   "/social-card.png",
+  "/__capsule_live_missing__.html",
 ];
 const guidePaths = [
   "codex-token-efficiency.html",
@@ -81,6 +82,11 @@ async function main() {
       checkPng(result);
       continue;
     }
+    if (result.pathname === "/__capsule_live_missing__.html") {
+      check(result, (value) => value.status === 404, "HTTP 404");
+      check(result, (value) => /name=["']robots["'][^>]+noindex/i.test(text(value)), "noindex metadata");
+      continue;
+    }
     check(result, (value) => value.status === 200, "HTTP 200");
     check(result, (value) => value.bytes.length > 0, "non-empty body");
   }
@@ -95,14 +101,16 @@ async function main() {
   check(byPath["/sitemap.xml"], () => /guide\/faq\.html/i.test(sitemap) && /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/i.test(sitemap), "FAQ and lastmod");
   check(byPath["/robots.txt"], () => /Sitemap:\s*https:\/\/hakiyaka\.github\.io\/capsule\/sitemap\.xml/i.test(robots), "sitemap directive");
   check(byPath["/feed.xml"], () => /guide\/faq\.html/i.test(feed), "FAQ RSS item");
+  check(byPath["/feed.xml"], () => /<atom:link\s+href="https:\/\/hakiyaka\.github\.io\/capsule\/feed\.xml"\s+rel="self"/i.test(feed), "RSS self link");
   check(byPath["/feed.xml"], () => /releases\/tag\/v1\.0\.0/i.test(feed), "release RSS item");
   check(byPath["/llms.txt"], () => /guide\/faq\.html/i.test(llms), "FAQ machine-readable link");
-  check(byPath["/llms.txt"], () => /releases\/download\/v1\.0\.0\/capsule-1\.0\.0-source\.zip/i.test(llms), "release archive machine-readable link");
-  check(byPath["/llms.txt"], () => /releases\/download\/v1\.0\.0\/capsule-1\.0\.0-source\.zip\.sha256/i.test(llms), "release checksum machine-readable link");
+  check(byPath["/llms.txt"], () => /releases\/download\/v1\.0\.1\/capsule-1\.0\.1-source\.zip/i.test(llms), "release archive machine-readable link");
+  check(byPath["/llms.txt"], () => /releases\/download\/v1\.0\.1\/capsule-1\.0\.1-source\.zip\.sha256/i.test(llms), "release checksum machine-readable link");
   for (const guidePath of guidePaths) {
     const escaped = guidePath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     check(byPath["/sitemap.xml"], () => new RegExp(`<loc>https:\/\/hakiyaka\\.github\\.io\/capsule${escaped}<\\/loc>`, "i").test(sitemap), `${guidePath}: live sitemap URL`);
     check(byPath["/feed.xml"], () => new RegExp(`<guid\\s+isPermaLink="true">https:\/\/hakiyaka\\.github\\.io\/capsule${escaped}<\\/guid>`, "i").test(feed), `${guidePath}: live RSS URL`);
+    check(byPath["/llms.txt"], () => llms.includes(`https://hakiyaka.github.io/capsule${guidePath}`), `${guidePath}: live machine-readable URL`);
   }
   if (/example\.com|localhost|127\.0\.0\.1/i.test(results.map(text).join("\n"))) failures.push("placeholder host");
   const report = {

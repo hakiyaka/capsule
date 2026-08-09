@@ -16,11 +16,12 @@ const roots = [
   "CODE_OF_CONDUCT.md",
   "SECURITY.md",
   "GITHUB-100-RESEARCH.md",
+  "docs",
   "skills",
   "optional-skills",
   ".github",
 ];
-const extensions = new Set([".md", ".txt"]);
+const extensions = new Set([".md", ".txt", ".html"]);
 const forbidden = [
   { pattern: /token[- ]cartographer/i, label: "retired Token Cartographer name" },
   { pattern: /context mode/i, label: "retired Context Mode name" },
@@ -50,6 +51,11 @@ function localLinks(text) {
     .filter((target) => target && !/^(?:[a-z]+:|#|\/\/)/i.test(target));
 }
 
+function githubSourceLinks(text) {
+  return [...text.matchAll(/https:\/\/github\.com\/hakiyaka\/capsule\/(?:blob|tree)\/main\/([^"'<>?#\s]+)/gi)]
+    .map((match) => decodeURIComponent(match[1]));
+}
+
 const files = [...new Set(roots.flatMap((entry) => walk(path.join(root, entry))))].sort();
 const failures = [];
 for (const file of files) {
@@ -68,6 +74,12 @@ for (const file of files) {
       failures.push({ file: relative(file), issue: `link escapes repository: ${target}` });
     } else if (!fs.existsSync(resolved)) {
       failures.push({ file: relative(file), issue: `broken local link: ${target}` });
+    }
+  }
+  for (const target of githubSourceLinks(text)) {
+    const resolved = path.resolve(root, target);
+    if (!resolved.startsWith(root + path.sep) || !fs.existsSync(resolved)) {
+      failures.push({ file: relative(file), issue: `broken GitHub source link: ${target}` });
     }
   }
 }

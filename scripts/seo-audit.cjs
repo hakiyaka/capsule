@@ -43,6 +43,7 @@ const socialCardPng = readBinary("social-card.png");
 const quickDemo = read("quick-demo.svg");
 const feed = read("feed.xml");
 const llms = read("llms.txt");
+const notFound = read("404.html");
 const guides = [
   "guide/codex-token-efficiency.html",
   "guide/mcp-context-compression.html",
@@ -67,12 +68,13 @@ if (socialCardPng) {
 requireMatch(quickDemo, /^\s*<svg\b[^>]*width="1200"[^>]*height="560"/i, "quick demo asset");
 requireMatch(feed, /<rss\b[^>]*version="2\.0"/i, "RSS version");
 requireMatch(feed, new RegExp(`<link>${escapeRegExp(canonical)}</link>`, "i"), "RSS canonical link");
+requireMatch(feed, new RegExp(`<atom:link\\s+href="${escapeRegExp(canonical)}feed\\.xml"\\s+rel="self"`, "i"), "RSS self link");
 requireMatch(feed, /<item>[\s\S]*<guid\s+isPermaLink="true">https:\/\/hakiyaka\.github\.io\/capsule\/guide\//i, "RSS item");
 requireMatch(llms, /^# Capsule\b/m, "machine-readable summary heading");
 requireMatch(llms, new RegExp(escapeRegExp("https://github.com/hakiyaka/capsule"), "i"), "machine-readable repository link");
 requireMatch(llms, new RegExp(escapeRegExp("https://hakiyaka.github.io/capsule/"), "i"), "machine-readable site link");
-requireMatch(llms, /releases\/download\/v1\.0\.0\/capsule-1\.0\.0-source\.zip/i, "machine-readable release archive");
-requireMatch(llms, /releases\/download\/v1\.0\.0\/capsule-1\.0\.0-source\.zip\.sha256/i, "machine-readable release checksum");
+requireMatch(llms, /releases\/download\/v1\.0\.1\/capsule-1\.0\.1-source\.zip/i, "machine-readable release archive");
+requireMatch(llms, /releases\/download\/v1\.0\.1\/capsule-1\.0\.1-source\.zip\.sha256/i, "machine-readable release checksum");
 requireMatch(html, /<title>[^<]{20,160}<\/title>/i, "descriptive title");
 requireMatch(html, /<meta\s+name=["']description["'][^>]+content="[^"]{80,220}"/i, "meta description");
 requireMatch(html, new RegExp(`<link\\s+rel=["']canonical["'][^>]+href=["']${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} ["']`, "i"), "canonical URL");
@@ -94,6 +96,7 @@ requireMatch(html, /application\/ld\+json/i, "JSON-LD block");
 requireMatch(robots, /User-agent:\s*\*/i, "robots user agent");
 requireMatch(robots, /Allow:\s*\//i, "robots allow");
 requireMatch(robots, new RegExp(`Sitemap:\\s*${canonical}sitemap\\.xml`, "i"), "robots sitemap");
+requireMatch(notFound, /<meta\s+name=["']robots["'][^>]+content=["'][^"']*noindex/i, "404 noindex");
 requireMatch(sitemap, new RegExp(`<loc>${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}<\\/loc>`, "i"), "sitemap canonical URL");
 requireMatch(sitemap, /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/i, "sitemap lastmod");
 if (/localhost|127\.0\.0\.1|example\.com/i.test(`${html}\n${robots}\n${sitemap}`)) failures.push("placeholder host");
@@ -124,12 +127,17 @@ for (const relative of guides) {
   requireMatch(page, /property=["']og:image:type["'][^>]+content=["']image\/png["']/i, `${relative}: Open Graph image type`);
   requireMatch(page, new RegExp(`<meta\\s+name=["']twitter:image["'][^>]+content=["']${escapeRegExp(socialImage)}["']`, "i"), `${relative}: Twitter image`);
   requireMatch(page, /name=["']twitter:card["'][^>]+content=["']summary_large_image["']/i, `${relative}: Twitter card`);
+  requireMatch(page, /name=["']twitter:title["']/i, `${relative}: Twitter title`);
+  requireMatch(page, /name=["']twitter:description["']/i, `${relative}: Twitter description`);
+  requireMatch(page, /name=["']twitter:url["']/i, `${relative}: Twitter URL`);
   requireMatch(page, /name=["']twitter:image:alt["']/i, `${relative}: Twitter image alt`);
+  requireMatch(page, /rel=["']alternate["'][^>]+type=["']application\/rss\+xml["'][^>]+href=["']\.\.\/feed\.xml["']/i, `${relative}: RSS alternate`);
   requireMatch(page, /<h1\b[^>]*>[^<]+<\/h1>/i, `${relative}: visible H1`);
   requireMatch(page, /application\/ld\+json/i, `${relative}: JSON-LD block`);
   if (!/"@type"\s*:\s*"(?:WebPage|HowTo|FAQPage)"/i.test(page)) failures.push(`${relative}: JSON-LD type`);
   if (!sitemap.includes(`<loc>${expected}</loc>`)) failures.push(`${relative}: sitemap URL`);
   if (!feed.includes(`<guid isPermaLink="true">${expected}</guid>`)) failures.push(`${relative}: RSS URL`);
+  if (!llms.includes(expected)) failures.push(`${relative}: machine-readable URL`);
   const sitemapBlock = new RegExp(`<url>[\\s\\S]*?<loc>${escapeRegExp(expected)}</loc>[\\s\\S]*?<lastmod>\\d{4}-\\d{2}-\\d{2}</lastmod>[\\s\\S]*?</url>`, "i");
   if (!sitemapBlock.test(sitemap)) failures.push(`${relative}: sitemap lastmod`);
 }
@@ -137,7 +145,7 @@ for (const relative of guides) {
 const report = {
   audit: "seo",
   canonical,
-  files: ["docs/index.html", ...guides.map((file) => `docs/${file}`), "docs/robots.txt", "docs/sitemap.xml", "docs/feed.xml", "docs/llms.txt", "docs/social-card.svg", "docs/social-card.png", "docs/quick-demo.svg"],
+  files: ["docs/index.html", ...guides.map((file) => `docs/${file}`), "docs/robots.txt", "docs/sitemap.xml", "docs/feed.xml", "docs/llms.txt", "docs/404.html", "docs/social-card.svg", "docs/social-card.png", "docs/quick-demo.svg"],
   json_ld_blocks: jsonLdBlocks,
   failures,
   passed: failures.length === 0,

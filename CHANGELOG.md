@@ -2,14 +2,14 @@
 
 All notable user-visible changes are recorded here.
 
-## Unreleased - refactor hardening
+## 1.0.1 - 2026-08-09
 
 - Added a public GitHub discoverability guide and repeatable visibility audit
   for repository metadata, rolling views/clones, popular referrers, release
   assets, and volatile repository-search snapshots with null-safe baseline
   deltas; no ranking, billing, or quota guarantee is inferred.
 - Added a crawlable RSS/llms/sitemap link for the discoverability guide and the
-  checksummed v1.0.0 source archive, with local SEO and live HTTPS smoke checks
+  checksummed v1.0.1 source archive, with local SEO and live HTTPS smoke checks
   enforcing parity across those surfaces.
 - Centralized local state hashing, bounded-number parsing, JSON validation, and
   collision-resistant atomic writes in `mcp/storage.cjs`; migrated the core,

@@ -94,7 +94,7 @@ test("stdio MCP handshake and tool call", async (context) => {
 
   const initialized = await request("initialize", { protocolVersion: "2025-03-26", capabilities: {} });
   assert.equal(initialized.result.serverInfo.name, "capsule");
-  assert.equal(initialized.result.serverInfo.version, "1.0.0");
+  assert.equal(initialized.result.serverInfo.version, "1.0.1");
 
   const listed = await request("tools/list");
   assert.equal(listed.result.tools.length, 1);

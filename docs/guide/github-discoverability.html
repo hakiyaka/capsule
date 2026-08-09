@@ -5,8 +5,9 @@
     <title>GitHub Discoverability and Visibility Measurement | Capsule</title>
     <meta name="description" content="Measure Capsule's GitHub repository visibility with repeatable metadata, traffic, referral, release, and repository-search snapshots without claiming ranking guarantees.">
     <link rel="canonical" href="https://hakiyaka.github.io/capsule/guide/github-discoverability.html">
+    <link rel="alternate" type="application/rss+xml" href="../feed.xml" title="Capsule updates">
     <meta property="og:type" content="article"><meta property="og:title" content="GitHub Discoverability and Visibility Measurement | Capsule"><meta property="og:description" content="A repeatable, ethical method for measuring GitHub metadata, traffic, referral, release, and repository-search discovery signals."><meta property="og:url" content="https://hakiyaka.github.io/capsule/guide/github-discoverability.html"><meta property="og:image" content="https://hakiyaka.github.io/capsule/social-card.png"><meta property="og:image:alt" content="Capsule exact-recoverable context compression for Codex"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://hakiyaka.github.io/capsule/social-card.png"><meta name="twitter:image:alt" content="Capsule exact-recoverable context compression for Codex">
+    <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="GitHub Discoverability and Visibility Measurement | Capsule"><meta name="twitter:description" content="A repeatable, ethical method for measuring GitHub metadata, traffic, referral, release, and repository-search discovery signals."><meta name="twitter:url" content="https://hakiyaka.github.io/capsule/guide/github-discoverability.html"><meta name="twitter:image" content="https://hakiyaka.github.io/capsule/social-card.png"><meta name="twitter:image:alt" content="Capsule exact-recoverable context compression for Codex">
     <link rel="stylesheet" href="../styles.css">
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"GitHub Discoverability and Visibility Measurement | Capsule","description":"A repeatable method for measuring GitHub discovery signals without claiming ranking guarantees.","url":"https://hakiyaka.github.io/capsule/guide/github-discoverability.html","isPartOf":{"@id":"https://hakiyaka.github.io/capsule/#website"}}</script>
   </head>
@@ -16,11 +17,11 @@
     <h1>Measure discovery before claiming growth.</h1>
     <p class="lead">GitHub visibility is a combination of repository metadata, rolling traffic, referrals, releases, Pages surfaces, and volatile repository-search order. Capsule records those signals without turning a snapshot into a ranking promise.</p>
     <h2>Run a repeatable snapshot</h2>
-    <pre><code>npm run audit:github-visibility -- --write visibility.json
-npm run audit:github-visibility:search -- --write visibility-search.json
+    <pre><code>npm run audit:github-visibility:write -- visibility.json
+npm run audit:github-visibility:search:write -- visibility-search.json
 
 # Later, compare the same fixed queries with the saved search snapshot.
-npm run audit:github-visibility:search -- --baseline visibility-search.json</code></pre>
+npm run audit:github-visibility:search:baseline -- visibility-search.json</code></pre>
     <p>Use the same repository, query set, and authentication context at each measurement point. The private traffic endpoints cover a rolling 14-day window; repository metadata and release assets are point-in-time or cumulative.</p>
     <h2>What the audit records</h2>
     <table>
@@ -28,7 +29,7 @@ npm run audit:github-visibility:search -- --baseline visibility-search.json</cod
       <tbody>
         <tr><td>Topics and description</td><td>Controlled relevance and entry-point metadata.</td><td>They influence discovery but do not guarantee ranking.</td></tr>
         <tr><td>Views, clones, popular paths</td><td>Authenticated repository traffic over the latest 14 days.</td><td>GitHub does not expose a universal lifetime visitor count here.</td></tr>
-        <tr><td>Popular referrers</td><td>Referral domains, views, uniques, and the top referrer.</td><td>The audit uses <code>traffic/popular/referrers</code>; an unavailable endpoint is reported as empty, not as zero traffic.</td></tr>
+        <tr><td>Popular referrers</td><td>Referral domains, views, summed per-domain uniques, and the top referrer.</td><td>The audit uses <code>traffic/popular/referrers</code>; per-domain uniques are not a global unique-user count, and an unavailable endpoint is marked unavailable.</td></tr>
         <tr><td>Repository search</td><td>First-100 presence, rank, total result count, and null-safe deltas for fixed queries.</td><td>Order is volatile and is not Google ranking, billing, or quota telemetry.</td></tr>
         <tr><td>Releases and assets</td><td>Release count, asset names, and download counts.</td><td>New assets can remain at zero downloads until real users choose them.</td></tr>
       </tbody>

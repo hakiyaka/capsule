@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Capsule updates</title>
     <link>https://hakiyaka.github.io/capsule/</link>
+    <atom:link href="https://hakiyaka.github.io/capsule/feed.xml" rel="self" type="application/rss+xml" />
     <description>Measured guides and release notes for the Capsule Codex plugin and MCP server.</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 09 Aug 2026 02:20:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 09 Aug 2026 02:43:04 GMT</lastBuildDate>
+    <item>
+      <title>Capsule 1.0.1 released</title>
+      <link>https://github.com/hakiyaka/capsule/releases/tag/v1.0.1</link>
+      <guid isPermaLink="true">https://github.com/hakiyaka/capsule/releases/tag/v1.0.1</guid>
+      <pubDate>Sun, 09 Aug 2026 02:43:04 GMT</pubDate>
+      <description>Patch release with crawlable discovery metadata, corrected visibility telemetry, and a checksummed source archive matching the tagged tree.</description>
+    </item>
     <item>
       <title>GitHub discoverability and visibility measurement</title>
       <link>https://hakiyaka.github.io/capsule/guide/github-discoverability.html</link>
@@ -21,7 +29,7 @@
       <description>Learn how Capsule bounds repeated context and reports measured input, output, and recovery costs for Codex tasks.</description>
     </item>
     <item>
-      <title>Get-content token savings guide</title>
+      <title>Get-Content token savings guide</title>
       <link>https://hakiyaka.github.io/capsule/guide/get-content-token-savings.html</link>
       <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/get-content-token-savings.html</guid>
       <pubDate>Sun, 09 Aug 2026 01:44:00 GMT</pubDate>
@@ -35,14 +43,14 @@
       <description>Install the portable Codex plugin and MCP server, then verify the local capability contract.</description>
     </item>
     <item>
-      <title>Web-search token savings guide</title>
+      <title>Web Search token savings guide</title>
       <link>https://hakiyaka.github.io/capsule/guide/web-search-token-savings.html</link>
       <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/web-search-token-savings.html</guid>
       <pubDate>Sun, 09 Aug 2026 01:42:00 GMT</pubDate>
       <description>Use bounded fetch, deduplication, and evidence expansion to keep web research useful without replaying full pages.</description>
     </item>
     <item>
-      <title>Terminal-output token savings guide</title>
+      <title>Terminal Output token savings guide</title>
       <link>https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html</link>
       <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html</guid>
       <pubDate>Sun, 09 Aug 2026 01:41:00 GMT</pubDate>

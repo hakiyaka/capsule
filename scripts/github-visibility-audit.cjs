@@ -8,6 +8,20 @@ const { spawnSync } = require("node:child_process");
 const { compareSearchSnapshots, summarizeReleases, summarizeReferrers } = require("./github-visibility-metrics.cjs");
 
 const argv = process.argv.slice(2);
+const valueFlags = new Set(["--repo", "--baseline", "--write"]);
+const booleanFlags = new Set(["--search"]);
+function validateArgs() {
+  for (let index = 0; index < argv.length; index += 1) {
+    const flag = argv[index];
+    if (valueFlags.has(flag)) {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) throw new Error(`${flag} requires a value`);
+      index += 1;
+    } else if (!booleanFlags.has(flag)) {
+      throw new Error(`Unknown argument: ${flag}`);
+    }
+  }
+}
 const repoIndex = argv.indexOf("--repo");
 const repo = repoIndex >= 0 ? String(argv[repoIndex + 1] || "") : (process.env.CAPSULE_GITHUB_REPO || "hakiyaka/capsule");
 const baselineIndex = argv.indexOf("--baseline");
@@ -22,6 +36,7 @@ const searchQueries = [
   "token reduction codex",
   "exact recoverable context",
 ];
+const schemaVersion = 2;
 
 function api(endpoint) {
   const result = spawnSync("gh", ["api", endpoint], { encoding: "utf8", windowsHide: true });
@@ -45,25 +60,33 @@ function searchSnapshot(query) {
     const rank = items.findIndex((item) => String(item?.full_name || "").toLowerCase() === repo.toLowerCase());
     return {
       query,
-      total_count: Number(result.total_count) || 0,
+      total_count: Number.isFinite(result.total_count) ? Number(result.total_count) : null,
+      incomplete_results: result.incomplete_results === true,
       rank_in_first_100: rank >= 0 ? rank + 1 : null,
-      top_repositories: items.slice(0, 10).map((item) => String(item?.full_name || "")).filter(Boolean),
+      top_repositories: items.slice(0, 10).filter((item) => item?.private !== true).map((item) => String(item?.full_name || "")).filter(Boolean),
     };
   } catch (error) {
-    return { query, error: String(error?.message || error) };
+    return { query, incomplete_results: null, error: String(error?.message || error) };
+  }
+}
+
+function optionalApi(endpoint) {
+  try {
+    return { value: api(endpoint), available: true, error: null };
+  } catch {
+    return { value: [], available: false, error: "endpoint unavailable" };
   }
 }
 
 try {
+  validateArgs();
   const metadata = api(`repos/${repo}`);
   const views = api(`repos/${repo}/traffic/views`);
   const clones = api(`repos/${repo}/traffic/clones`);
-  const referrers = (() => {
-    try { return api(`repos/${repo}/traffic/popular/referrers`); } catch { return []; }
-  })();
-  const popularPaths = (() => {
-    try { return api(`repos/${repo}/traffic/popular/paths`); } catch { return []; }
-  })();
+  const referrerResult = optionalApi(`repos/${repo}/traffic/popular/referrers`);
+  const popularPathResult = optionalApi(`repos/${repo}/traffic/popular/paths`);
+  const referrers = referrerResult.value;
+  const popularPaths = popularPathResult.value;
   const releases = api(`repos/${repo}/releases?per_page=100`);
   const community = (() => {
     try { return api(`repos/${repo}/community/profile`); } catch { return null; }
@@ -74,11 +97,13 @@ try {
   const referrerSummary = summarizeReferrers(referrers);
   const releaseSummary = summarizeReleases(releases);
   const current = {
+    schema_version: schemaVersion,
     measured_at: new Date().toISOString(),
     repo,
     stars: Number(metadata.stargazers_count) || 0,
     forks: Number(metadata.forks_count) || 0,
-    watchers: Number(metadata.subscribers_count ?? metadata.watchers_count) || 0,
+    watch_subscribers: Number(metadata.subscribers_count) || 0,
+    watchers_count: Number(metadata.watchers_count) || 0,
     open_issues: Number(metadata.open_issues_count) || 0,
     topics: Array.isArray(metadata.topics) ? metadata.topics.length : 0,
     topic_names: Array.isArray(metadata.topics) ? metadata.topics.map((topic) => String(topic)).sort() : [],
@@ -95,6 +120,10 @@ try {
     clones_14d: Number(clones.count) || sum(clones.clones, "count"),
     unique_cloners_14d: Number(clones.uniques) || sum(clones.clones, "uniques"),
     ...referrerSummary,
+    referrers_available: referrerResult.available,
+    referrers_error: referrerResult.error,
+    popular_paths_available: popularPathResult.available,
+    popular_paths_error: popularPathResult.error,
     popular_paths_14d: Array.isArray(popularPaths) ? popularPaths.length : 0,
     top_path: Array.isArray(popularPaths) && popularPaths[0] ? String(popularPaths[0].path || "") : "",
     top_path_views_14d: Array.isArray(popularPaths) && popularPaths[0] ? Number(popularPaths[0].count) || 0 : 0,
@@ -102,9 +131,10 @@ try {
     pages_url: pages?.html_url || "",
     pages_build_type: pages?.build_type || "",
   };
-  const report = { audit: "github-visibility", current, baseline: null, ratios: null, caveat: "Traffic endpoints cover a rolling 14-day window; stars, forks, releases, and topics are cumulative or point-in-time metadata. This measures discoverability inputs, not guaranteed search ranking." };
+  const report = { audit: "github-visibility", schema_version: schemaVersion, current, baseline: null, ratios: null, caveat: "Traffic endpoints cover a rolling 14-day window; referrer uniques are summed per-domain values rather than global uniques; stars, forks, releases, and topics are cumulative or point-in-time metadata. This measures discoverability inputs, not guaranteed search ranking." };
   if (searchEnabled) {
     report.search = {
+      schema_version: schemaVersion,
       measured_at: new Date().toISOString(),
       queries: searchQueries.map(searchSnapshot),
       caveat: "GitHub repository-search order and totals are volatile snapshots, not search-engine ranking or traffic guarantees.",
@@ -115,7 +145,14 @@ try {
     const baseline = JSON.parse(fs.readFileSync(baselineFile, "utf8"));
     const baselineCurrent = baseline.current || baseline;
     report.baseline = baselineCurrent;
-    report.ratios = Object.fromEntries(["stars", "forks", "topics", "releases", "release_assets", "release_downloads", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "unique_referrers_14d", "top_path_views_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
+    report.baseline_warnings = [];
+    if (baseline.schema_version && baseline.schema_version !== schemaVersion) {
+      report.baseline_warnings.push(`schema version differs: baseline=${baseline.schema_version}, current=${schemaVersion}`);
+    }
+    if (baselineCurrent.repo && baselineCurrent.repo.toLowerCase() !== repo.toLowerCase()) {
+      report.baseline_warnings.push(`repository differs: baseline=${baselineCurrent.repo}, current=${repo}`);
+    }
+    report.ratios = Object.fromEntries(["stars", "forks", "topics", "releases", "release_assets", "release_downloads", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "referrer_uniques_sum_14d", "top_path_views_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
     if (report.search && baseline.search) {
       report.search_deltas = compareSearchSnapshots(report.search, baseline.search);
     }

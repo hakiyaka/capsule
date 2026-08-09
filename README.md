@@ -85,6 +85,16 @@ The recommended starting point is [How to measure Capsule visibility and
 token-efficiency results](https://github.com/hakiyaka/capsule/discussions/1).
 For concise boundary and compatibility answers, see the [Capsule FAQ](https://hakiyaka.github.io/capsule/guide/faq.html).
 
+Public guides: [install](https://hakiyaka.github.io/capsule/guide/install-capsule.html),
+[Codex token efficiency](https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html),
+[MCP context compression](https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html),
+[Get-Content](https://hakiyaka.github.io/capsule/guide/get-content-token-savings.html),
+[web search](https://hakiyaka.github.io/capsule/guide/web-search-token-savings.html),
+[terminal output](https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html),
+[benchmarks](https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html),
+[share and cite](https://hakiyaka.github.io/capsule/guide/share-and-cite.html), and
+[GitHub discoverability](https://hakiyaka.github.io/capsule/guide/github-discoverability.html).
+
 ## A measured first web call
 
 For a first real web search (local measurement):
@@ -244,7 +254,8 @@ npm run audit:github-visibility
 
 It reports stars, forks, releases, the exact topic names, repository surface
 flags, community health, Pages status, and the rolling 14-day views/clones
-window. Pass
+window. Referrer uniques are explicitly a sum of GitHub's per-domain values,
+not a global unique-user count. Pass
 `--baseline path/to/snapshot.json` to compute
 ratios against a prior snapshot, or add `--write path/to/snapshot.json` to
 save the read-only report for the next comparison. It also records aggregate
@@ -260,6 +271,8 @@ are reliable:
 npm run audit:github-visibility:write -- path/to/snapshot.json
 npm run audit:github-visibility:baseline -- path/to/snapshot.json
 npm run audit:github-visibility:search
+npm run audit:github-visibility:search:write -- path/to/search.json
+npm run audit:github-visibility:search:baseline -- path/to/search.json
 ```
 
 The search helper records the first 100 GitHub repository-search results for

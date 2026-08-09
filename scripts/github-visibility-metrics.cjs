@@ -9,7 +9,9 @@ function summarizeReferrers(rows) {
   return {
     referrer_domains_14d: list.length,
     referrer_views_14d: list.reduce((total, row) => total + (Number(row?.count) || 0), 0),
-    unique_referrers_14d: list.reduce((total, row) => total + (Number(row?.uniques) || 0), 0),
+    // GitHub reports uniques per referrer domain. Summing them is useful as a
+    // directional signal, but is not a global unique-user count.
+    referrer_uniques_sum_14d: list.reduce((total, row) => total + (Number(row?.uniques) || 0), 0),
     top_referrer: list[0] ? String(list[0].referrer || "") : "",
   };
 }
@@ -32,17 +34,21 @@ function compareSearchSnapshots(current, baseline) {
       .map((entry) => [entry.query, entry]),
   );
   return currentQueries.map((entry) => {
-    const previous = baselineByQuery.get(entry.query);
-    const currentRank = Number.isInteger(entry.rank_in_first_100) ? entry.rank_in_first_100 : null;
-    const previousRank = Number.isInteger(previous?.rank_in_first_100) ? previous.rank_in_first_100 : null;
+    const query = typeof entry?.query === "string" ? entry.query : "";
+    const previous = baselineByQuery.get(query);
+    const currentValid = entry && !entry.error && entry.incomplete_results !== true;
+    const previousValid = previous && !previous.error && previous.incomplete_results !== true;
+    const currentRank = currentValid && Number.isInteger(entry.rank_in_first_100) ? entry.rank_in_first_100 : null;
+    const previousRank = previousValid && Number.isInteger(previous.rank_in_first_100) ? previous.rank_in_first_100 : null;
     const currentPresent = currentRank !== null;
     const previousPresent = previousRank !== null;
-    const currentTotal = Number.isFinite(Number(entry.total_count)) ? Number(entry.total_count) : null;
-    const previousTotal = Number.isFinite(Number(previous?.total_count)) ? Number(previous.total_count) : null;
+    const currentTotal = currentValid && Number.isFinite(entry?.total_count) ? Number(entry.total_count) : null;
+    const previousTotal = previousValid && Number.isFinite(previous?.total_count) ? Number(previous.total_count) : null;
     return {
-      query: entry.query,
-      rank_delta: currentRank !== null && previousRank !== null ? previousRank - currentRank : null,
-      present_in_first_100_delta: Number(currentPresent) - Number(previousPresent),
+      query,
+      // Positive means the repository moved toward rank 1.
+      rank_improvement: currentRank !== null && previousRank !== null ? previousRank - currentRank : null,
+      present_in_first_100_delta: currentValid && previousValid ? Number(currentPresent) - Number(previousPresent) : null,
       total_count_delta: currentTotal !== null && previousTotal !== null ? currentTotal - previousTotal : null,
     };
   });
