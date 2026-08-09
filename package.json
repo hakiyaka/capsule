@@ -53,6 +53,7 @@
     "audit:public": "node scripts/public-readiness.cjs",
     "audit:docs": "node scripts/docs-audit.cjs",
     "audit:seo": "node scripts/seo-audit.cjs",
+    "audit:live": "node scripts/live-surface-smoke.cjs",
     "audit:github-visibility": "node scripts/github-visibility-audit.cjs",
     "audit:github-visibility:write": "node scripts/github-visibility-audit.cjs --write",
     "audit:github-visibility:baseline": "node scripts/github-visibility-audit.cjs --baseline",

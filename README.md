@@ -283,6 +283,9 @@ The same site exposes a small [RSS feed](https://hakiyaka.github.io/capsule/feed
 for release and guide updates so real users and aggregators can follow changes.
 An intentionally concise [machine-readable summary](https://hakiyaka.github.io/capsule/llms.txt)
 keeps the canonical links and measurement caveat available to indexing tools.
+Run `npm run audit:live` after a Pages deployment to verify the public HTML,
+FAQ metadata, PNG social card, sitemap, robots directive, RSS item, and
+machine-readable links over HTTPS. It is a smoke test, not proof of ranking.
 
 ## Repository map
 
