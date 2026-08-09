@@ -1,134 +1,117 @@
 {
-  "generated_at": "2026-07-27T21:58:35.107Z",
-  "baseline_label": "installed Capsule baseline",
-  "treatment_label": "working tree",
-  "sessions_scanned": 5,
   "routing": {
     "scope": "Router response plus the SKILL.md reads required by positive matches.",
-    "before_chars": 42032,
-    "after_chars": 585,
-    "avoided_chars": 41447,
-    "avoided_approx_text_tokens": 10362,
-    "saved_percent": 98.61,
+    "before_chars": 594,
+    "after_chars": 594,
+    "avoided_chars": 0,
+    "avoided_approx_text_tokens": 0,
+    "saved_percent": 0,
     "cases": [
       {
-        "query_sha256": "996a5ccaa0f817ef8d4e9d20fa87027e7521fb4bee1f4d158c1242599217c4ae",
-        "baseline_matches": [
-          "codex-bughunter",
-          "ctf-sandbox-orchestrator",
-          "competition-android-hooking"
-        ],
-        "treatment_matches": [],
-        "baseline_route_chars": 1675,
-        "treatment_route_chars": 296,
-        "baseline_required_skill_chars": 13926,
+        "case_id": "routing_case_1",
+        "baseline_route_chars": 305,
+        "treatment_route_chars": 305,
+        "baseline_required_skill_chars": 0,
         "treatment_required_skill_chars": 0,
-        "before_chars": 15601,
-        "after_chars": 296,
-        "saved_percent": 98.1
+        "before_chars": 305,
+        "after_chars": 305,
+        "saved_percent": 0
       },
       {
-        "query_sha256": "d8d07802a1a85dc9e0bb27c3d0495662a3e6162d86710d076b3491d11f5714c4",
-        "baseline_matches": [
-          "codex-bughunter",
-          "hunt-session",
-          "competition-dpapi-credential-chain"
-        ],
-        "treatment_matches": [],
-        "baseline_route_chars": 1616,
+        "case_id": "routing_case_2",
+        "baseline_route_chars": 289,
         "treatment_route_chars": 289,
-        "baseline_required_skill_chars": 24815,
+        "baseline_required_skill_chars": 0,
         "treatment_required_skill_chars": 0,
-        "before_chars": 26431,
+        "before_chars": 289,
         "after_chars": 289,
-        "saved_percent": 98.91
+        "saved_percent": 0
       }
     ]
   },
   "compaction": {
     "insight": {
       "scope": "Serialized compaction audit section; treatment keeps aggregates plus the latest event.",
-      "before_chars": 23681,
-      "after_chars": 4968,
-      "avoided_chars": 18713,
-      "avoided_approx_text_tokens": 4679,
-      "saved_percent": 79.02,
+      "before_chars": 57457,
+      "after_chars": 6254,
+      "avoided_chars": 51203,
+      "avoided_approx_text_tokens": 12801,
+      "saved_percent": 89.12,
       "cases": [
         {
-          "compactions": 11,
-          "before_chars": 3523,
-          "after_chars": 1247,
-          "avoided_chars": 2276,
-          "saved_percent": 64.6
+          "compactions": 73,
+          "before_chars": 17785,
+          "after_chars": 1246,
+          "avoided_chars": 16539,
+          "saved_percent": 92.99
         },
         {
-          "compactions": 40,
-          "before_chars": 10149,
-          "after_chars": 1243,
-          "avoided_chars": 8906,
-          "saved_percent": 87.75
+          "compactions": 38,
+          "before_chars": 9784,
+          "after_chars": 1254,
+          "avoided_chars": 8530,
+          "saved_percent": 87.18
         },
         {
-          "compactions": 2,
-          "before_chars": 1459,
-          "after_chars": 1235,
-          "avoided_chars": 224,
-          "saved_percent": 15.35
+          "compactions": 41,
+          "before_chars": 10364,
+          "after_chars": 1248,
+          "avoided_chars": 9116,
+          "saved_percent": 87.96
         },
         {
-          "compactions": 33,
-          "before_chars": 8550,
-          "after_chars": 1243,
-          "avoided_chars": 7307,
-          "saved_percent": 85.46
+          "compactions": 38,
+          "before_chars": 9762,
+          "after_chars": 1253,
+          "avoided_chars": 8509,
+          "saved_percent": 87.16
+        },
+        {
+          "compactions": 38,
+          "before_chars": 9762,
+          "after_chars": 1253,
+          "avoided_chars": 8509,
+          "saved_percent": 87.16
         }
       ]
     },
     "seed": {
       "scope": "PreCompact continuation seed input; treatment uses a 1,200-char field budget and <=600-token summary target.",
-      "before_chars": 5581,
-      "after_chars": 3992,
-      "avoided_chars": 1589,
-      "avoided_approx_text_tokens": 398,
-      "saved_percent": 28.47,
+      "before_chars": 3607,
+      "after_chars": 3607,
+      "avoided_chars": 0,
+      "avoided_approx_text_tokens": 0,
+      "saved_percent": 0,
       "cases": [
         {
-          "before_chars": 1401,
-          "after_chars": 839,
-          "avoided_chars": 562,
-          "saved_percent": 40.11,
+          "before_chars": 1192,
+          "after_chars": 1192,
+          "avoided_chars": 0,
+          "saved_percent": 0,
           "baseline_capsules_retained": 0,
           "treatment_capsules_retained": 0
         },
         {
-          "before_chars": 1322,
-          "after_chars": 854,
-          "avoided_chars": 468,
-          "saved_percent": 35.4,
+          "before_chars": 1014,
+          "after_chars": 1014,
+          "avoided_chars": 0,
+          "saved_percent": 0,
           "baseline_capsules_retained": 0,
           "treatment_capsules_retained": 0
         },
         {
-          "before_chars": 920,
-          "after_chars": 726,
-          "avoided_chars": 194,
-          "saved_percent": 21.09,
+          "before_chars": 872,
+          "after_chars": 872,
+          "avoided_chars": 0,
+          "saved_percent": 0,
           "baseline_capsules_retained": 0,
           "treatment_capsules_retained": 0
         },
         {
-          "before_chars": 743,
-          "after_chars": 754,
-          "avoided_chars": -11,
-          "saved_percent": -1.48,
-          "baseline_capsules_retained": 0,
-          "treatment_capsules_retained": 0
-        },
-        {
-          "before_chars": 1195,
-          "after_chars": 819,
-          "avoided_chars": 376,
-          "saved_percent": 31.46,
+          "before_chars": 529,
+          "after_chars": 529,
+          "avoided_chars": 0,
+          "saved_percent": 0,
           "baseline_capsules_retained": 0,
           "treatment_capsules_retained": 0
         }

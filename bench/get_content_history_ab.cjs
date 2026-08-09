@@ -104,7 +104,7 @@ async function scanHistory() {
   const result = {
     benchmark: "get-content-history-ab",
     method: "historical safe Get-Content calls; A=generic stdout projector, B=native file evidence/replay",
-    session_root: sessionRoot,
+    session_root: "local Codex session directory (redacted)",
     sessions_scanned: 0,
     session_bytes_scanned: 0,
     session_lines_scanned: 0,

@@ -1,6 +1,6 @@
 {
   "method": {
-    "dataset": "Non-media tool outputs from the most recently modified local Codex sessions.",
+    "dataset": "Bounded non-media tool-output fixtures; local session identifiers are omitted.",
     "arm_a": "Installed Capsule baseline.",
     "arm_b": "Working-tree Capsule with silent control tags, near-duplicate delta replay, and adaptive reasoning thresholds.",
     "exact_replay": "Each real output is replayed byte-identically; accounting includes replacement plus hook-added context.",

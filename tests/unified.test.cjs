@@ -839,15 +839,15 @@ test("skills route returns no match instead of injecting an unrelated low-overla
   }
 });
 
-test("skills route does not treat generic status language as Gmail intent", async () => {
+test("skills route does not treat generic status language as mailbox intent", async () => {
   const previousCodexHome = process.env.CODEX_HOME;
   const codexHome = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-skill-generic-status-"));
-  const folder = path.join(codexHome, "skills", "gmail-inbox-triage");
+  const folder = path.join(codexHome, "skills", "mailbox-inbox-triage");
   fs.mkdirSync(folder, { recursive: true });
   fs.writeFileSync(path.join(folder, "SKILL.md"), [
     "---",
-    "name: gmail-inbox-triage",
-    "description: Triage a Gmail inbox into actionable buckets such as urgent, needs reply soon, waiting, and FYI using connected Gmail data. Use when the user asks to triage the inbox, rank what needs attention, find what still needs a reply, or separate important mail from noise.",
+    "name: mailbox-inbox-triage",
+    "description: Triage a generic mailbox into actionable buckets such as urgent, needs reply soon, waiting, and FYI. Use when the user asks to triage the inbox, rank what needs attention, find what still needs a reply, or separate important mail from noise.",
     "---",
   ].join("\n"), "utf8");
   process.env.CODEX_HOME = codexHome;
@@ -867,9 +867,9 @@ test("skills route does not treat generic status language as Gmail intent", asyn
 
     const explicitEmail = await unified.dispatch({
       action: "skills",
-      payload: { operation: "route", query: "Triage my Gmail inbox and rank messages needing replies" },
+      payload: { operation: "route", query: "Triage a generic mailbox and rank messages needing replies" },
     });
-    assert.equal(explicitEmail.response.matches[0].name, "gmail-inbox-triage");
+    assert.equal(explicitEmail.response.matches[0].name, "mailbox-inbox-triage");
   } finally {
     if (previousCodexHome == null) delete process.env.CODEX_HOME;
     else process.env.CODEX_HOME = previousCodexHome;
@@ -927,12 +927,12 @@ test("skills route abstains from historical presentation, architecture, and desk
   process.env.CODEX_HOME = codexHome;
   try {
     for (const query of [
-      "Passively audit every currently live virtual football match and all betting markets for data, timing, score, odds, identifier, and network anomalies without placing bets or mutating the service.",
-      "Build a fast retrospective Goaloo scraper and anomaly detector for Crown bookmaker early market closures in FT/HT 1X2 and over-under odds.",
-      "Find evidence-based internal pricing or state anomalies across already captured live virtual football matches using score-dependent market validity, monotonic odds lines, and cross-market probability consistency; do not invent suspicion.",
-      "Persist the confirmed stale last_event anomaly and conduct an extended passive longitudinal audit of all live virtual football matches across multiple rounds, tracking score, time, events, odds, and market consistency.",
-      "Invent a radically new architecture for reducing model reasoning and output tokens before generation while preserving correctness.",
-      "Passively investigate a public live virtual football event for anomalies using browser, API, WebSocket, network traffic, and client-side evidence without mutating the service.",
+      "Summarize a fictional market dataset for a status review without creating a report.",
+      "Inspect a synthetic pricing table for anomalies without producing a presentation template.",
+      "Compare two fictional rounds of a market fixture and report only verified changes.",
+      "Track a synthetic event table across several rounds without selecting a report template.",
+      "Explain a possible token-saving idea without requesting repository architecture work.",
+      "Review a synthetic browser event log for anomalies without testing an installed desktop application.",
     ]) {
       const routed = await unified.dispatch({
         action: "skills",
@@ -1018,8 +1018,8 @@ test("skills route rejects generic Capsule control-plane queries", async () => {
   try {
     const queries = [
       "verify Capsule activation after Codex restart and automatic compaction savings telemetry",
-      "measure automatic context compaction token savings in another Codex thread using session telemetry",
-      "improve universal Codex token and quota efficiency after v0.18 by researching user pain, detecting wasted model turns, implementing safe automatic controls, benchmarking real sessions, and reinstalling the plugin",
+      "measure automatic context compaction savings in a synthetic task fixture",
+      "improve a generic token-budget policy by detecting wasted model turns and applying safe bounded controls",
     ];
     for (const query of queries) {
       const routed = await unified.dispatch({
@@ -1066,7 +1066,7 @@ test("skills route requires security intent before loading security specialists"
   try {
     for (const query of [
       "clone a live website into responsive frontend code",
-      "manage Gmail inbox triage",
+      "manage a generic mailbox triage queue",
     ]) {
       const routed = await unified.dispatch({
         action: "skills",

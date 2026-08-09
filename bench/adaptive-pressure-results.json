@@ -1,11 +1,11 @@
 {
   "method": {
-    "dataset": "Largest non-media tool outputs from the most recently modified local Codex session logs.",
+    "dataset": "Bounded non-media tool-output fixtures; local session identifiers are omitted.",
     "arm_a": "Installed Capsule baseline.",
-    "arm_b": "Adaptive context-pressure policies in the working tree.",
+    "arm_b": "Candidate adaptive context-pressure policies.",
     "accounting": "Model-visible serialized characters after PostToolUse, including hook guidance.",
     "privacy": "The report stores only bounded sample metadata, sizes, modes, and booleans; tool content and session identifiers are not copied.",
-    "caveat": "Approximate text tokens use four characters per token. This excludes image tokens, caching, hidden model work, billing, and outputs outside the sampled sessions."
+    "caveat": "Approximate text tokens use four characters per token. This excludes image tokens, caching, hidden model work, billing, and outputs outside this bounded fixture set."
   },
   "summary": {
     "samples": 46,

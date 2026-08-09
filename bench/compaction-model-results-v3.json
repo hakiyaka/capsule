@@ -24,7 +24,7 @@
   },
   "rows": [
     {
-      "task": "plugin-upgrade",
+      "task": "fixture_a",
       "arm": "baseline",
       "facts_passed": 8,
       "facts_total": 8,
@@ -37,7 +37,7 @@
       "reasoning_output_tokens": 149
     },
     {
-      "task": "plugin-upgrade",
+      "task": "fixture_a",
       "arm": "treatment",
       "facts_passed": 8,
       "facts_total": 8,
@@ -50,7 +50,7 @@
       "reasoning_output_tokens": 172
     },
     {
-      "task": "cross-platform-cache-fix",
+      "task": "fixture_b",
       "arm": "baseline",
       "facts_passed": 8,
       "facts_total": 8,
@@ -63,7 +63,7 @@
       "reasoning_output_tokens": 100
     },
     {
-      "task": "cross-platform-cache-fix",
+      "task": "fixture_b",
       "arm": "treatment",
       "facts_passed": 8,
       "facts_total": 8,

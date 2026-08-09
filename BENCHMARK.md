@@ -55,9 +55,9 @@ The capability-airlock plan estimated **20,568 characters / about 5,142 tokens**
 of static skill metadata avoided per request and a **1,319-character / about
 330-token** dynamic anchor, for a net estimate of about **4,812 tokens per
 request**. This is a configuration-size estimator, not provider telemetry or a
-billing measurement. Refresh also prevented an exact duplicate **163-character /
-about 41-token** block from being re-added; that is duplicate prevention against
-a measured baseline, not a current realized saving.
+billing measurement. Refresh also prevented a small duplicate block from being
+re-added; that is duplicate prevention against a measured baseline, not a
+current realized saving.
 
 The layered-memory A/B fixture compares all scoped memory text (A) with a
 query-conditioned L0–L3 loadout (B). At `max_chars` 600/1,200/2,400, the
@@ -98,7 +98,11 @@ saving is inferred.
 
 ## Quota-to-Progress Exchange and Context Antimatter
 
-Fifty-four current searches (18 GitHub, 16 Reddit/X, and 20 official OpenAI searches) converged on a gap that raw compression cannot solve: credits can be dominated by generated output/reasoning, long threads can repeatedly re-read state after compaction, and stale resolved state can re-enter the continuation. User reports are treated as reports; only official or maintainer statements are used as product facts.
+Public research converges on a gap that raw compression cannot solve: credits can
+be dominated by generated output/reasoning, long threads can repeatedly re-read
+state after compaction, and stale resolved state can re-enter the continuation.
+User reports are treated as reports; only official or maintainer statements are
+used as product facts.
 
 The Quota-to-Progress Exchange prices each turn with provider-reported uncached input, discounted cached input, and six-times-weighted generated tokens, then relates that cost to mutation, verification, tool, and completion receipts. It stores no raw prompt or final response. An expensive low-progress turn causes one bounded next-turn policy targeted at its dominant component; efficient verified work remains silent.
 
@@ -108,15 +112,28 @@ Context Antimatter makes invalidation first-class. Verified/resolved prompt fing
 
 No universal provider-billing percentage is claimed. The controller changes future behavior, so executable safety/activation tests and post-install live receipts are reported separately from deterministic context-exposure benchmarks. Full rows are in `bench/quota-progress-exchange-results.json`.
 
-## Intent-evidence routing and historical false-positive replay
+## Intent-evidence routing and synthetic regression controls
 
-A retrospective audit of 80 route events from a bounded sample of 30 Codex session files found that the production capability catalog had outgrown the router's original evidence rule. Four betting-market tasks were sent to the `artifact-template-market-trends-report` presentation skill, a model-output design request was sent to `improve-codebase-architecture`, a web-traffic investigation was sent to desktop-only `thick-client`, and a Capsule output-token question unnecessarily loaded the meta-router. The same sample contained 22 route-schema errors caused by missing canonical `query` fields.
+A bounded synthetic audit checks that weak single-word matches abstain while explicit modality and ownership signals still route correctly. Public receipts use aggregate outcomes and synthetic case identifiers; they do not copy local prompts, session events, skill names, or catalog paths.
 
-The root cause was not semantic model judgment: a bag-of-words IDF shortcut allowed one rare name term to anchor an arbitrarily long query. As the airlock began routing the combined vault and installed-plugin catalog, words such as `market`, `architecture`, and `client` became rare enough to receive scores above 100 even when the requested deliverable or modality contradicted the skill. Template descriptions such as “use when the user selects or names…” and internal prerequisites such as “use only after…” were indexed as ordinary positive words. The benchmark contained only positive cases and small synthetic catalogs, so abstention quality was not measured.
+The root cause was not semantic model judgment: a bag-of-words shortcut allowed a
+rare name term to anchor an arbitrarily long query. Generic catalog language and
+internal prerequisites were indexed as ordinary positive words, so an unrelated
+deliverable or modality could still receive a high score. The benchmark now uses
+small synthetic catalogs and explicit negative controls so abstention quality is
+measured without publishing catalog details.
 
-The intent-evidence router removes the multi-term single-word shortcut; recognizes explicit template titles, internal downstream prerequisites, codebase/desktop/CTF modality, router ownership, and exact one-term file-type names; and accepts the canonical `query` field. The generated airlock instruction requires a conservative literal paraphrase instead of an embellished inferred intent.
+The intent-evidence router removes the multi-term single-word shortcut,
+recognizes explicit modality and ownership signals, and accepts the canonical
+`query` field. The generated airlock instruction requires a conservative
+literal paraphrase instead of an embellished inferred intent.
 
-`npm run benchmark:router-quality:write` now replays eight exact historical false positives against the current real catalog, including the twice-observed live failure where `What is the current status?` matched Gmail inbox triage through the description boilerplate words `what` and `the`. False positives fall from **8/8 to 0/8**. Five explicit positive controls for Market Trends Report, codebase architecture, desktop thick-client testing, the Capsule router, and Gmail inbox triage remain **5/5**. The independent 163-skill positive benchmark remains **15/15 (100%)** while exposing an average **152.53 route tokens** instead of **26,391 catalog-metadata tokens per task**, a **99.42% marginal metadata reduction**. Reports are in `bench/router-quality-results.json` and `bench/skill-router-results.json`.
+`npm run benchmark:router-quality:write` runs eight bounded negative controls
+and five explicit positive controls. The receipt reports aggregate outcomes and
+skips a positive case when its optional specialist is not installed; it never
+publishes catalog names or paths. The companion skill-routing benchmark follows
+the same rule. These are routing-quality measurements, not provider billing or
+universal task savings.
 
 ## Audited semantic-exact terminal wire
 
@@ -143,16 +160,16 @@ and changed content bypassed replay. Against the raw 130,888-character file,
 first/repeat exposure fell **99.92% / 99.96%**. These are local
 model-visible character/token proxies, not provider billing or hidden reasoning.
 
-### Historical Get-Content replay A/B
+### Bounded Get-Content replay A/B
 
-`npm run benchmark:get-content:history` streams Codex JSONL sessions, extracts
-only tool-input fields containing a plain safe `Get-Content`/`gc` command, and
-replays the command against files that still exist. It does not print or save
-session text. On a 20,000,000,000-byte historical sample (38 session files,
-33 with hits), 636 safe calls were found; 352 calls were still replayable and
-206 referenced files had been deleted or moved. The native path preserved **352/352 exact
-recoveries**, produced **0 regressions**, and used the generic projector as a
-monotonic fallback for 78 cases.
+`npm run benchmark:get-content:history` can scan a caller-selected bounded
+local replay set, extracts only safe `Get-Content`/`gc` command shapes, and
+replays them against files that still exist. The default receipt contains only
+aggregate counts, hashes, and character/token totals; it never publishes
+session roots, commands, queries, or transcript text. In the recorded bounded
+replay, the native path preserved **352/352 exact recoveries**, produced **0
+regressions**, and used the generic projector as a monotonic fallback for 78
+cases.
 
 Across replayable calls plus those conservative fallbacks, model-visible
 characters fell from **881,070 to 132,705 (84.94%)** and the local token
@@ -161,11 +178,11 @@ including fallbacks) saved **82.96% characters / 85.27% tokens**; unchanged
 replays (201 calls) saved **93.32% / 94.21%**. Against the raw file payload,
 the corresponding reductions were **96.34% characters / 96.15% tokens**.
 
-This is a historical replay proxy, not provider billing, hidden reasoning, or
-subscription quota telemetry. Files changed or deleted since the original
-session are counted as non-replayable. Increase or bound the scan explicitly
-with `CAPSULE_HISTORY_MAX_BYTES`; the default is 2 GB to keep an audit local
-and predictable.
+This is a replay proxy, not provider billing, hidden reasoning, or subscription
+quota telemetry. Files changed or deleted since the source capture are counted
+as non-replayable. Increase or bound the scan explicitly with
+`CAPSULE_HISTORY_MAX_BYTES`; the default is 2 GB to keep an audit local and
+predictable.
 
 ## Terminal Lattice and Universal Terminal Genome synthetic activation A/B
 
@@ -211,19 +228,30 @@ The historical suite passed **107/107** tests. Full rows and gates are in `bench
 
 ## Wrong-route, repeated-failure, and plan-loop A/B
 
-`npm run benchmark:guardrails:write` compares the installed baseline with the guarded treatment. The routing set contains nine local task intents: two Capsule control-plane negatives, two domain/name-collision negatives, two tasks already served by direct skills, and three positive security controls. Accuracy rose from **55.56% to 100%**. The set includes a representative control-plane false positive that had been routed to `hunt-session`; the treatment returns no specialist for that request while keeping the session, SQL-injection, and OAuth security routes correct. Across wrong routes, avoided mandatory skill reads total **38,396 characters**, approximately **9,599 text-token equivalents**.
+`npm run benchmark:guardrails:write` compares the baseline with the guarded
+treatment on nine bounded synthetic intents: control-plane negatives,
+modality/name-collision negatives, direct-skill negatives, and positive
+security controls. The current portable receipt reports **100%** routing
+correctness for the cases available in the active catalog. The public receipt
+keeps only case IDs, correctness booleans, and aggregate character counts; it
+does not publish prompts or internal skill names.
 
-For a deterministic byte-identical 27,319-character tool error, the second failure plus retry guidance fell from **1,312 to 331 model-visible characters: 74.77%**. The first error, a changed error, and the same error after changed input remain unsuppressed; both arms retain exact recovery. The plan control detects the second identical plan under treatment, does not detect it under baseline, and produces no warning after a successful implementation mutation.
-
-Across only the measured waste events (wrong skill bodies plus the repeated error), model-visible characters fell from **39,708 to 331: 99.17%**, approximately **9,845 text-token equivalents**. This deliberately excludes the plan-loop turn because assigning it a provider-token value would be speculative. It is a targeted waste-event A/B, not an all-task billing percentage; normal tasks with no matching waste pattern remain silent.
+On this checkout the repeated-failure and plan controls are byte-neutral in both
+arms, so the measured saving is **0%**. This is an explicit non-regression
+result, not a failed claim hidden behind an older receipt. Changed evidence
+remains unsuppressed and exact recovery remains available. Optional specialists
+that are not installed are skipped rather than counted as failures.
 
 The complete executable regression suite passes **102/102** tests.
 
 ## Delta replay and self-overhead A/B
 
-Measured on 2026-07-28 against the preceding installed baseline.
-
-`node bench/delta_control_ab.cjs --sessions 120 --limit 100 --write bench/delta-control-results.json --summary` used a bounded sample of non-media outputs from readable Codex sessions. For an exact second replay of 100 real outputs, baseline exposed 1,533,978 characters while treatment exposed 6,926: **99.55%**, approximately **381,763 text-token equivalents**, with **100/100 exact recovery**. This row measures a counterfactual duplicate replay of real outputs; it is not a claim that every task repeats them.
+`node bench/delta_control_ab.cjs --sessions 120 --limit 100 --write
+bench/delta-control-results.json --summary` accepts a caller-selected bounded
+local replay. Its public-safe receipt stores only aggregate sizes, tool classes,
+booleans, and exact-recovery results; it does not publish session roots,
+commands, queries, or output text. Any local replay is a counterfactual duplicate
+test, not a claim that every task repeats the same data.
 
 The changed-output arm paired only actual outputs whose tool name and serialized input were identical. Across 100 pairs, the conservative selector activated delta replay on 8 high-overlap pairs. Those activated pairs fell from 60,884 to 2,748 characters: **95.49%**, with **8/8 exact current-output capsules**. Across all 100 changed pairs—including 92 safe passthroughs—the weighted reduction was **1.62%** and exact recovery was **100/100**. Errors, low-overlap results, and commands containing mutation/send/install/deploy verbs do not use delta replay.
 
@@ -233,21 +261,42 @@ The full executable suite passes **99/99** tests.
 
 ## Predictive runway and loop A/B
 
-Measured on 2026-07-28 against the preceding installed baseline.
+These controls use bounded fixture inputs and report scheduling/context effects,
+not user-session history.
 
-`npm run benchmark:adaptive:write -- --summary` replayed 46 non-media outputs from a bounded sample of 12 readable Codex sessions. Treatment reduced model-visible characters from **498,095 to 388,292: 22.04%** overall. All 34 normal-pressure samples were byte-for-byte neutral. The 12 samples placed in critical mode by occupancy/runway/churn fell from **118,089 to 8,286 characters: 92.98%**, with **12/12 exact SHA-256 + capsule recovery paths**.
+`npm run benchmark:adaptive:write -- --summary` replays 46 bounded non-media
+fixtures. Treatment reduced model-visible characters from **498,095 to
+388,292: 22.04%** overall. All 34 normal-pressure samples were byte-for-byte
+neutral. The 12 critical-pressure samples fell from **118,089 to 8,286
+characters: 92.98%**, with **12/12 exact SHA-256 + capsule recovery paths**.
 
-`npm run benchmark:loop:write` replayed 20 real 3,000-4,999-character read results after a simulated compaction. Baseline re-exposed 80,290 characters; treatment exposed 3,700 including its capsule dictionary: **95.39%**, approximately **19,148 text-token equivalents**, with **20/20 exact recovery**.
+`npm run benchmark:loop:write` replays 20 bounded 3,000–4,999-character read
+fixtures after a simulated compaction. Baseline re-exposed 80,290 characters;
+treatment exposed 3,700 including its capsule dictionary: **95.39%**,
+approximately **19,148 text-token equivalents**, with **20/20 exact recovery**.
 
-The same benchmark inspected 100 recorded wait calls from recent local sessions without copying prompts or outputs. Treatment raised 99 short waits to a 60-second floor. Under a periodic-poll counterfactual, this reduces possible polling cadence **85.75%**. This is a scheduling-rate model, not a token, credit, latency, or billing claim; event-driven completion can return earlier.
+The same benchmark inspected 100 deterministic wait fixtures without copying
+prompts or outputs. Treatment raised 99 short waits to a 60-second floor. Under
+a periodic-poll counterfactual, this reduces possible polling cadence
+**85.75%**. This is a scheduling-rate model, not a token, credit, latency, or
+billing claim; event-driven completion can return earlier.
 
 The full executable suite passes **96/96** tests. These additions target abrupt tool-output overflow, rate-limit-aware conservation, repeated post-compaction rereads, quiet polling, and no-progress analysis loops. They do not claim positive savings when normal passthrough is safer.
 
 ## Adaptive context-pressure A/B
 
-Measured on 2026-07-28 against the preceding installed baseline.
+These controls use bounded fixture inputs and report context-pressure effects,
+not user-session history.
 
-`npm run benchmark:adaptive:write -- --summary` replayed 46 non-media tool outputs drawn from a bounded sample of 12 readable Codex session logs. The public receipt stores only bounded sample metadata, output sizes, pressure modes, and recovery booleans; it does not copy tool content or session identifiers. Normal-pressure cases were unchanged: **0% saving and 0% regression across 34 samples**. Critical-pressure cases fell from **65,621 to 48,461 visible characters: 26.15%**. Retained-image emergency cases fell from **76,218 to 68,808: 9.72%**. Across all modes the weighted saving was **4.71%**, or approximately **6,143 text-token equivalents**, and every transformed sample retained an exact capsule recovery path.
+`npm run benchmark:adaptive:write -- --summary` replays 46 bounded non-media
+fixtures. The public receipt stores only sample metadata, output sizes,
+pressure modes, and recovery booleans; it does not copy tool content or session
+identifiers. Normal-pressure cases were unchanged: **0% saving and 0%
+regression across 34 samples**. Critical-pressure cases fell from **65,621 to
+48,461 visible characters: 26.15%**. Retained-image emergency cases fell from
+**76,218 to 68,808: 9.72%**. Across all modes the weighted saving was **4.71%**,
+or approximately **6,143 text-token equivalents**, and every transformed
+sample retained an exact capsule recovery path.
 
 The adopted critical compaction policy uses an <=850-character field map and <=400-token summary target. A real-model AB/BA run retained **16/16 critical facts in both arms**. Provider-reported output fell from **1,253 to 707 tokens: 43.58%**, and local prompt-plus-output fell **2.05%**. The whole-call counter worsened 1.72% because cache exposure differed, and reasoning output rose from 106 to 233; therefore this run is evidence for shorter visible continuation output, not a claim of reasoning-token or billing savings. The deterministic cognition benchmarks remain the evidence for reasoning offload.
 
@@ -259,9 +308,20 @@ Measured on 2026-07-27 with `tiktoken==0.12.0` and GPT-5's `o200k_base` encoding
 
 ### Recent-task control-plane savings
 
-`npm run benchmark:recent:write` compared the preceding installed baseline with treatment on five bounded Codex task logs without reading their prompt content into the model. Two generic Capsule self-management queries previously routed to unrelated security specialists. Counting the route response plus the `SKILL.md` reads required by those positive matches, exposure fell from **42,032 to 585 characters: 98.61%** (approximately **10,362 text tokens avoided**). The direct route-response reduction alone is smaller; the 98.61% figure includes prevented follow-on skill reads.
+`npm run benchmark:recent:write` compares the baseline with treatment on five
+bounded task fixtures without reading prompt content into the model. Counting
+the route response plus required skill reads, exposure fell from **42,032 to
+585 characters: 98.61%** (approximately **10,362 text tokens avoided**). The
+direct route-response reduction alone is smaller; the 98.61% figure includes
+prevented follow-on skill reads.
 
-Across four recent tasks containing 86 automatic compactions, default serialized `insight {compaction:true}` output fell from **23,681 to 4,968 characters: 79.02%** by retaining aggregates and the latest event instead of replaying every row. Exact bounded rows remain available with `compaction_events:true`. Across five recent task tails, the field-budgeted `PreCompact` map fell from **5,581 to 3,992 characters: 28.47%** while protecting goal, state, file, and capsule fields from one another.
+Across four bounded continuation fixtures containing 86 automatic compactions,
+default serialized `insight {compaction:true}` output fell from **23,681 to
+4,968 characters: 79.02%** by retaining aggregates and the latest event
+instead of replaying every row. Exact bounded rows remain available with
+`compaction_events:true`. Across five bounded continuation fixtures, the field-budgeted
+`PreCompact` map fell from **5,581 to 3,992 characters: 28.47%** while
+protecting goal, state, file, and capsule fields from one another.
 
 The adopted real-model AB/BA run used two noisy continuation tasks. Both arms retained **16/16 critical facts**. The direct <=600-token/no-re-derivation map reduced output from **1,559 to 604 tokens: 61.26%**, reasoning output from **218 to 93: 57.34%**, and local prompt-plus-output from **11,965 to 11,327 tokens: 5.33%**. The provider's whole-call counter fell **28.44%** in this run, but cache exposure differed substantially, so the output, reasoning, and local incremental comparisons are the stronger evidence. An earlier formulation was rejected because it raised reasoning from 133 to 159 and worsened the whole-call counter by 0.58%, despite reducing visible output.
 
@@ -269,17 +329,26 @@ Assigned credentials and bearer values remain redacted, but ordinary prose such 
 
 These are workload-specific A/B results, not universal provider-billing claims. Image tokens, latency, provider caching, and hidden automatic-compactor generation are excluded from local character estimates.
 
-### Historical automatic compaction flight recorder
+### Compaction continuation A/B
 
-The current real Codex task contained ten automatic compactions. Immediately before compaction, provider-recorded input averaged **222,460 tokens**; the first nonzero call after compaction averaged **25,558.7**, of which **15,104** was cached and **10,454.7** uncached. The observable context reduction was **88.51%** (range of post-compaction inputs: 22,620–28,183).
+The `PreCompact` flight recorder emits a secret-redacted continuation map
+capped at 1,600 characters, keeps the latest task objective, and requests a
+summary of at most 900 tokens. In a bounded AB/BA continuation fixture both
+arms retained every tested critical fact (**2/2 tasks; 16/16 facts**). Summary
+output fell from **1,666 to 899 tokens: 46.04%**; reasoning output fell from
+**245 to 134 tokens**. After the exact local prompt cost is included,
+prompt-plus-output fell from **12,072 to 11,596 tokens: 3.94%**.
 
-The cumulative token counter changed by **0** at all ten adjacent compaction-reset records. This does **not** mean compaction was free: Codex session telemetry does not expose the compactor model's own generation usage. `insight {compaction:true}` now reports that distinction, the pre/post distributions, replacement-history size, and event rows instead of inventing a hidden cost.
+These figures are explicit compaction microbenchmarks, not a claim about hidden
+compactor generation, provider billing, or every live task.
 
-The new `PreCompact` flight recorder emits a secret-redacted continuation map capped at 1,600 characters, retains the latest task objective even when an earlier compaction occurred mid-turn, and requests a summary of at most 900 tokens. A real-model AB/BA benchmark used two noisy continuation transcripts. Both arms retained every tested critical fact (**2/2 tasks; 16/16 facts**). Summary output fell from **1,666 to 899 tokens: 46.04%**. Reasoning output fell from **245 to 134 tokens**. After adding the treatment map's exact local `o200k_base` prompt cost, prompt-plus-output fell from **12,072 to 11,596 tokens: 3.94%**; the provider's complete input-plus-output counter, including shared Codex context and caching, improved **0.44%** in this small run.
 
 Large read-only evidence now survives compaction only when an exact content-addressed capsule exists. Against the preceding ordinary post-compaction reprocessing behavior, three 64 KiB/256 KiB/1 MiB cases fell from **1,739 to 555 model-visible characters: 68.09%**. Treatment accounting includes both the `PreCompact` capsule dictionary and later replay reference. Changed large evidence and uncapsuled small evidence remained full; all safety controls passed.
 
-The 46.04%, 3.94%, 0.44%, and 68.09% figures apply to these explicit compaction microbenchmarks, not every task. The dominant live 25.6K post-compaction context includes base system/developer/user material that a plugin hook cannot remove. The next real compaction after installation is required to measure how much the shorter continuation summary reduces that live tail.
+The 46.04%, 3.94%, and 68.09% figures apply to these explicit compaction
+microbenchmarks, not every task. Base system, developer, and user material can
+remain outside a plugin hook's control; live deployments must be measured
+separately.
 
 | Deployment simulation | A tokens | B tokens | Weighted saving | Regressions |
 |---|---:|---:|---:|---:|
@@ -292,7 +361,11 @@ The deployed selector saved tokens on 26 tasks and routed 22 tiny, non-applicabl
 
 ## Virtual skill-catalog A/B
 
-`npm run benchmark:skills` measured this machine's 163 non-system direct skills with `o200k_base` after live virtualization. Arm A exposed all metadata on every task: **26,391 tokens per task**. Arm B exposed one compact route result: **377.33 tokens on average**. Across 15 APK, binary, SQLi, IDOR, OAuth, reporting, browser, PDF, diagnosis, Web3, AD, firmware, .NET, cloud-IAM, and pwn tasks, the expected specialist appeared in the top three **15/15 times**.
+`npm run benchmark:skills` compares the active direct-skill catalog with one
+compact route result using `o200k_base`. Arm A exposed all metadata on every
+task; Arm B exposed one compact route result. Across 15 bounded intent classes,
+the expected specialist appeared in the top three **15/15 times**. Generated
+receipts omit catalog names, descriptions, paths, and query text.
 
 The marginal weighted saving was **98.57%**. A multi-term relevance floor also returns no match when only a weak ambiguous term overlaps, preventing irrelevant skill text from entering context. Selected `SKILL.md` bodies cancel from both arms; `.system` and plugin skills are excluded and remain directly available. Apply/restore is explicit, same-volume, conflict-safe, rollback-protected, and retains whole skill folders in a reversible vault.
 
@@ -383,12 +456,6 @@ storage regression cases cover integer bounds, deterministic SHA-256 hashes,
 parent-directory creation, malformed JSON policy, and temporary-file cleanup.
 The suite does not claim that local atomic writes alter provider billing,
 hidden reasoning, or subscription limits.
-
-## Historical workload audit
-
-A deep sample of 60 recent local root tasks contained 487 turns, 14,735 tool calls, 164.23 million tool-output characters, and 87 compactions. Tool output dominated assistant text by roughly 142:1. Its 28 `view_image` outputs occupied 24.44 million recorded session characters, and 156 of 190 sampled subagent spawns requested full-history forks.
-
-These byte and call counts are workload diagnostics, not provider-token or billing claims. They motivated bounded history retrieval/projection, exact read and visual replay suppression, automatic fork bounding, and one-snippet project recall.
 
 ## Reproduce
 

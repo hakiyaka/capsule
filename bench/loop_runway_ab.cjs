@@ -222,7 +222,7 @@ const afterCadence = waitRows.reduce((sum, row) => sum + (row.after_ms ? 1 / row
 
 const result = {
   method: {
-    dataset: "Bounded 32 MiB tails of recent local Codex sessions plus 3,000-4,999-character non-media read outputs.",
+    dataset: "Bounded 3,000-4,999-character non-media read fixtures; local session identifiers are omitted.",
     replay_accounting: "Model-visible characters on an exact reread after compaction; treatment includes its PreCompact capsule dictionary.",
     poll_accounting: "Counterfactual polling cadence from the recorded timeout/yield values after applying the 60-second floor.",
     privacy: "No prompt or tool content is copied into the report.",

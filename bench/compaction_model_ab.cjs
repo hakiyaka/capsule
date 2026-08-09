@@ -14,7 +14,7 @@ const executablePrefix = fs.existsSync(codexScript) ? [codexScript] : [];
 
 const tasks = [
   {
-    name: "plugin-upgrade",
+    name: "fixture_a",
     goal: "Continue NEBULA-417. Use only Capsule, do not browse, and preserve compatibility.",
     agent: "Implemented mcp/compaction.cjs and scripts/hook.cjs. Tests 40/40 pass. " +
       "Observed direct compaction delta 0 because telemetry does not expose generation cost; " +
@@ -33,7 +33,7 @@ const tasks = [
     ],
   },
   {
-    name: "cross-platform-cache-fix",
+    name: "fixture_b",
     goal: "Continue ORBIT-9. Support Windows, Linux, and macOS; preserve rollback and never delete user data.",
     agent: "Root cause is stale cache invalidation. Changed src/router.ts and tests/cache.test.ts. " +
       "npm test is 73/73. Decision: key cache entries by content hash. " +

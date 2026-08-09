@@ -16,7 +16,6 @@ const roots = [
   "CODE_OF_CONDUCT.md",
   "SECURITY.md",
   "PRIVACY.md",
-  "GITHUB-100-RESEARCH.md",
   "docs",
   "skills",
   "optional-skills",

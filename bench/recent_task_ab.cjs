@@ -92,7 +92,7 @@ function skillReadChars(matches) {
 async function routingBenchmark(baselineUnified) {
   const queries = [
     "verify Capsule activation after Codex restart and automatic compaction savings telemetry",
-    "measure automatic context compaction token savings in another Codex thread using session telemetry",
+    "measure automatic context compaction savings in a synthetic task fixture",
   ];
   const cases = [];
   for (const query of queries) {
@@ -111,9 +111,7 @@ async function routingBenchmark(baselineUnified) {
     const before = baselineRouteChars + baselineSkillChars;
     const after = treatmentRouteChars + treatmentSkillChars;
     cases.push({
-      query_sha256: require("node:crypto").createHash("sha256").update(query).digest("hex"),
-      baseline_matches: baseline.response.matches.map((match) => match.name),
-      treatment_matches: treatment.response.matches.map((match) => match.name),
+      case_id: `routing_case_${cases.length + 1}`,
       baseline_route_chars: baselineRouteChars,
       treatment_route_chars: treatmentRouteChars,
       baseline_required_skill_chars: baselineSkillChars,
@@ -208,10 +206,6 @@ async function main() {
   const routing = await routingBenchmark(baselineUnified);
   const compaction = compactionBenchmark(files, baselineCompaction);
   const result = {
-    generated_at: new Date().toISOString(),
-    baseline_label: "installed Capsule baseline",
-    treatment_label: "working tree",
-    sessions_scanned: files.length,
     routing,
     compaction,
     caveat: "Local serialized-character A/B. Approximate text tokens use four characters per token; image tokens, provider billing, caching, latency, and hidden compactor generation are excluded.",

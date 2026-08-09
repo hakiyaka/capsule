@@ -18,6 +18,8 @@ function stringFlag(name) {
   return index >= 0 && process.argv[index + 1] ? String(process.argv[index + 1]) : "";
 }
 
+const unsafeOutput = process.argv.includes("--unsafe");
+
 function sessionFiles(root) {
   const files = [];
   const stack = [root];
@@ -130,25 +132,29 @@ async function main() {
   for (const file of files) events.push(...await eventsFromFile(file.path));
   events.sort((left, right) => String(right.timestamp).localeCompare(String(left.timestamp)));
   const selected = events.slice(0, eventLimit);
-  const bySkill = {};
+  const byOutcome = {};
   for (const event of selected) {
-    const key = event.error ? "(error)" : event.match || "(no-match)";
-    bySkill[key] = (bySkill[key] || 0) + 1;
+    const key = event.error ? "error" : event.match ? "matched" : "no-match";
+    byOutcome[key] = (byOutcome[key] || 0) + 1;
   }
   const output = {
-    root,
+    root: "local Codex session directory (redacted)",
     files_scanned: files.length,
     route_events: selected.length,
     matched: selected.filter((event) => event.match).length,
     no_match: selected.filter((event) => !event.match && !event.error).length,
     errors: selected.filter((event) => event.error).length,
     suspicious: selected.filter((event) => event.suspicious).length,
-    by_skill: Object.fromEntries(
-      Object.entries(bySkill).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    by_outcome: Object.fromEntries(
+      Object.entries(byOutcome).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
     ),
-    suspicious_events: selected.filter((event) => event.suspicious),
-    events: selected,
+    redacted: !unsafeOutput,
   };
+  if (unsafeOutput) {
+    output.warning = "--unsafe includes local route queries and event metadata; do not commit its output.";
+    output.suspicious_events = selected.filter((event) => event.suspicious);
+    output.events = selected;
+  }
   process.stdout.write(`${JSON.stringify(output, null, 2)}\n`);
 }
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Measure virtual skill routing against the user's real direct-skill catalog."""
+"""Measure virtual skill routing without exporting local catalog details."""
 
 from __future__ import annotations
 
@@ -117,8 +117,7 @@ def main() -> None:
         if not available_expected:
             results.append(
                 {
-                    "query": query,
-                    "top3": [],
+                    "case_id": f"case_{len(results) + 1:02d}",
                     "pass": None,
                     "skipped": "No expected specialist exists in the active direct-skill catalog.",
                     "route_tokens": 0,
@@ -132,8 +131,7 @@ def main() -> None:
         treatment_tokens += route_tokens
         results.append(
             {
-                "query": query,
-                "top3": names,
+                "case_id": f"case_{len(results) + 1:02d}",
                 "pass": bool(available_expected.intersection(names)),
                 "route_tokens": route_tokens,
             }
@@ -150,8 +148,8 @@ def main() -> None:
             "exclusions": "System/plugin skills, selected skill bodies, provider caching, billing, and answer tokens.",
         },
         "catalog": {
+            "scope": "Active local direct-skill catalog; names, descriptions, paths, and query text are omitted from reports.",
             "virtualized": active,
-            "skills": len(rows),
             "baseline_metadata_tokens_per_task": baseline_tokens,
         },
         "summary": {

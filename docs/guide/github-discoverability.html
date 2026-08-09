@@ -17,23 +17,20 @@
     <p class="eyebrow">Public discovery measurement</p>
     <h1>Measure discovery before claiming growth.</h1>
     <p class="lead">GitHub visibility is a combination of repository metadata, rolling traffic, referrals, releases, Pages surfaces, and volatile repository-search order. Capsule records those signals without turning a snapshot into a ranking promise.</p>
-    <h2>Run a repeatable snapshot</h2>
-    <pre><code>npm run audit:github-visibility:write -- visibility.json
-npm run audit:github-visibility:search:write -- visibility-search.json
-
-# Later, compare the same fixed queries with the saved search snapshot.
-npm run audit:github-visibility:search:baseline -- visibility-search.json</code></pre>
-    <p>Use the same repository, query set, and authentication context at each measurement point. Set <code>CAPSULE_GITHUB_REPO=owner/name</code> or invoke <code>node scripts/github-visibility-audit.cjs --repo owner/name</code> for a fork; otherwise the default is <code>hakiyaka/capsule</code>. Do not rely on <code>npm run ... -- --repo</code> option forwarding on Windows. The private traffic endpoints cover a rolling 14-day window; repository metadata and release assets are point-in-time or cumulative. The scheduled workflow downloads the prior retained artifact when it exists, validates its repository/schema/query provenance, computes null-safe deltas, and still treats a genuinely missing or expired artifact as a new baseline. Each artifact includes a run, ref, commit, and baseline provenance record.</p>
+    <h2>Use comparable snapshots</h2>
+    <p>Compare the same repository and metric at multiple points in time. Keep
+    a timestamp and the workload or release beside any result, and treat a
+    missing or delayed signal as unknown rather than zero. Search order is
+    volatile; it is a diagnostic input, not a Google-ranking or adoption claim.</p>
     <h2>What the audit records</h2>
     <table>
       <thead><tr><th>Signal</th><th>Meaning</th><th>Limit</th></tr></thead>
       <tbody>
         <tr><td>Topics and description</td><td>Controlled relevance and entry-point metadata.</td><td>They influence discovery but do not guarantee ranking.</td></tr>
-        <tr><td>Views, clones, popular paths</td><td>Authenticated repository traffic over the latest 14 days, with observed window timestamps, point counts, and API lag.</td><td>GitHub does not expose a universal lifetime visitor count here; compare matching windows, do not treat a lagging endpoint as current, keep missing aggregate uniques unknown rather than summing daily values, and treat an unavailable endpoint as unknown rather than zero.</td></tr>
-        <tr><td>Popular referrers</td><td>Referral domains, views, summed per-domain uniques, and the top referrer.</td><td>The audit uses <code>traffic/popular/referrers</code>; per-domain uniques are not a global unique-user count, and an unavailable endpoint is marked unavailable.</td></tr>
-        <tr><td>Repository social preview</td><td>Authenticated GraphQL status of the GitHub repository card, including <code>social_preview_custom</code> and the served preview URL.</td><td>This is separate from Pages' <code>social-card.png</code>; a false value means the owner still needs to upload the card in GitHub Settings.</td></tr>
+        <tr><td>Traffic and referrals</td><td>Rolling repository views, clones, and referring domains when GitHub makes them available.</td><td>Windows are limited and may lag; unavailable data stays unknown and is never treated as zero or as unique people.</td></tr>
+        <tr><td>Repository social preview</td><td>The GitHub link card and the Pages social image are separate surfaces.</td><td>A social card improves link recognition but does not establish ranking or usage.</td></tr>
         <tr><td>Repository search</td><td>First-100 presence, rank, total result count, and null-safe deltas for fixed queries.</td><td>Order is volatile and is not Google ranking, billing, or quota telemetry.</td></tr>
-        <tr><td>Releases and assets</td><td>Release count, asset names, and download counts.</td><td>New assets can remain at zero downloads until real users choose them.</td></tr>
+        <tr><td>Releases and assets</td><td>Tagged source archives, checksums, and release links.</td><td>Asset requests are not unique users or installations.</td></tr>
       </tbody>
     </table>
     <h2>Use ethical discovery surfaces</h2>
@@ -41,13 +38,15 @@ npm run audit:github-visibility:search:baseline -- visibility-search.json</code>
       <article class="card"><h3>One truthful description</h3><p>Describe the real Codex plugin and MCP server capabilities in plain language; do not stack unrelated keywords.</p></article>
       <article class="card"><h3>Substantive pages</h3><p>Keep the Pages guides, canonical links, sitemap, RSS feed, and machine-readable summary useful to people and crawlers.</p></article>
       <article class="card"><h3>Reproducible releases</h3><p>Attach a source archive and checksum when they correspond exactly to a tagged release.</p></article>
-      <article class="card"><h3>Real discussion answers</h3><p>Answer measurement questions with commands and limitations; do not manufacture stars, comments, or referral traffic.</p></article>
+      <article class="card"><h3>Useful answers</h3><p>Answer real user questions with reproducible examples and limitations; do not manufacture stars, comments, or referral traffic.</p></article>
       <article class="card"><h3>Repository social preview</h3><p>Pages metadata and the GitHub repository link card are separate. Owners can upload <code>docs/social-card.png</code> in repository Settings → General → Social preview and verify the API flag afterward.</p></article>
     </div>
-    <p>Repository owners may also verify the Pages property in Google Search Console or Bing Webmaster Tools and submit the sitemap. Project Pages serve <code>robots.txt</code> under the project path; a host-root robots file belongs to the account-level Pages site, so submit the explicit project sitemap URL rather than assuming a root directive was seen. Verification requires the owner's account; never add invented tokens to a public repository.</p>
+    <p>Repository owners may verify the Pages property in Google Search Console
+    or Bing Webmaster Tools and submit the published sitemap. Verification
+    tokens belong to the owner and should never be invented or committed.</p>
     <h2>Interpret a 100x target</h2>
     <div class="panel"><p>A 100x target is a project direction, not an observable guarantee. A defensible result needs a named baseline, the same query set, a timestamp, the current repository state, and separate reporting for metadata, search order, traffic, and referral signals. A change in one field must not be presented as a 100x increase in users or search ranking.</p></div>
-    <p>See the implementation in <a href="https://github.com/hakiyaka/capsule/blob/main/scripts/github-visibility-audit.cjs">the visibility audit</a>, the pure aggregation tests in <a href="https://github.com/hakiyaka/capsule/blob/main/tests/github-visibility-audit.test.cjs">the test contract</a>, and the <a href="benchmarks-and-methodology.html">workload measurement guide</a>. Share a sanitized snapshot and workload context in the <a href="https://github.com/hakiyaka/capsule/discussions/1">measurement discussion</a>.</p>
+    <p>For product measurements, see the <a href="benchmarks-and-methodology.html">benchmark methodology guide</a> and the <a href="share-and-cite.html">share and cite guide</a>. Publish only sanitized, workload-specific results with their limitations.</p>
     <footer><a href="../">Capsule</a> · <a href="https://github.com/hakiyaka/capsule/releases">Releases</a> · <a href="https://github.com/hakiyaka/capsule/blob/main/CITATION.cff">Citation</a></footer>
   </main></body>
 </html>

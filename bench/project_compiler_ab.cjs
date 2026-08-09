@@ -88,8 +88,7 @@ function main() {
         !group.some((expected) => selectedPaths.includes(expected))
       );
       results.push({
-        id: benchmarkCase.id,
-        query: benchmarkCase.query,
+        case_id: benchmarkCase.id,
         baseline_tokens: cold.response.profit_gate.baseline_tokens,
         cold: {
           elapsed_ms: Number(coldMs.toFixed(2)),
@@ -105,17 +104,13 @@ function main() {
           avoided_tokens: warm.response.profit_gate.avoided_tokens,
           avoided_ratio: warm.response.profit_gate.avoided_ratio,
         },
-        selected_paths: warm.response.selected_files.map((file) => ({
-          path: file.path,
-          score: Number(file.score.toFixed(2)),
-          via: file.via,
-        })),
+        selected_file_count: selectedPaths.length,
         quality: {
           passed: missingGroups.length === 0,
-          expected_groups: benchmarkCase.expected_groups,
-          missing_groups: missingGroups,
+          expected_group_count: benchmarkCase.expected_groups.length,
+          missing_group_count: missingGroups.length,
         },
-        exact: warm.response.exact,
+        exact_recovery: Boolean(warm.response.exact),
       });
     }
     const baselineTokens = results.reduce((total, item) => total + item.baseline_tokens, 0);
@@ -140,7 +135,7 @@ function main() {
           ? Number(((baselineTokens - warmEmitted) / baselineTokens).toFixed(4))
           : 0,
       },
-      caveat: "Token comparison is against the raw selected-file evidence for the same query, not provider billing.",
+      caveat: "Token comparison is against raw selected-file evidence for each bounded fixture, not provider billing.",
     };
     if (args.write) fs.writeFileSync(path.resolve(args.write), `${JSON.stringify(result, null, 2)}\n`, "utf8");
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);

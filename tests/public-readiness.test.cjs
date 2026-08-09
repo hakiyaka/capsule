@@ -18,6 +18,28 @@ test("public repository surface passes the portable release audit", () => {
   assert.ok(result.inspected_files > 0);
 });
 
+test("public benchmark receipts omit raw prompt and session fields", () => {
+  const root = path.resolve(__dirname, "..");
+  const bench = path.join(root, "bench");
+  const forbidden = new Set(["query", "prompt", "session_file", "session_id", "skill_file", "transcript"]);
+  const offenders = [];
+  function walk(value, file) {
+    if (Array.isArray(value)) {
+      value.forEach((item) => walk(item, file));
+    } else if (value && typeof value === "object") {
+      for (const [key, child] of Object.entries(value)) {
+        if (forbidden.has(key)) offenders.push(`${path.relative(root, file)}:${key}`);
+        walk(child, file);
+      }
+    }
+  }
+  for (const file of fs.readdirSync(bench).filter((name) => name.endsWith(".json"))) {
+    const absolute = path.join(bench, file);
+    walk(JSON.parse(fs.readFileSync(absolute, "utf8")), absolute);
+  }
+  assert.deepEqual(offenders, []);
+});
+
 test("tagged release workflow pins the tree and verifies a deterministic archive", () => {
   const root = path.resolve(__dirname, "..");
   const workflow = fs.readFileSync(path.join(root, ".github", "workflows", "release.yml"), "utf8");

@@ -258,62 +258,23 @@ public-readiness audit, and documentation audit. Run the broader suites with
 are workload-specific; they are not a promise of a fixed saving on every
 prompt or a substitute for provider billing telemetry.
 
-For the GitHub visibility goal, run the read-only authenticated snapshot:
-
-```sh
-npm run audit:github-visibility
-```
-
-It reports stars, forks, releases, the exact topic names, repository surface
-flags, community health, Pages status, and the rolling 14-day views/clones
-window. It also records the observed start/end timestamps, sample-point count,
-and API lag for the views and clones arrays so a stale rolling window is not
-mistaken for a current trend. If the authenticated traffic endpoints are not
-available, the report records `*_available:false` and the bounded API error
-instead of inventing zero traffic. Referrer uniques are explicitly a sum of
-GitHub's per-domain values, not a global unique-user count. Pass
-`--baseline path/to/snapshot.json` to compute
-ratios against a prior snapshot, or add `--write path/to/snapshot.json` to
-save the read-only report for the next comparison. It also records aggregate
-referrer and popular-path counts so future outreach can be tied to observed
-traffic; traffic data is not written to Capsule state. Referrers come from
-GitHub's `traffic/popular/referrers` endpoint. If that endpoint is unavailable,
-the audit marks its aggregate fields unknown and does not infer that traffic
-was zero.
-For a fork or another public repository, set `CAPSULE_GITHUB_REPO=owner/name`
-or invoke `node scripts/github-visibility-audit.cjs --repo owner/name`;
-otherwise the documented default is `hakiyaka/capsule`. Do not rely on
-`npm run ... -- --repo` option forwarding on Windows.
-
-On Windows, where npm can consume leading option names, the explicit helpers
-are reliable:
-
-```sh
-npm run audit:github-visibility:write -- path/to/snapshot.json
-npm run audit:github-visibility:baseline -- path/to/snapshot.json
-npm run audit:github-visibility:search
-npm run audit:github-visibility:search:write -- path/to/search.json
-npm run audit:github-visibility:search:baseline -- path/to/search.json
-```
-
-The search helper records the first 100 GitHub repository-search results for
-five fixed, relevant queries. Search order is volatile and is reported as a
-snapshot only; it is not a promise about Google ranking or traffic. When a
-search-enabled snapshot is compared with `--baseline`, the report also emits
-null-safe per-query rank, first-100 presence, and result-count deltas.
+The optional read-only GitHub visibility audit records repository metadata and
+volatile search/traffic signals for maintainers. See the
+[GitHub discoverability guide](https://hakiyaka.github.io/capsule/guide/github-discoverability.html)
+for bounded commands and interpretation limits; search order is not a promise
+about Google ranking, users, billing, or quota.
 
 For a consistent public reference, use the [share and cite guide](https://hakiyaka.github.io/capsule/guide/share-and-cite.html),
 the canonical [GitHub repository](https://github.com/hakiyaka/capsule), or
 [CITATION.cff](CITATION.cff). Describe the workload and version beside any
 measurement; do not present one benchmark as a universal saving or ranking claim.
 
-The historical Get-Content replay benchmark is bounded by
+The bounded Get-Content replay benchmark is bounded by
 `CAPSULE_HISTORY_MAX_BYTES` (2 GB by default) and reports only aggregate,
 hash-safe measurements; it does not export session text.
 
 See [BENCHMARK.md](BENCHMARK.md) for methodology and [CHANGELOG.md](CHANGELOG.md)
-for release history. The 100-project research ledger is in
-[GITHUB-100-RESEARCH.md](GITHUB-100-RESEARCH.md).
+for release history.
 
 ## Search visibility and publishing
 
@@ -321,40 +282,21 @@ The `docs/` site is a small, crawlable GitHub Pages landing page with a
 canonical URL, a linked [guide index](https://hakiyaka.github.io/capsule/guide/index.html),
 `robots.txt`, XML sitemap, Open Graph metadata, and JSON-LD.
 The Pages deployment is defined in
-[`.github/workflows/pages.yml`](.github/workflows/pages.yml). After enabling
-Pages for the repository, add `https://hakiyaka.github.io/capsule/` as a
-verified property in Google Search Console and submit
-`https://hakiyaka.github.io/capsule/sitemap.xml`; Google controls crawl and
-ranking decisions, so submission is a discovery signal rather than a ranking
-guarantee.
-The same owner-controlled verification and sitemap submission can be done in
-Bing Webmaster Tools; no verification token is included here because tokens
-must belong to the repository owner.
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml). Repository owners
+may verify the site in Google Search Console or Bing Webmaster Tools and submit
+`https://hakiyaka.github.io/capsule/sitemap.xml`; search providers control
+crawl and ranking, so submission is only a discovery signal.
 GitHub's repository-level link card is separate from Pages metadata: upload
 [`docs/social-card.png`](docs/social-card.png) under **Settings → General →
-Social preview** when you control the repository, then verify it with
-`gh repo view --json usesCustomOpenGraphImage,openGraphImageUrl` or inspect the
-`social_preview_custom` field in `audit:github-visibility`.
+Social preview** when you control the repository.
 The same site exposes a small [RSS feed](https://hakiyaka.github.io/capsule/feed.xml)
 for release and all ten guide pages so real users and aggregators can follow
 changes without relying on a search result.
 The [GitHub discoverability guide](https://hakiyaka.github.io/capsule/guide/github-discoverability.html)
-documents the repeatable metadata, traffic, referral, release, and repository-search audit.
-An intentionally concise [machine-readable summary](https://hakiyaka.github.io/capsule/llms.txt)
-keeps the canonical links and measurement caveat available to indexing tools.
-The repository also has a weekly and manually dispatchable read-only visibility
-workflow; it retrieves the previous retained artifact when available and emits
-null-safe baseline ratios and search deltas before storing the new timestamped
-JSON snapshots plus a run/ref/SHA provenance record as short-lived Actions
-artifacts. Incompatible or corrupt prior artifacts fail validation instead of
-silently erasing the comparison. It never comments, stars, forks, or edits the
-repository. Semver tags trigger the release workflow, which rebuilds the source
-archive and checksum from the exact tag before publishing them.
-The dedicated [live-surface workflow](.github/workflows/live.yml) runs after a
-successful Pages deployment and weekly; you can also run `npm run audit:live`
-after a Pages deployment to verify the public HTML,
-FAQ metadata, PNG social card, sitemap, robots directive, RSS item, and
-machine-readable links over HTTPS. It is a smoke test, not proof of ranking.
+summarizes repeatable measurement limits, while the concise
+[machine-readable summary](https://hakiyaka.github.io/capsule/llms.txt) keeps
+canonical product links available to indexing tools. These surfaces describe
+the project; they do not manufacture traffic or guarantee ranking.
 
 ## Repository map
 

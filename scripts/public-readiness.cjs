@@ -111,6 +111,10 @@ for (const relative of distributedRoots) {
 // but reject machine/session identifiers if they are accidentally committed.
 const publicArtifactFiles = [
   path.join(root, "README.md"),
+  path.join(root, "BENCHMARK.md"),
+  ...fs.readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && path.extname(entry.name).toLowerCase() === ".md")
+    .map((entry) => path.join(root, entry.name)),
   ...walk(path.join(root, "docs")).filter((file) =>
     new Set([".html", ".md", ".txt", ".xml"]).has(path.extname(file).toLowerCase())
   ),
@@ -120,13 +124,41 @@ const publicPathPatterns = [
   /[A-Za-z]:\\\\Users\\\\[^\s"]+/i,
   /\/(?:Users|home)\/[^\s"]+/i,
   /rollout-\d{4}-\d{2}-\d{2}T[^\s"]+\.jsonl/i,
+  /rollout-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.jsonl/i,
 ];
+const forbiddenReceiptKeys = new Set([
+  "query",
+  "prompt",
+  "session_file",
+  "session_id",
+  "skill_file",
+  "transcript",
+]);
+function receiptKeys(value, found = new Set()) {
+  if (Array.isArray(value)) {
+    for (const item of value) receiptKeys(item, found);
+  } else if (value && typeof value === "object") {
+    for (const [key, child] of Object.entries(value)) {
+      if (forbiddenReceiptKeys.has(key)) found.add(key);
+      receiptKeys(child, found);
+    }
+  }
+  return found;
+}
 for (const file of publicArtifactFiles) {
   const text = fs.readFileSync(file, "utf8");
   for (const pattern of publicPathPatterns) {
     if (pattern.test(text)) {
       failures.push(`public artifact contains machine/session identifier: ${path.relative(root, file)}`);
       break;
+    }
+  }
+  if (path.dirname(file) === path.join(root, "bench") && path.extname(file).toLowerCase() === ".json") {
+    try {
+      const keys = [...receiptKeys(JSON.parse(text))];
+      if (keys.length) failures.push(`public benchmark receipt contains raw fields (${keys.join(", ")}): ${path.relative(root, file)}`);
+    } catch {
+      failures.push(`public benchmark receipt is not valid JSON: ${path.relative(root, file)}`);
     }
   }
 }
