@@ -3,6 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "description": "Capsule: a portable, exact-recoverable token-efficiency, context, search, memory, and evidence engine for Codex.",
+  "homepage": "https://hakiyaka.github.io/capsule/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hakiyaka/capsule.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hakiyaka/capsule/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
   "keywords": [
     "codex",
     "openai-codex",
@@ -40,6 +52,7 @@
     "audit:public": "node scripts/public-readiness.cjs",
     "audit:docs": "node scripts/docs-audit.cjs",
     "audit:seo": "node scripts/seo-audit.cjs",
+    "audit:github-visibility": "node scripts/github-visibility-audit.cjs",
     "verify": "npm test && npm run audit:source && npm run audit:public && npm run audit:docs && npm run audit:seo",
     "audit:sessions": "node scripts/session-audit.cjs",
     "audit:router-history": "node bench/router_history_audit.cjs",

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Codex Token Efficiency: What Capsule Measures</title>
+    <meta name="description" content="Learn how Capsule reduces repeated Codex context exposure, which workloads it measures, and why exact recovery and conservative fallbacks matter.">
+    <link rel="canonical" href="https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html">
+    <meta property="og:type" content="article"><meta property="og:title" content="Codex Token Efficiency: What Capsule Measures"><meta property="og:description" content="A practical, measured explanation of local Codex token-efficiency and exact-recovery techniques."><meta property="og:url" content="https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html">
+    <meta name="twitter:card" content="summary">
+    <link rel="stylesheet" href="../styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Codex Token Efficiency: What Capsule Measures","description":"A measured explanation of local Codex token-efficiency techniques.","url":"https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html","isPartOf":{"@type":"WebSite","url":"https://hakiyaka.github.io/capsule/"}}</script>
+  </head>
+  <body><main>
+    <nav aria-label="Primary navigation"><a href="../">Capsule home</a><a href="https://github.com/hakiyaka/capsule">GitHub source</a><a href="../guide/install-capsule.html">Install</a></nav>
+    <p class="eyebrow">Codex token efficiency</p>
+    <h1>Reduce repeated context without losing the evidence.</h1>
+    <p class="lead">Capsule is designed for the part of Codex usage we can observe: tool results, file reads, project exploration, web payloads, and repeated context. It keeps a compact view in the conversation and an exact local capsule for recovery.</p>
+    <h2>What is measured</h2>
+    <div class="grid"><article class="card"><h3>Model-visible payload</h3><p>Character and local token estimates compare the text shown to the model before and after a policy activates.</p></article><article class="card"><h3>Exact recovery</h3><p>Content hashes and capsule IDs verify that a compact view can recover the original local result.</p></article><article class="card"><h3>Monotonic safety</h3><p>If a compact representation would be larger or less safe, Capsule passes through or falls back to the existing projector.</p></article></div>
+    <h2>What is not claimed</h2>
+    <p>Capsule cannot see hidden provider reasoning, provider-side caching, subscription limits, or billing counters. A local reduction is not automatically a billing reduction. Every benchmark therefore states its workload, control arm, recovery invariant, and exclusions.</p>
+    <h2>Where the savings come from</h2>
+    <table><thead><tr><th>Workload</th><th>Technique</th><th>Safety rule</th></tr></thead><tbody><tr><td>Terminal output</td><td>Keep failures, critical lines, and novel evidence; omit repeated boilerplate.</td><td>Failed or explicit full output passes through.</td></tr><tr><td>Files and projects</td><td>Return task-conditioned ranges, symbols, and dependency impact first.</td><td>Exact expansion remains available.</td></tr><tr><td>Web and tools</td><td>Keep structured fields, URLs, and references in a bounded view.</td><td>Real URLs and recovery IDs are required.</td></tr><tr><td>Repeated reads</td><td>Replay unchanged content from a verified hash.</td><td>Any content change invalidates replay.</td></tr></tbody></table>
+    <h2>Run your own measurement</h2>
+    <pre><code>npm run verify
+npm run benchmark:get-content
+npm run benchmark:get-content:history</code></pre>
+    <p>See the full methodology in <a href="https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md">BENCHMARK.md</a> and the implementation in the <a href="https://github.com/hakiyaka/capsule/tree/main/mcp">MCP source</a>.</p>
+    <footer><a href="../">Capsule</a> · <a href="https://github.com/hakiyaka/capsule/releases">Releases</a> · <a href="https://github.com/hakiyaka/capsule/blob/main/SECURITY.md">Security</a></footer>
+  </main></body>
+</html>

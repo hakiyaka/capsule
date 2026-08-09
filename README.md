@@ -217,6 +217,16 @@ public-readiness audit, and documentation audit. Run the broader suites with
 are workload-specific; they are not a promise of a fixed saving on every
 prompt or a substitute for provider billing telemetry.
 
+For the GitHub visibility goal, run the read-only authenticated snapshot:
+
+```sh
+npm run audit:github-visibility
+```
+
+It reports stars, forks, releases, topics, Pages status, and the rolling
+14-day views/clones window. Pass `--baseline path/to/snapshot.json` to compute
+ratios against a prior snapshot; traffic data is not written to Capsule state.
+
 The historical Get-Content replay benchmark is bounded by
 `CAPSULE_HISTORY_MAX_BYTES` (2 GB by default) and reports only aggregate,
 hash-safe measurements; it does not export session text.

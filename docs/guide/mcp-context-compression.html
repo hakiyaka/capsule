@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MCP Context Compression for Codex | Capsule</title>
+    <meta name="description" content="See how Capsule uses one conservative MCP surface to compress terminal, file, project, web, memory, and tool context while preserving exact recovery.">
+    <link rel="canonical" href="https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html">
+    <meta property="og:type" content="article"><meta property="og:title" content="MCP Context Compression for Codex"><meta property="og:description" content="One local-first MCP surface for bounded context, exact recovery, and measurable Codex output savings."><meta property="og:url" content="https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html">
+    <meta name="twitter:card" content="summary">
+    <link rel="stylesheet" href="../styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"MCP Context Compression for Codex","description":"Capsule's MCP context-compression surface.","url":"https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html","isPartOf":{"@type":"WebSite","url":"https://hakiyaka.github.io/capsule/"}}</script>
+  </head>
+  <body><main>
+    <nav aria-label="Primary navigation"><a href="../">Capsule home</a><a href="https://github.com/hakiyaka/capsule">GitHub source</a><a href="../guide/codex-token-efficiency.html">Token efficiency</a></nav>
+    <p class="eyebrow">MCP context compression</p>
+    <h1>One bounded surface for the context Codex actually needs.</h1>
+    <p class="lead">MCP servers can save a round trip only when they also control the shape of the result. Capsule keeps a single action surface and applies task-specific, exact-recoverable views instead of injecting every tool catalogue and every old result into every turn.</p>
+    <h2>The action map</h2>
+    <div class="grid"><article class="card"><h3><code>run</code> / <code>batch</code></h3><p>Execute commands with bounded stdout/stderr projections and preserved failure evidence.</p></article><article class="card"><h3><code>file</code> / <code>project</code></h3><p>Read files or understand a codebase through ranges, symbols, impact cones, and exact expansion.</p></article><article class="card"><h3><code>fetch</code> / <code>execute</code></h3><p>Keep web text and generated data bounded while retaining real URLs and structured recovery paths.</p></article><article class="card"><h3><code>index</code> / <code>search</code></h3><p>Recall durable local facts without replaying an unbounded memory store into the model.</p></article></div>
+    <h2>Why exact recovery matters</h2>
+    <p>A small output is useful only when the omitted evidence is still available and the model can request the right portion. Capsule writes content-addressed local capsules, emits a compact proof marker, and invalidates replay when the source changes.</p>
+    <h2>Compatibility and fallbacks</h2>
+    <p>Complex shell syntax, unknown encodings, wildcard reads, explicit full-output requests, unsafe operations, low-confidence matches, and token-negative candidates stay on the normal route. Compression is opt-in by evidence and never a requirement for correctness.</p>
+    <pre><code>{"action":"project","payload":{"operation":"query","root":"."}}
+{"action":"file","payload":{"path":"README.md","question":"installation"}}
+{"action":"expand","payload":{"capsule_id":"cap_..."}}</code></pre>
+    <p>Start with the <a href="../guide/install-capsule.html">installation guide</a>, then inspect the <a href="https://github.com/hakiyaka/capsule/blob/main/README.md">README</a> and <a href="https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md">benchmarks</a>.</p>
+    <footer><a href="../">Capsule</a> · <a href="https://github.com/hakiyaka/capsule/releases">Releases</a> · <a href="https://github.com/hakiyaka/capsule/blob/main/CONTRIBUTING.md">Contributing</a></footer>
+  </main></body>
+</html>

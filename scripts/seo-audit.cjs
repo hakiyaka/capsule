@@ -27,8 +27,14 @@ function requireMatch(text, expression, label) {
 const html = read("index.html");
 const robots = read("robots.txt");
 const sitemap = read("sitemap.xml");
+const guides = [
+  "guide/codex-token-efficiency.html",
+  "guide/mcp-context-compression.html",
+  "guide/get-content-token-savings.html",
+  "guide/install-capsule.html",
+];
 requireMatch(html, /<title>[^<]{20,160}<\/title>/i, "descriptive title");
-requireMatch(html, /<meta\s+name=["']description["'][^>]+content=["'][^"']{80,220}["']/i, "meta description");
+requireMatch(html, /<meta\s+name=["']description["'][^>]+content="[^"]{80,220}"/i, "meta description");
 requireMatch(html, new RegExp(`<link\\s+rel=["']canonical["'][^>]+href=["']${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} ["']`, "i"), "canonical URL");
 requireMatch(html, /property=["']og:title["']/i, "Open Graph title");
 // Keep the canonical check independent of attribute ordering/whitespace.
@@ -61,10 +67,25 @@ for (const block of html.matchAll(/<script\s+type=["']application\/ld\+json["']>
 }
 if (jsonLdBlocks === 0) failures.push("missing parseable JSON-LD");
 
+for (const relative of guides) {
+  const page = read(relative);
+  const expected = canonical + relative;
+  requireMatch(page, /<title>[^<]{20,180}<\/title>/i, `${relative}: title`);
+  requireMatch(page, /<meta\s+name=["']description["'][^>]+content="[^"]{80,240}"/i, `${relative}: meta description`);
+  if (!page.includes(`href="${expected}"`)) failures.push(`${relative}: canonical URL`);
+  requireMatch(page, /property=["']og:title["']/i, `${relative}: Open Graph title`);
+  requireMatch(page, /property=["']og:description["']/i, `${relative}: Open Graph description`);
+  requireMatch(page, /name=["']twitter:card["'][^>]+content=["']summary["']/i, `${relative}: Twitter card`);
+  requireMatch(page, /<h1\b[^>]*>[^<]+<\/h1>/i, `${relative}: visible H1`);
+  requireMatch(page, /application\/ld\+json/i, `${relative}: JSON-LD block`);
+  if (!/"@type"\s*:\s*"(?:WebPage|HowTo)"/i.test(page)) failures.push(`${relative}: JSON-LD type`);
+  if (!sitemap.includes(`<loc>${expected}</loc>`)) failures.push(`${relative}: sitemap URL`);
+}
+
 const report = {
   audit: "seo",
   canonical,
-  files: ["docs/index.html", "docs/robots.txt", "docs/sitemap.xml"],
+  files: ["docs/index.html", ...guides.map((file) => `docs/${file}`), "docs/robots.txt", "docs/sitemap.xml"],
   json_ld_blocks: jsonLdBlocks,
   failures,
   passed: failures.length === 0,
