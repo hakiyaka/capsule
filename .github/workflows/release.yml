@@ -55,7 +55,7 @@ jobs:
           git archive --format=zip --prefix="capsule-${version}/" --output="$archive" "$RELEASE_TAG"
           sha256sum "$archive" > "$archive.sha256"
           git ls-tree -r --name-only "$RELEASE_TAG" | sort > expected.paths
-          unzip -Z1 "$archive" | sed "s#^capsule-${version}/##" | sort > actual.paths
+          unzip -Z1 "$archive" | sed "s#^capsule-${version}/##" | grep -v '/$' | sed '/^$/d' | sort > actual.paths
           diff -u expected.paths actual.paths
           echo "RELEASE_ARCHIVE=$archive" >> "$GITHUB_ENV"
           echo "RELEASE_CHECKSUM=$archive.sha256" >> "$GITHUB_ENV"
