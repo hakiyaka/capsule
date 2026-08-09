@@ -23,8 +23,8 @@
 - Discussions: https://github.com/hakiyaka/capsule/discussions
 - Methodology source: https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md
 - Releases: https://github.com/hakiyaka/capsule/releases
-- v1.0.1 source archive: https://github.com/hakiyaka/capsule/releases/download/v1.0.1/capsule-1.0.1-source.zip
-- v1.0.1 SHA-256 sidecar: https://github.com/hakiyaka/capsule/releases/download/v1.0.1/capsule-1.0.1-source.zip.sha256
+- v1.0.2 source archive: https://github.com/hakiyaka/capsule/releases/download/v1.0.2/capsule-1.0.2-source.zip
+- v1.0.2 SHA-256 sidecar: https://github.com/hakiyaka/capsule/releases/download/v1.0.2/capsule-1.0.2-source.zip.sha256
 
 ## Scope
 

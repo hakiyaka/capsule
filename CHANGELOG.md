@@ -2,6 +2,17 @@
 
 All notable user-visible changes are recorded here.
 
+## 1.0.2 - 2026-08-09
+
+- Hardened the GitHub visibility audit with paginated release collection,
+  bounded API diagnostics, configurable output buffering, and safe repository
+  overrides so incomplete or unavailable signals are not reported as zeros.
+- Derived release smoke and SEO checks from `package.json` and documented the
+  repository social-preview, Search Console, Bing, and portable repository
+  selection steps for maintainers.
+- Added regression coverage for pagination, API errors, repository validation,
+  and the Windows-safe visibility workflow.
+
 ## 1.0.1 - 2026-08-09
 
 - Added a public GitHub discoverability guide and repeatable visibility audit

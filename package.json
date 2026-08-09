@@ -1,6 +1,6 @@
 {
   "name": "capsule",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Capsule: a portable Codex token efficiency tool and MCP context compression server with exact-recoverable terminal, file, project, web, memory, and evidence output.",
   "homepage": "https://hakiyaka.github.io/capsule/",
