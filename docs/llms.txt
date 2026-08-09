@@ -1,6 +1,6 @@
 # Capsule
 
-> Capsule is a local-first Codex plugin and MCP server for token reduction through exact-recoverable evidence compression.
+> Capsule is a local-first Codex token efficiency tool and MCP context compression server for exact-recoverable evidence.
 
 ## Canonical resources
 

@@ -11,6 +11,10 @@
 > Capsule reduces model-visible terminal, file, project, web, and context
 > output while keeping the complete result locally recoverable.
 
+Capsule is a Codex token efficiency tool and an MCP context compression layer:
+it keeps the smallest safe evidence view visible while preserving exact local
+recovery for the complete result.
+
 ![Illustrative Capsule terminal evidence view](docs/quick-demo.svg)
 
 The graphic is illustrative, not a universal percentage claim; reproduce the
@@ -253,7 +257,12 @@ are reliable:
 ```sh
 npm run audit:github-visibility:write -- path/to/snapshot.json
 npm run audit:github-visibility:baseline -- path/to/snapshot.json
+npm run audit:github-visibility:search
 ```
+
+The search helper records the first 100 GitHub repository-search results for
+five fixed, relevant queries. Search order is volatile and is reported as a
+snapshot only; it is not a promise about Google ranking or traffic.
 
 For a consistent public reference, use the [share and cite guide](https://hakiyaka.github.io/capsule/guide/share-and-cite.html),
 the canonical [GitHub repository](https://github.com/hakiyaka/capsule), or
