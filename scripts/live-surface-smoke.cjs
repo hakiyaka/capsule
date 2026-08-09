@@ -4,9 +4,19 @@
 // separate from the offline SEO contract so a local pass cannot masquerade as
 // proof that GitHub Pages served the latest files.
 
+const fs = require("node:fs");
+const path = require("node:path");
+
 const base = (process.env.CAPSULE_SITE_URL || "https://hakiyaka.github.io/capsule/").replace(/\/$/, "");
 const timeoutMs = Math.max(1000, Number(process.env.CAPSULE_LIVE_TIMEOUT_MS) || 15000);
 const attempts = Math.max(1, Number(process.env.CAPSULE_LIVE_ATTEMPTS) || 3);
+const root = path.resolve(__dirname, "..");
+const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+const releaseVersion = String(packageJson.version || "").trim();
+const releaseTag = `v${releaseVersion}`;
+const releaseAsset = `capsule-${releaseVersion}-source.zip`;
+const releaseArchiveUrl = `https://github.com/hakiyaka/capsule/releases/download/${releaseTag}/${releaseAsset}`;
+const releaseChecksumUrl = `${releaseArchiveUrl}.sha256`;
 const paths = [
   "/",
   "/guide/faq.html",
@@ -20,8 +30,8 @@ const paths = [
   "/sitemap.xml",
   "/social-card.png",
   "/__capsule_live_missing__.html",
-  "https://github.com/hakiyaka/capsule/releases/download/v1.0.1/capsule-1.0.1-source.zip",
-  "https://github.com/hakiyaka/capsule/releases/download/v1.0.1/capsule-1.0.1-source.zip.sha256",
+  releaseArchiveUrl,
+  releaseChecksumUrl,
 ];
 const headOnlyPaths = new Set(paths.filter((pathname) => /^https:\/\/github\.com\/hakiyaka\/capsule\/releases\/download\//i.test(pathname)));
 const guidePaths = [
@@ -107,10 +117,10 @@ async function main() {
   check(byPath["/robots.txt"], () => /Sitemap:\s*https:\/\/hakiyaka\.github\.io\/capsule\/sitemap\.xml/i.test(robots), "sitemap directive");
   check(byPath["/feed.xml"], () => /guide\/faq\.html/i.test(feed), "FAQ RSS item");
   check(byPath["/feed.xml"], () => /<atom:link\s+href="https:\/\/hakiyaka\.github\.io\/capsule\/feed\.xml"\s+rel="self"/i.test(feed), "RSS self link");
-  check(byPath["/feed.xml"], () => /releases\/tag\/v1\.0\.0/i.test(feed), "release RSS item");
+  check(byPath["/feed.xml"], () => feed.includes(`releases/tag/${releaseTag}`), "release RSS item");
   check(byPath["/llms.txt"], () => /guide\/faq\.html/i.test(llms), "FAQ machine-readable link");
-  check(byPath["/llms.txt"], () => /releases\/download\/v1\.0\.1\/capsule-1\.0\.1-source\.zip/i.test(llms), "release archive machine-readable link");
-  check(byPath["/llms.txt"], () => /releases\/download\/v1\.0\.1\/capsule-1\.0\.1-source\.zip\.sha256/i.test(llms), "release checksum machine-readable link");
+  check(byPath["/llms.txt"], () => llms.includes(releaseArchiveUrl), "release archive machine-readable link");
+  check(byPath["/llms.txt"], () => llms.includes(releaseChecksumUrl), "release checksum machine-readable link");
   for (const guidePath of guidePaths) {
     const escaped = guidePath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     check(byPath["/sitemap.xml"], () => new RegExp(`<loc>https:\/\/hakiyaka\\.github\\.io\/capsule${escaped}<\\/loc>`, "i").test(sitemap), `${guidePath}: live sitemap URL`);

@@ -12,6 +12,10 @@ const canonical = "https://hakiyaka.github.io/capsule/";
 const socialImage = `${canonical}social-card.png`;
 const failures = [];
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+const releaseVersion = String(packageJson.version || "").trim();
+const releaseTag = `v${releaseVersion}`;
+const releaseAsset = `capsule-${releaseVersion}-source.zip`;
 
 function read(name) {
   const file = path.join(site, name);
@@ -73,8 +77,8 @@ requireMatch(feed, /<item>[\s\S]*<guid\s+isPermaLink="true">https:\/\/hakiyaka\.
 requireMatch(llms, /^# Capsule\b/m, "machine-readable summary heading");
 requireMatch(llms, new RegExp(escapeRegExp("https://github.com/hakiyaka/capsule"), "i"), "machine-readable repository link");
 requireMatch(llms, new RegExp(escapeRegExp("https://hakiyaka.github.io/capsule/"), "i"), "machine-readable site link");
-requireMatch(llms, /releases\/download\/v1\.0\.1\/capsule-1\.0\.1-source\.zip/i, "machine-readable release archive");
-requireMatch(llms, /releases\/download\/v1\.0\.1\/capsule-1\.0\.1-source\.zip\.sha256/i, "machine-readable release checksum");
+requireMatch(llms, new RegExp(`releases/download/${escapeRegExp(releaseTag)}/${escapeRegExp(releaseAsset)}`, "i"), "machine-readable release archive");
+requireMatch(llms, new RegExp(`releases/download/${escapeRegExp(releaseTag)}/${escapeRegExp(releaseAsset)}\\.sha256`, "i"), "machine-readable release checksum");
 requireMatch(html, /<title>[^<]{20,160}<\/title>/i, "descriptive title");
 requireMatch(html, /<meta\s+name=["']description["'][^>]+content="[^"]{80,220}"/i, "meta description");
 requireMatch(html, new RegExp(`<link\\s+rel=["']canonical["'][^>]+href=["']${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} ["']`, "i"), "canonical URL");
