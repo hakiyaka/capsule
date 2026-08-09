@@ -22,7 +22,7 @@
     <h2>Codex plugin and MCP packaging checklist</h2>
     <p>Capsule keeps the plugin manifest and the MCP server configuration as two explicit files. The manifest points to <code>./.mcp.json</code>; the JSON file contains a camel-case <code>mcpServers</code> map. Keeping those contracts visible prevents a common failure mode where a plugin installs successfully but its bundled server is not discovered.</p>
     <pre><code>// .codex-plugin/plugin.json
-{"name":"capsule","version":"1.0.4+codex.BUILD","mcpServers":"./.mcp.json"}
+{"name":"capsule","version":"1.0.5+codex.BUILD","mcpServers":"./.mcp.json"}
 
 // .mcp.json
 {"mcpServers":{"capsule":{"command":"node","args":["--no-warnings","./mcp/server.cjs"],"cwd":"."}}}</code></pre>

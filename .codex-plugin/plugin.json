@@ -1,6 +1,6 @@
 {
   "name": "capsule",
-  "version": "1.0.4+codex.20260809071839",
+  "version": "1.0.5+codex.20260809080134",
   "description": "Capsule is a local-first Codex plugin and MCP server for exact-recoverable token and context compression across terminal, files, projects, web, memory, and evidence.",
   "author": {
     "name": "Capsule contributors"
@@ -43,9 +43,9 @@
       "Interactive"
     ],
     "defaultPrompt": [
-      "Use Capsule as the only general token-efficiency engine for this task.",
-      "Honor semantic-exact Terminal Lattice projection, exact-line Terminal Genome reuse, literal benchmark/full-output bypass, zero-inference wait receipts, and learned JIT toolchain results; reason only about judgment a certificate cannot encode.",
-      "Minimize model-visible command, file, history, media, and recall payloads while preserving expandable proof."
+      "Use Capsule for general token-efficiency work on large or repeated terminal, file, project, web, memory, and evidence output.",
+      "Use bounded projections with expandable proof for exact recovery; route specialist docs, browser, media, or app work separately.",
+      "Keep full, raw, benchmark, verbatim, unsafe, and ambiguous requests literal; do not claim universal savings or billing changes."
     ]
   }
 }

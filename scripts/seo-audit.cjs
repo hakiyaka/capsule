@@ -26,6 +26,15 @@ function read(name) {
   return fs.readFileSync(file, "utf8");
 }
 
+function readRoot(name) {
+  const file = path.join(root, name);
+  if (!fs.existsSync(file)) {
+    failures.push(`missing root ${name}`);
+    return "";
+  }
+  return fs.readFileSync(file, "utf8");
+}
+
 function readBinary(name) {
   const file = path.join(site, name);
   if (!fs.existsSync(file)) {
@@ -48,6 +57,10 @@ const quickDemo = read("quick-demo.svg");
 const feed = read("feed.xml");
 const llms = read("llms.txt");
 const notFound = read("404.html");
+const readme = readRoot("README.md");
+const installGuide = read("guide/install-capsule.html");
+const shareGuide = read("guide/share-and-cite.html");
+const mcpGuide = read("guide/mcp-context-compression.html");
 const guides = [
   "guide/index.html",
   "guide/codex-token-efficiency.html",
@@ -93,6 +106,13 @@ requireMatch(llms, /https:\/\/github\.com\/hakiyaka\/capsule\/discussions\/1/i, 
 requireMatch(llms, /https:\/\/github\.com\/hakiyaka\/capsule\/blob\/main\/PRIVACY\.md/i, "machine-readable privacy policy");
 requireMatch(llms, new RegExp(`releases/download/${escapeRegExp(releaseTag)}/${escapeRegExp(releaseAsset)}`, "i"), "machine-readable release archive");
 requireMatch(llms, new RegExp(`releases/download/${escapeRegExp(releaseTag)}/${escapeRegExp(releaseAsset)}\\.sha256`, "i"), "machine-readable release checksum");
+requireMatch(readme, new RegExp(`releases/tag/${escapeRegExp(releaseTag)}`, "i"), "README active release tag");
+requireMatch(readme, new RegExp(`releases/download/${escapeRegExp(releaseTag)}/${escapeRegExp(releaseAsset)}\\.sha256`, "i"), "README active release checksum");
+requireMatch(installGuide, new RegExp(`releases/tag/${escapeRegExp(releaseTag)}`, "i"), "install guide active release tag");
+requireMatch(installGuide, new RegExp(`releases/download/${escapeRegExp(releaseTag)}/${escapeRegExp(releaseAsset)}\\.sha256`, "i"), "install guide active release checksum");
+requireMatch(shareGuide, new RegExp(`releases/tag/${escapeRegExp(releaseTag)}`, "i"), "share guide active release tag");
+requireMatch(mcpGuide, new RegExp(`\\"version\\":\\"${escapeRegExp(releaseVersion)}\\+codex\\.BUILD\\"`, "i"), "MCP guide active plugin version");
+requireMatch(feed, new RegExp(`<title>Capsule ${escapeRegExp(releaseVersion)} released</title>[\\s\\S]*?<link>https://github\\.com/hakiyaka/capsule/releases/tag/${escapeRegExp(releaseTag)}</link>`, "i"), "RSS active release item");
 requireMatch(html, /<title>[^<]{20,160}<\/title>/i, "descriptive title");
 requireMatch(html, /<meta\s+name=["']description["'][^>]+content="[^"]{80,220}"/i, "meta description");
 requireMatch(html, new RegExp(`<link\\s+rel=["']canonical["'][^>]+href=["']${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} ["']`, "i"), "canonical URL");

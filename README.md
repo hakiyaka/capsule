@@ -136,8 +136,8 @@ Add the repository root as a local Codex plugin. The bundled
 and its lifecycle hooks. Trust the hooks when Codex asks, then restart Codex.
 
 For a reproducible checkout instead of the moving `main` branch, use the
-[v1.0.4 release](https://github.com/hakiyaka/capsule/releases/tag/v1.0.4) and
-verify its [SHA-256 sidecar](https://github.com/hakiyaka/capsule/releases/download/v1.0.4/capsule-1.0.4-source.zip.sha256)
+[v1.0.5 release](https://github.com/hakiyaka/capsule/releases/tag/v1.0.5) and
+verify its [SHA-256 sidecar](https://github.com/hakiyaka/capsule/releases/download/v1.0.5/capsule-1.0.5-source.zip.sha256)
 before unpacking the source archive. Capsule is intentionally clone/release
 based (`package.json` remains private); it is not the unrelated public npm
 package named `capsule`.

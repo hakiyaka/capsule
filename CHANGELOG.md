@@ -21,9 +21,15 @@ All notable user-visible changes are recorded here.
 - Add a scenario-led Codex plugin/MCP packaging checklist covering the manifest,
   `mcpServers` contract, runtime verification, and relative-path
   compatibility boundaries.
-- Disable automatic hook event, phase, and final-memory persistence by default;
-  require `CAPSULE_CAPTURE_MEMORY=1` for sanitized, bounded excerpts and align
-  the privacy and contract documentation with that opt-in behavior.
+
+## 1.0.5 - 2026-08-09
+
+- Disabled automatic hook event, phase, and final-memory persistence by default;
+  sanitized, bounded excerpts now require explicit `CAPSULE_CAPTURE_MEMORY=1`.
+- Removed unnecessary local telemetry and research identifiers from public
+  documentation and hardened diagnostics so public receipts do not expose them.
+- Simplified plugin starter prompts to describe user-facing outcomes instead of
+  internal implementation names and bounded them to the public plugin contract.
 
 ## 1.0.4 - 2026-08-09
 
