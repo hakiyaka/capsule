@@ -2,6 +2,16 @@
 
 All notable user-visible changes are recorded here.
 
+## 1.0.3 - 2026-08-09
+
+- Added a tag-driven release workflow that rebuilds and path-checks the source
+  archive and SHA-256 sidecar from the exact tagged tree.
+- Added a weekly/manual read-only GitHub visibility snapshot workflow with
+  artifact provenance, and exposed traffic-window timestamps, point counts,
+  API lag, and unavailable-endpoint diagnostics in the audit.
+- Clarified reproducible release installation, clone-only distribution, and
+  the boundary between GitHub repository search and organic audience growth.
+
 ## 1.0.2 - 2026-08-09
 
 - Hardened the GitHub visibility audit with paginated release collection,

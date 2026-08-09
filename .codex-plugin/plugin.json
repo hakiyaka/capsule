@@ -1,6 +1,6 @@
 {
   "name": "capsule",
-  "version": "1.0.2+codex.20260809032042",
+  "version": "1.0.3+codex.20260809035243",
   "description": "Capsule is a portable, exact-recoverable token-efficiency, context, search, memory, evidence, and Codex hook-contract engine.",
   "author": {
     "name": "Capsule contributors"
