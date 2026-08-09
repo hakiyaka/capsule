@@ -12,6 +12,10 @@ keywords:
   - codex-plugin
   - model-context-protocol
   - token-efficiency
+  - token-reduction
   - context-compression
+  - mcp-context-compression
+  - codex-token-efficiency
+  - exact-recoverable-context
 authors:
   - name: "Capsule contributors"
