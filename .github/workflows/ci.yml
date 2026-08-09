@@ -31,3 +31,5 @@ jobs:
         run: npm run audit:public
       - name: Audit documentation
         run: npm run audit:docs
+      - name: Audit SEO publishing surface
+        run: npm run audit:seo
