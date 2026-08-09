@@ -249,7 +249,9 @@ window. Pass
 ratios against a prior snapshot, or add `--write path/to/snapshot.json` to
 save the read-only report for the next comparison. It also records aggregate
 referrer and popular-path counts so future outreach can be tied to observed
-traffic; traffic data is not written to Capsule state.
+traffic; traffic data is not written to Capsule state. Referrers come from
+GitHub's `traffic/popular/referrers` endpoint. If that endpoint is unavailable,
+the audit records an empty list and does not infer that traffic was zero.
 
 On Windows, where npm can consume leading option names, the explicit helpers
 are reliable:
@@ -262,7 +264,9 @@ npm run audit:github-visibility:search
 
 The search helper records the first 100 GitHub repository-search results for
 five fixed, relevant queries. Search order is volatile and is reported as a
-snapshot only; it is not a promise about Google ranking or traffic.
+snapshot only; it is not a promise about Google ranking or traffic. When a
+search-enabled snapshot is compared with `--baseline`, the report also emits
+null-safe per-query rank, first-100 presence, and result-count deltas.
 
 For a consistent public reference, use the [share and cite guide](https://hakiyaka.github.io/capsule/guide/share-and-cite.html),
 the canonical [GitHub repository](https://github.com/hakiyaka/capsule), or
@@ -289,7 +293,8 @@ verified property in Google Search Console and submit
 ranking decisions, so submission is a discovery signal rather than a ranking
 guarantee.
 The same site exposes a small [RSS feed](https://hakiyaka.github.io/capsule/feed.xml)
-for release and guide updates so real users and aggregators can follow changes.
+for release and all nine guide pages so real users and aggregators can follow
+changes without relying on a search result.
 An intentionally concise [machine-readable summary](https://hakiyaka.github.io/capsule/llms.txt)
 keeps the canonical links and measurement caveat available to indexing tools.
 Run `npm run audit:live` after a Pages deployment to verify the public HTML,

@@ -126,6 +126,7 @@ for (const relative of guides) {
   requireMatch(page, /application\/ld\+json/i, `${relative}: JSON-LD block`);
   if (!/"@type"\s*:\s*"(?:WebPage|HowTo|FAQPage)"/i.test(page)) failures.push(`${relative}: JSON-LD type`);
   if (!sitemap.includes(`<loc>${expected}</loc>`)) failures.push(`${relative}: sitemap URL`);
+  if (!feed.includes(`<guid isPermaLink="true">${expected}</guid>`)) failures.push(`${relative}: RSS URL`);
   const sitemapBlock = new RegExp(`<url>[\\s\\S]*?<loc>${escapeRegExp(expected)}</loc>[\\s\\S]*?<lastmod>\\d{4}-\\d{2}-\\d{2}</lastmod>[\\s\\S]*?</url>`, "i");
   if (!sitemapBlock.test(sitemap)) failures.push(`${relative}: sitemap lastmod`);
 }

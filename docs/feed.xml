@@ -5,7 +5,42 @@
     <link>https://hakiyaka.github.io/capsule/</link>
     <description>Measured guides and release notes for the Capsule Codex plugin and MCP server.</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 09 Aug 2026 00:43:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 09 Aug 2026 01:50:00 GMT</lastBuildDate>
+    <item>
+      <title>Codex token efficiency guide</title>
+      <link>https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html</link>
+      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html</guid>
+      <pubDate>Sun, 09 Aug 2026 01:45:00 GMT</pubDate>
+      <description>Learn how Capsule bounds repeated context and reports measured input, output, and recovery costs for Codex tasks.</description>
+    </item>
+    <item>
+      <title>Get-content token savings guide</title>
+      <link>https://hakiyaka.github.io/capsule/guide/get-content-token-savings.html</link>
+      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/get-content-token-savings.html</guid>
+      <pubDate>Sun, 09 Aug 2026 01:44:00 GMT</pubDate>
+      <description>Compare bounded file reads with raw Get-Content output while preserving exact recovery when it is needed.</description>
+    </item>
+    <item>
+      <title>Install Capsule</title>
+      <link>https://hakiyaka.github.io/capsule/guide/install-capsule.html</link>
+      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/install-capsule.html</guid>
+      <pubDate>Sun, 09 Aug 2026 01:43:00 GMT</pubDate>
+      <description>Install the portable Codex plugin and MCP server, then verify the local capability contract.</description>
+    </item>
+    <item>
+      <title>Web-search token savings guide</title>
+      <link>https://hakiyaka.github.io/capsule/guide/web-search-token-savings.html</link>
+      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/web-search-token-savings.html</guid>
+      <pubDate>Sun, 09 Aug 2026 01:42:00 GMT</pubDate>
+      <description>Use bounded fetch, deduplication, and evidence expansion to keep web research useful without replaying full pages.</description>
+    </item>
+    <item>
+      <title>Terminal-output token savings guide</title>
+      <link>https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html</link>
+      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html</guid>
+      <pubDate>Sun, 09 Aug 2026 01:41:00 GMT</pubDate>
+      <description>Reduce repetitive shell stdout and stderr while retaining exit status, failure evidence, and exact expansion paths.</description>
+    </item>
     <item>
       <title>Capsule FAQ</title>
       <link>https://hakiyaka.github.io/capsule/guide/faq.html</link>

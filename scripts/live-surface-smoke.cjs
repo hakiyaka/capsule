@@ -19,6 +19,17 @@ const paths = [
   "/sitemap.xml",
   "/social-card.png",
 ];
+const guidePaths = [
+  "codex-token-efficiency.html",
+  "mcp-context-compression.html",
+  "get-content-token-savings.html",
+  "install-capsule.html",
+  "share-and-cite.html",
+  "benchmarks-and-methodology.html",
+  "web-search-token-savings.html",
+  "terminal-output-token-savings.html",
+  "faq.html",
+].map((name) => `/guide/${name}`);
 const failures = [];
 
 async function get(pathname) {
@@ -82,6 +93,11 @@ async function main() {
   check(byPath["/robots.txt"], () => /Sitemap:\s*https:\/\/hakiyaka\.github\.io\/capsule\/sitemap\.xml/i.test(robots), "sitemap directive");
   check(byPath["/feed.xml"], () => /guide\/faq\.html/i.test(feed), "FAQ RSS item");
   check(byPath["/llms.txt"], () => /guide\/faq\.html/i.test(llms), "FAQ machine-readable link");
+  for (const guidePath of guidePaths) {
+    const escaped = guidePath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    check(byPath["/sitemap.xml"], () => new RegExp(`<loc>https:\/\/hakiyaka\\.github\\.io\/capsule${escaped}<\\/loc>`, "i").test(sitemap), `${guidePath}: live sitemap URL`);
+    check(byPath["/feed.xml"], () => new RegExp(`<guid\\s+isPermaLink="true">https:\/\/hakiyaka\\.github\\.io\/capsule${escaped}<\\/guid>`, "i").test(feed), `${guidePath}: live RSS URL`);
+  }
   if (/example\.com|localhost|127\.0\.0\.1/i.test(results.map(text).join("\n"))) failures.push("placeholder host");
   const report = {
     audit: "live-surface-smoke",
