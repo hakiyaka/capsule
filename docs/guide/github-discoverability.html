@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GitHub Discoverability and Visibility Measurement | Capsule</title>
+    <meta name="description" content="Measure Capsule's GitHub repository visibility with repeatable metadata, traffic, referral, release, and repository-search snapshots without claiming ranking guarantees.">
+    <link rel="canonical" href="https://hakiyaka.github.io/capsule/guide/github-discoverability.html">
+    <meta property="og:type" content="article"><meta property="og:title" content="GitHub Discoverability and Visibility Measurement | Capsule"><meta property="og:description" content="A repeatable, ethical method for measuring GitHub metadata, traffic, referral, release, and repository-search discovery signals."><meta property="og:url" content="https://hakiyaka.github.io/capsule/guide/github-discoverability.html"><meta property="og:image" content="https://hakiyaka.github.io/capsule/social-card.png"><meta property="og:image:alt" content="Capsule exact-recoverable context compression for Codex"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://hakiyaka.github.io/capsule/social-card.png"><meta name="twitter:image:alt" content="Capsule exact-recoverable context compression for Codex">
+    <link rel="stylesheet" href="../styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"GitHub Discoverability and Visibility Measurement | Capsule","description":"A repeatable method for measuring GitHub discovery signals without claiming ranking guarantees.","url":"https://hakiyaka.github.io/capsule/guide/github-discoverability.html","isPartOf":{"@id":"https://hakiyaka.github.io/capsule/#website"}}</script>
+  </head>
+  <body><main>
+    <nav aria-label="Primary navigation"><a href="../">Capsule home</a><a href="https://github.com/hakiyaka/capsule">GitHub source</a><a href="https://github.com/hakiyaka/capsule/releases">Releases</a><a href="https://github.com/hakiyaka/capsule/discussions/1">Measurement discussion</a></nav>
+    <p class="eyebrow">Public discovery measurement</p>
+    <h1>Measure discovery before claiming growth.</h1>
+    <p class="lead">GitHub visibility is a combination of repository metadata, rolling traffic, referrals, releases, Pages surfaces, and volatile repository-search order. Capsule records those signals without turning a snapshot into a ranking promise.</p>
+    <h2>Run a repeatable snapshot</h2>
+    <pre><code>npm run audit:github-visibility -- --write visibility.json
+npm run audit:github-visibility:search -- --write visibility-search.json
+
+# Later, compare the same fixed queries with the saved search snapshot.
+npm run audit:github-visibility:search -- --baseline visibility-search.json</code></pre>
+    <p>Use the same repository, query set, and authentication context at each measurement point. The private traffic endpoints cover a rolling 14-day window; repository metadata and release assets are point-in-time or cumulative.</p>
+    <h2>What the audit records</h2>
+    <table>
+      <thead><tr><th>Signal</th><th>Meaning</th><th>Limit</th></tr></thead>
+      <tbody>
+        <tr><td>Topics and description</td><td>Controlled relevance and entry-point metadata.</td><td>They influence discovery but do not guarantee ranking.</td></tr>
+        <tr><td>Views, clones, popular paths</td><td>Authenticated repository traffic over the latest 14 days.</td><td>GitHub does not expose a universal lifetime visitor count here.</td></tr>
+        <tr><td>Popular referrers</td><td>Referral domains, views, uniques, and the top referrer.</td><td>The audit uses <code>traffic/popular/referrers</code>; an unavailable endpoint is reported as empty, not as zero traffic.</td></tr>
+        <tr><td>Repository search</td><td>First-100 presence, rank, total result count, and null-safe deltas for fixed queries.</td><td>Order is volatile and is not Google ranking, billing, or quota telemetry.</td></tr>
+        <tr><td>Releases and assets</td><td>Release count, asset names, and download counts.</td><td>New assets can remain at zero downloads until real users choose them.</td></tr>
+      </tbody>
+    </table>
+    <h2>Use ethical discovery surfaces</h2>
+    <div class="grid">
+      <article class="card"><h3>One truthful description</h3><p>Describe the real Codex plugin and MCP server capabilities in plain language; do not stack unrelated keywords.</p></article>
+      <article class="card"><h3>Substantive pages</h3><p>Keep the Pages guides, canonical links, sitemap, RSS feed, and machine-readable summary useful to people and crawlers.</p></article>
+      <article class="card"><h3>Reproducible releases</h3><p>Attach a source archive and checksum when they correspond exactly to a tagged release.</p></article>
+      <article class="card"><h3>Real discussion answers</h3><p>Answer measurement questions with commands and limitations; do not manufacture stars, comments, or referral traffic.</p></article>
+    </div>
+    <h2>Interpret a 100x target</h2>
+    <div class="panel"><p>A 100x target is a project direction, not an observable guarantee. A defensible result needs a named baseline, the same query set, a timestamp, the current repository state, and separate reporting for metadata, search order, traffic, and referral signals. A change in one field must not be presented as a 100x increase in users or search ranking.</p></div>
+    <p>See the implementation in <a href="https://github.com/hakiyaka/capsule/blob/main/scripts/github-visibility-audit.cjs">the visibility audit</a>, the pure aggregation tests in <a href="https://github.com/hakiyaka/capsule/blob/main/tests/github-visibility-audit.test.cjs">the test contract</a>, and the <a href="benchmarks-and-methodology.html">workload measurement guide</a>. Share a sanitized snapshot and workload context in the <a href="https://github.com/hakiyaka/capsule/discussions/1">measurement discussion</a>.</p>
+    <footer><a href="../">Capsule</a> · <a href="https://github.com/hakiyaka/capsule/releases">Releases</a> · <a href="https://github.com/hakiyaka/capsule/blob/main/CITATION.cff">Citation</a></footer>
+  </main></body>
+</html>

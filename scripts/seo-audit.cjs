@@ -50,6 +50,7 @@ const guides = [
   "guide/install-capsule.html",
   "guide/share-and-cite.html",
   "guide/benchmarks-and-methodology.html",
+  "guide/github-discoverability.html",
   "guide/web-search-token-savings.html",
   "guide/terminal-output-token-savings.html",
   "guide/faq.html",

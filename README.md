@@ -293,8 +293,10 @@ verified property in Google Search Console and submit
 ranking decisions, so submission is a discovery signal rather than a ranking
 guarantee.
 The same site exposes a small [RSS feed](https://hakiyaka.github.io/capsule/feed.xml)
-for release and all nine guide pages so real users and aggregators can follow
+for release and all ten guide pages so real users and aggregators can follow
 changes without relying on a search result.
+The [GitHub discoverability guide](https://hakiyaka.github.io/capsule/guide/github-discoverability.html)
+documents the repeatable metadata, traffic, referral, release, and repository-search audit.
 An intentionally concise [machine-readable summary](https://hakiyaka.github.io/capsule/llms.txt)
 keeps the canonical links and measurement caveat available to indexing tools.
 Run `npm run audit:live` after a Pages deployment to verify the public HTML,

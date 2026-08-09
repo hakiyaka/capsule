@@ -5,7 +5,14 @@
     <link>https://hakiyaka.github.io/capsule/</link>
     <description>Measured guides and release notes for the Capsule Codex plugin and MCP server.</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 09 Aug 2026 01:50:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 09 Aug 2026 02:20:00 GMT</lastBuildDate>
+    <item>
+      <title>GitHub discoverability and visibility measurement</title>
+      <link>https://hakiyaka.github.io/capsule/guide/github-discoverability.html</link>
+      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/github-discoverability.html</guid>
+      <pubDate>Sun, 09 Aug 2026 02:18:00 GMT</pubDate>
+      <description>Measure repository metadata, traffic, referrals, releases, and volatile repository-search snapshots without ranking guarantees.</description>
+    </item>
     <item>
       <title>Codex token efficiency guide</title>
       <link>https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html</link>

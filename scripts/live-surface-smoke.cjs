@@ -11,6 +11,7 @@ const paths = [
   "/",
   "/guide/faq.html",
   "/guide/benchmarks-and-methodology.html",
+  "/guide/github-discoverability.html",
   "/guide/web-search-token-savings.html",
   "/guide/terminal-output-token-savings.html",
   "/feed.xml",
@@ -26,6 +27,7 @@ const guidePaths = [
   "install-capsule.html",
   "share-and-cite.html",
   "benchmarks-and-methodology.html",
+  "github-discoverability.html",
   "web-search-token-savings.html",
   "terminal-output-token-savings.html",
   "faq.html",
@@ -83,12 +85,13 @@ async function main() {
     check(result, (value) => value.bytes.length > 0, "non-empty body");
   }
   const byPath = Object.fromEntries(results.map((result) => [result.pathname, result]));
-  const home = text(byPath["/"]); const faq = text(byPath["/guide/faq.html"]);
+  const home = text(byPath["/"]); const faq = text(byPath["/guide/faq.html"]); const discoverability = text(byPath["/guide/github-discoverability.html"]);
   const sitemap = text(byPath["/sitemap.xml"]); const robots = text(byPath["/robots.txt"]);
   const feed = text(byPath["/feed.xml"]); const llms = text(byPath["/llms.txt"]);
   check(byPath["/"], (value) => /<link\s+rel=["']canonical["']\s+href=["']https:\/\/hakiyaka\.github\.io\/capsule\/["']/i.test(text(value)), "canonical home");
   check(byPath["/"], () => /social-card\.png/i.test(home) && /summary_large_image/i.test(home), "PNG social metadata");
   check(byPath["/guide/faq.html"], () => /FAQPage/i.test(faq) && /social-card\.png/i.test(faq), "FAQ structured metadata");
+  check(byPath["/guide/github-discoverability.html"], () => /GitHub Discoverability/i.test(discoverability) && /social-card\.png/i.test(discoverability), "discoverability guide metadata");
   check(byPath["/sitemap.xml"], () => /guide\/faq\.html/i.test(sitemap) && /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/i.test(sitemap), "FAQ and lastmod");
   check(byPath["/robots.txt"], () => /Sitemap:\s*https:\/\/hakiyaka\.github\.io\/capsule\/sitemap\.xml/i.test(robots), "sitemap directive");
   check(byPath["/feed.xml"], () => /guide\/faq\.html/i.test(feed), "FAQ RSS item");
