@@ -23,6 +23,7 @@ test("tagged release workflow pins the tree and verifies a deterministic archive
   const workflow = fs.readFileSync(path.join(root, ".github", "workflows", "release.yml"), "utf8");
   assert.match(workflow, /persist-credentials:\s*false/);
   assert.match(workflow, /remote_tag_sha/);
+  assert.match(workflow, /if \[\[ -z "\$remote_tag_sha" \]\]/);
   assert.match(workflow, /TZ:\s*UTC/);
   assert.match(workflow, /sha256sum --check/);
 });

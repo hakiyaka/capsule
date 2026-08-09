@@ -50,6 +50,9 @@ jobs:
           test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_TAG"
           checked_out_sha="$(git rev-parse HEAD)"
           remote_tag_sha="$(git ls-remote origin "refs/tags/${RELEASE_TAG}^{}" | awk '{print $1}')"
+          if [[ -z "$remote_tag_sha" ]]; then
+            remote_tag_sha="$(git ls-remote origin "refs/tags/${RELEASE_TAG}" | awk '{print $1}')"
+          fi
           test -n "$remote_tag_sha"
           test "$remote_tag_sha" = "$checked_out_sha"
           npm run verify
