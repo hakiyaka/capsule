@@ -310,6 +310,10 @@ verified property in Google Search Console and submit
 `https://hakiyaka.github.io/capsule/sitemap.xml`; Google controls crawl and
 ranking decisions, so submission is a discovery signal rather than a ranking
 guarantee.
+GitHub's repository-level link card is separate from Pages metadata: upload
+[`docs/social-card.png`](docs/social-card.png) under **Settings → General →
+Social preview** when you control the repository, then verify it with
+`gh repo view --json usesCustomOpenGraphImage,openGraphImageUrl`.
 The same site exposes a small [RSS feed](https://hakiyaka.github.io/capsule/feed.xml)
 for release and all ten guide pages so real users and aggregators can follow
 changes without relying on a search result.
