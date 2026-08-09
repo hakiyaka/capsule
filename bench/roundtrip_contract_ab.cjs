@@ -723,7 +723,6 @@ function compareDirectFamily(name, baselineRows, treatmentRows) {
       additional_context_chars: treatment.additional_context_chars,
       ...(treatment.absolute_cap != null ? { absolute_cap: treatment.absolute_cap } : {}),
       ...(treatment.capsule_id ? {
-        capsule_id: treatment.capsule_id,
         capsule_text_recovery: treatment.capsule_text_recovery,
         capsule_sha_recovery: treatment.capsule_sha_recovery,
         header_sha_recovery: treatment.header_sha_recovery,

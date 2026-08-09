@@ -133,6 +133,7 @@ const forbiddenReceiptKeys = new Set([
   "session_id",
   "skill_file",
   "transcript",
+  "capsule_id",
 ]);
 function receiptKeys(value, found = new Set()) {
   if (Array.isArray(value)) {

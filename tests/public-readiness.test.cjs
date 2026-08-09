@@ -21,7 +21,7 @@ test("public repository surface passes the portable release audit", () => {
 test("public benchmark receipts omit raw prompt and session fields", () => {
   const root = path.resolve(__dirname, "..");
   const bench = path.join(root, "bench");
-  const forbidden = new Set(["query", "prompt", "session_file", "session_id", "skill_file", "transcript"]);
+  const forbidden = new Set(["query", "prompt", "session_file", "session_id", "skill_file", "transcript", "capsule_id"]);
   const offenders = [];
   function walk(value, file) {
     if (Array.isArray(value)) {

@@ -1205,7 +1205,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_da2fda14473712b0",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1226,7 +1225,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_263facb181dc76eb",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1247,7 +1245,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_cae3ae3ff05a1e9c",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1268,7 +1265,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_a40ff768914ae530",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1289,7 +1285,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_f163d2edeaefc799",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1310,7 +1305,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_43936a73c091d7c7",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1331,7 +1325,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_dc9735e5fc9b50dc",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1352,7 +1345,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_9a22dab69364ce8a",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1373,7 +1365,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_ae52d66d12e7fe5c",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1394,7 +1385,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_bf01d3c41686ed75",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1415,7 +1405,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_b0fb244c5b96eb24",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1436,7 +1425,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_1ee5b830e1bd97d1",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1457,7 +1445,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_7115202f7bc01165",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1478,7 +1465,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_9cbe8e70a2545fae",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1499,7 +1485,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_ff1fc9ba20fac298",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1520,7 +1505,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_59c970432494d4c7",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1541,7 +1525,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_5327791770e4484b",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1562,7 +1545,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_ec72c3968efda738",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1583,7 +1565,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_ca28484722a32642",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1604,7 +1585,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_d658f2ad46192b8c",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1625,7 +1605,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_a66a53dde86280fd",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1646,7 +1625,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_606a045e756eedd0",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1667,7 +1645,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_ca70edcd33818a72",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1688,7 +1665,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_fb5f8475b454ebb3",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1709,7 +1685,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_aa14d8728e7e9332",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1730,7 +1705,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_d12a1f06d05048c7",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1751,7 +1725,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_89d9d635fdaf3ae9",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1772,7 +1745,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_097b39511f6a46b6",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1793,7 +1765,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_efb113c7306f6801",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
@@ -1814,7 +1785,6 @@
           "payload_passthrough": false,
           "additional_context_chars": 0,
           "absolute_cap": true,
-          "capsule_id": "cap_9fc4048d8af8ffde",
           "capsule_text_recovery": true,
           "capsule_sha_recovery": true,
           "header_sha_recovery": true
