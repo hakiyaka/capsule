@@ -1,25 +1,34 @@
 name: Feature request
-description: Propose a measurable Capsule improvement
+description: Suggest a focused improvement with a concrete user outcome.
 title: "[Feature]: "
-labels: ["enhancement"]
+labels:
+  - enhancement
 body:
   - type: textarea
     id: problem
     attributes:
-      label: Problem
-      description: Which real workflow is inefficient or unsupported?
+      label: Problem to solve
+      description: What repeated workflow or limitation should Capsule address?
     validations:
       required: true
   - type: textarea
     id: proposal
     attributes:
       label: Proposed behavior
+      description: Describe the smallest useful behavior and how it should be measured.
     validations:
       required: true
   - type: textarea
     id: measurement
     attributes:
-      label: Verification
+      label: Verification plan
       description: Describe an A/B case, correctness invariant, or regression test.
     validations:
       required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: I checked the existing guides, issues, and discussions first.
+          required: true

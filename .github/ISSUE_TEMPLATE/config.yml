@@ -9,3 +9,6 @@ contact_links:
   - name: Measured benchmarks
     url: https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md
     about: Review workload-specific A/B methodology and limitations.
+  - name: Community discussions
+    url: https://github.com/hakiyaka/capsule/discussions
+    about: Ask usage questions and compare measured workflows with other users.
