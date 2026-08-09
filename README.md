@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/website-GitHub%20Pages-222?logo=github)](https://hakiyaka.github.io/capsule/)
 [![GitHub release](https://img.shields.io/github/v/release/hakiyaka/capsule?display_name=tag)](https://github.com/hakiyaka/capsule/releases)
+[![Discussions](https://img.shields.io/github/discussions/hakiyaka/capsule)](https://github.com/hakiyaka/capsule/discussions)
 [![GitHub stars](https://img.shields.io/github/stars/hakiyaka/capsule?style=social)](https://github.com/hakiyaka/capsule)
 
 > **A local-first Codex plugin and MCP server for exact-recoverable context compression.**
