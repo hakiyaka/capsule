@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Capsule: Exact-Recoverable Token Efficiency for Codex</title>
+    <meta name="description" content="Capsule is a local-first Codex plugin and MCP server that compresses terminal, file, project, web, and context output into exact-recoverable evidence.">
+    <link rel="canonical" href="https://hakiyaka.github.io/capsule/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Capsule">
+    <meta property="og:title" content="Capsule: Exact-Recoverable Token Efficiency for Codex">
+    <meta property="og:description" content="A local-first Codex plugin and MCP server for safe context compression and exact evidence recovery.">
+    <meta property="og:url" content="https://hakiyaka.github.io/capsule/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Capsule for Codex">
+    <meta name="twitter:description" content="Exact-recoverable token efficiency for terminal, file, project, web, and context workflows.">
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://hakiyaka.github.io/capsule/#website",
+            "url": "https://hakiyaka.github.io/capsule/",
+            "name": "Capsule",
+            "description": "Exact-recoverable token efficiency for Codex."
+          },
+          {
+            "@type": "SoftwareSourceCode",
+            "@id": "https://github.com/hakiyaka/capsule#software",
+            "name": "Capsule",
+            "description": "A local-first Codex plugin and MCP server for exact-recoverable context compression.",
+            "codeRepository": "https://github.com/hakiyaka/capsule",
+            "programmingLanguage": "JavaScript",
+            "license": "https://github.com/hakiyaka/capsule/blob/main/LICENSE",
+            "isPartOf": {"@id": "https://hakiyaka.github.io/capsule/#website"}
+          }
+        ]
+      }
+    </script>
+    <style>
+      :root { color-scheme: dark; --bg: #0d1117; --panel: #161b22; --line: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: radial-gradient(circle at 75% -10%, #1f3b59 0, var(--bg) 42%); color: var(--text); font: 16px/1.65 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      main { max-width: 1040px; margin: 0 auto; padding: 5rem 1.25rem 4rem; }
+      nav { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 4rem; }
+      nav a, a { color: var(--accent); }
+      nav a { text-decoration: none; font-weight: 650; }
+      .eyebrow { color: var(--green); font-weight: 750; letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; }
+      h1 { max-width: 820px; font-size: clamp(2.5rem, 7vw, 5.2rem); line-height: 1.04; letter-spacing: -.05em; margin: .75rem 0 1.5rem; }
+      .lead { max-width: 760px; color: var(--muted); font-size: clamp(1.1rem, 2.2vw, 1.35rem); }
+      .actions { display: flex; gap: .8rem; flex-wrap: wrap; margin: 2rem 0 4rem; }
+      .button { border: 1px solid var(--line); border-radius: .65rem; padding: .7rem 1rem; text-decoration: none; font-weight: 700; background: var(--panel); }
+      .button.primary { background: var(--accent); color: #07111c; border-color: var(--accent); }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; }
+      .card { border: 1px solid var(--line); border-radius: .8rem; padding: 1.25rem; background: color-mix(in srgb, var(--panel) 88%, transparent); }
+      .card h2 { font-size: 1.05rem; margin-top: 0; }
+      .card p { color: var(--muted); margin-bottom: 0; }
+      section { margin-top: 4rem; }
+      h2 { font-size: 1.7rem; letter-spacing: -.02em; }
+      code { border: 1px solid var(--line); border-radius: .35rem; padding: .12rem .3rem; background: #0b0f14; }
+      pre { overflow-x: auto; border: 1px solid var(--line); border-radius: .65rem; background: #080b10; padding: 1rem; }
+      footer { border-top: 1px solid var(--line); color: var(--muted); margin-top: 5rem; padding-top: 1.5rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav aria-label="Primary navigation">
+        <a href="https://github.com/hakiyaka/capsule">GitHub repository</a>
+        <a href="https://github.com/hakiyaka/capsule/releases">Releases</a>
+        <a href="https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md">Benchmarks</a>
+      </nav>
+      <p class="eyebrow">Codex plugin · MCP server · local-first</p>
+      <h1>Spend context on the task, not on repetition.</h1>
+      <p class="lead">Capsule is an exact-recoverable token-efficiency and context-compression layer for Codex. It shows the model the smallest safe evidence view, while keeping the complete local result available on demand.</p>
+      <div class="actions">
+        <a class="button primary" href="https://github.com/hakiyaka/capsule#install">Install Capsule</a>
+        <a class="button" href="https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md">Read measured results</a>
+      </div>
+      <div class="grid">
+        <article class="card"><h2>Terminal and files</h2><p>Compresses repetitive stdout, bounded file reads, and safe <code>Get-Content</code> calls without hiding failures or exact recovery.</p></article>
+        <article class="card"><h2>Projects and memory</h2><p>Compiles symbols, dependency impact, durable facts, and context handoffs before the model rereads an entire codebase.</p></article>
+        <article class="card"><h2>Web and tools</h2><p>Keeps structured results, URLs, and references recoverable while limiting repeated catalog and page payloads.</p></article>
+        <article class="card"><h2>Conservative by design</h2><p>Token-negative, unsafe, failed, literal, or explicitly full requests pass through unchanged.</p></article>
+      </div>
+      <section>
+        <h2>How it works</h2>
+        <p>Every result follows a simple local pipeline:</p>
+        <pre><code>request → classify → compact evidence view
+                    ↘ exact local capsule → expand on demand</code></pre>
+        <p>Capsule's published A/B figures are workload-specific model-visible measurements, not a promise about hidden reasoning, provider caching, billing, or subscription quotas.</p>
+      </section>
+      <section>
+        <h2>Open source and verifiable</h2>
+        <p>Read the implementation, tests, release history, privacy contract, and reproducible benchmarks in the public repository. Contributions and security reports are welcome.</p>
+        <div class="actions">
+          <a class="button" href="https://github.com/hakiyaka/capsule/blob/main/CONTRIBUTING.md">Contributing</a>
+          <a class="button" href="https://github.com/hakiyaka/capsule/blob/main/SECURITY.md">Security</a>
+          <a class="button" href="https://github.com/hakiyaka/capsule/blob/main/LICENSE">MIT License</a>
+        </div>
+      </section>
+      <footer>Capsule is maintained by the open-source community. <a href="https://github.com/hakiyaka/capsule">View source on GitHub</a>.</footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+"use strict";
+
+// Offline contract audit for the public GitHub Pages surface. This validates
+// the signals we control without pretending to measure Google's index/rank.
+
+const fs = require("node:fs");
+const path = require("node:path");
+
+const root = path.resolve(__dirname, "..");
+const site = path.join(root, "docs");
+const canonical = "https://hakiyaka.github.io/capsule/";
+const failures = [];
+
+function read(name) {
+  const file = path.join(site, name);
+  if (!fs.existsSync(file)) {
+    failures.push(`missing ${name}`);
+    return "";
+  }
+  return fs.readFileSync(file, "utf8");
+}
+
+function requireMatch(text, expression, label) {
+  if (!expression.test(text)) failures.push(label);
+}
+
+const html = read("index.html");
+const robots = read("robots.txt");
+const sitemap = read("sitemap.xml");
+requireMatch(html, /<title>[^<]{20,160}<\/title>/i, "descriptive title");
+requireMatch(html, /<meta\s+name=["']description["'][^>]+content=["'][^"']{80,220}["']/i, "meta description");
+requireMatch(html, new RegExp(`<link\\s+rel=["']canonical["'][^>]+href=["']${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} ["']`, "i"), "canonical URL");
+requireMatch(html, /property=["']og:title["']/i, "Open Graph title");
+// Keep the canonical check independent of attribute ordering/whitespace.
+if (html.includes(`href="${canonical}"`)) {
+  const canonicalFailure = failures.indexOf("canonical URL");
+  if (canonicalFailure >= 0) failures.splice(canonicalFailure, 1);
+}
+requireMatch(html, /property=["']og:description["']/i, "Open Graph description");
+requireMatch(html, /name=["']twitter:card["'][^>]+content=["']summary["']/i, "Twitter card");
+requireMatch(html, /<h1\b[^>]*>[^<]+<\/h1>/i, "visible H1");
+requireMatch(html, /href=["']https:\/\/github\.com\/hakiyaka\/capsule(?:\/|["'])/i, "repository link");
+requireMatch(html, /application\/ld\+json/i, "JSON-LD block");
+requireMatch(robots, /User-agent:\s*\*/i, "robots user agent");
+requireMatch(robots, /Allow:\s*\//i, "robots allow");
+requireMatch(robots, new RegExp(`Sitemap:\\s*${canonical}sitemap\\.xml`, "i"), "robots sitemap");
+requireMatch(sitemap, new RegExp(`<loc>${canonical.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}<\\/loc>`, "i"), "sitemap canonical URL");
+if (/localhost|127\.0\.0\.1|example\.com/i.test(`${html}\n${robots}\n${sitemap}`)) failures.push("placeholder host");
+
+let jsonLdBlocks = 0;
+for (const block of html.matchAll(/<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) {
+  try {
+    const parsed = JSON.parse(block[1]);
+    const graph = parsed?.["@graph"] || parsed;
+    const types = Array.isArray(graph) ? graph.map((item) => item?.["@type"]) : [graph?.["@type"]];
+    if (!types.flat().some((type) => ["WebSite", "SoftwareSourceCode"].includes(type))) failures.push("JSON-LD type");
+    jsonLdBlocks += 1;
+  } catch {
+    failures.push("invalid JSON-LD");
+  }
+}
+if (jsonLdBlocks === 0) failures.push("missing parseable JSON-LD");
+
+const report = {
+  audit: "seo",
+  canonical,
+  files: ["docs/index.html", "docs/robots.txt", "docs/sitemap.xml"],
+  json_ld_blocks: jsonLdBlocks,
+  failures,
+  passed: failures.length === 0,
+};
+process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+if (failures.length) process.exitCode = 1;

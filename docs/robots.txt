@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hakiyaka.github.io/capsule/sitemap.xml

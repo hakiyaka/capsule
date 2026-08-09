@@ -5,11 +5,19 @@
   "description": "Capsule: a portable, exact-recoverable token-efficiency, context, search, memory, and evidence engine for Codex.",
   "keywords": [
     "codex",
+    "openai-codex",
+    "codex-plugin",
     "mcp",
+    "model-context-protocol",
+    "mcp-server",
     "token-efficiency",
+    "llm-context",
+    "context-window",
     "context",
     "compaction",
-    "evidence"
+    "evidence",
+    "ai-agent-tools",
+    "developer-tools"
   ],
   "files": [
     ".github",
@@ -31,7 +39,8 @@
     "audit:source": "node bench/source_integrity_audit.cjs",
     "audit:public": "node scripts/public-readiness.cjs",
     "audit:docs": "node scripts/docs-audit.cjs",
-    "verify": "npm test && npm run audit:source && npm run audit:public && npm run audit:docs",
+    "audit:seo": "node scripts/seo-audit.cjs",
+    "verify": "npm test && npm run audit:source && npm run audit:public && npm run audit:docs && npm run audit:seo",
     "audit:sessions": "node scripts/session-audit.cjs",
     "audit:router-history": "node bench/router_history_audit.cjs",
     "test": "node --test",

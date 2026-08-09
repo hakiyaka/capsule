@@ -1,12 +1,13 @@
-# Capsule
+# Capsule — exact-recoverable token efficiency for Codex
 
 [![CI](https://github.com/hakiyaka/capsule/actions/workflows/ci.yml/badge.svg)](https://github.com/hakiyaka/capsule/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Website](https://img.shields.io/badge/website-GitHub%20Pages-222?logo=github)](https://hakiyaka.github.io/capsule/)
 
-> **Lossless context compression for Codex.**
+> **A local-first Codex plugin and MCP server for exact-recoverable context compression.**
 >
-> Capsule shows the model the smallest safe piece of evidence and keeps the
-> complete result locally recoverable.
+> Capsule reduces model-visible terminal, file, project, web, and context
+> output while keeping the complete result locally recoverable.
 
 Codex does not need to reread the same terminal output, whole files, project
 neighbours, web pages, or tool catalogues on every turn. Capsule turns that
@@ -55,6 +56,15 @@ result through.
 Capsule does not claim to control hidden provider-side reasoning, cache, or
 billing counters. Its measurements describe the observable model-facing
 payload and local exact-recovery path.
+
+## Find Capsule
+
+Capsule is an open-source **Codex token-efficiency**, **MCP context-compression**,
+and **AI-agent developer-tool** project. The public project site is
+[hakiyaka.github.io/capsule](https://hakiyaka.github.io/capsule/); the source,
+benchmarks, installation instructions, and release history remain on GitHub.
+Use the site for a concise overview and the repository for exact implementation
+and verification evidence.
 
 ## A measured first web call
 
@@ -214,6 +224,18 @@ hash-safe measurements; it does not export session text.
 See [BENCHMARK.md](BENCHMARK.md) for methodology and [CHANGELOG.md](CHANGELOG.md)
 for release history. The 100-project research ledger is in
 [GITHUB-100-RESEARCH.md](GITHUB-100-RESEARCH.md).
+
+## Search visibility and publishing
+
+The `docs/` site is a small, crawlable GitHub Pages landing page with a
+canonical URL, `robots.txt`, XML sitemap, Open Graph metadata, and JSON-LD.
+The Pages deployment is defined in
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml). After enabling
+Pages for the repository, add `https://hakiyaka.github.io/capsule/` as a
+verified property in Google Search Console and submit
+`https://hakiyaka.github.io/capsule/sitemap.xml`; Google controls crawl and
+ranking decisions, so submission is a discovery signal rather than a ranking
+guarantee.
 
 ## Repository map
 
