@@ -26,6 +26,29 @@ function summarizeReleases(releases) {
   };
 }
 
+function summarizeTrafficWindow(rows, measuredAt = Date.now()) {
+  const timestamps = (Array.isArray(rows) ? rows : [])
+    .map((row) => Date.parse(String(row?.timestamp || "")))
+    .filter(Number.isFinite)
+    .sort((a, b) => a - b);
+  if (!timestamps.length) {
+    return {
+      observed_start: null,
+      observed_end: null,
+      observed_points: 0,
+      lag_days: null,
+    };
+  }
+  const end = timestamps[timestamps.length - 1];
+  const lag = Number(measuredAt) - end;
+  return {
+    observed_start: new Date(timestamps[0]).toISOString(),
+    observed_end: new Date(end).toISOString(),
+    observed_points: timestamps.length,
+    lag_days: Number.isFinite(lag) ? Number((Math.max(0, lag) / 86_400_000).toFixed(2)) : null,
+  };
+}
+
 function compareSearchSnapshots(current, baseline) {
   const currentQueries = Array.isArray(current?.queries) ? current.queries : [];
   const baselineByQuery = new Map(
@@ -54,4 +77,4 @@ function compareSearchSnapshots(current, baseline) {
   });
 }
 
-module.exports = { compareSearchSnapshots, summarizeReleases, summarizeReferrers };
+module.exports = { compareSearchSnapshots, summarizeReleases, summarizeReferrers, summarizeTrafficWindow };

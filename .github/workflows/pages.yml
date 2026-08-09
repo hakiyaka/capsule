@@ -5,6 +5,12 @@ on:
     branches: [main]
     paths:
       - "docs/**"
+      - "README.md"
+      - "package.json"
+      - "CITATION.cff"
+      - "CHANGELOG.md"
+      - "scripts/seo-audit.cjs"
+      - "scripts/live-surface-smoke.cjs"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 

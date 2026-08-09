@@ -5,7 +5,7 @@
 // written to Capsule state or benchmark artifacts.
 
 const { spawnSync } = require("node:child_process");
-const { compareSearchSnapshots, summarizeReleases, summarizeReferrers } = require("./github-visibility-metrics.cjs");
+const { compareSearchSnapshots, summarizeReleases, summarizeReferrers, summarizeTrafficWindow } = require("./github-visibility-metrics.cjs");
 const { collectPaginated, formatError, normalizeRepository } = require("./github-visibility-helpers.cjs");
 
 const argv = process.argv.slice(2);
@@ -103,9 +103,12 @@ function optionalApi(endpoint, fallback) {
 try {
   validateArgs();
   repo = normalizeRepository(configuredRepo);
+  const measuredAt = new Date();
   const metadata = api(`repos/${repo}`);
-  const views = api(`repos/${repo}/traffic/views`);
-  const clones = api(`repos/${repo}/traffic/clones`);
+  const viewsResult = optionalApi(`repos/${repo}/traffic/views`, null);
+  const clonesResult = optionalApi(`repos/${repo}/traffic/clones`, null);
+  const views = viewsResult.value || {};
+  const clones = clonesResult.value || {};
   const referrerResult = optionalApi(`repos/${repo}/traffic/popular/referrers`);
   const popularPathResult = optionalApi(`repos/${repo}/traffic/popular/paths`);
   const referrers = referrerResult.value;
@@ -118,6 +121,8 @@ try {
   const pages = pagesResult.value;
   const referrerSummary = summarizeReferrers(referrers);
   const releaseSummary = summarizeReleases(releases);
+  const viewsWindow = summarizeTrafficWindow(views.views, measuredAt.getTime());
+  const clonesWindow = summarizeTrafficWindow(clones.clones, measuredAt.getTime());
   const current = {
     schema_version: schemaVersion,
     measured_at: new Date().toISOString(),
@@ -141,10 +146,22 @@ try {
     community_health: Number.isFinite(Number(community?.health_percentage)) ? Number(community.health_percentage) : null,
     community_available: communityResult.available,
     community_error: communityResult.error,
-    views_14d: Number(views.count) || sum(views.views, "count"),
-    unique_viewers_14d: Number(views.uniques) || sum(views.views, "uniques"),
-    clones_14d: Number(clones.count) || sum(clones.clones, "count"),
-    unique_cloners_14d: Number(clones.uniques) || sum(clones.clones, "uniques"),
+    views_14d: viewsResult.available ? Number(views.count) || sum(views.views, "count") : null,
+    unique_viewers_14d: viewsResult.available ? Number(views.uniques) || sum(views.views, "uniques") : null,
+    views_available: viewsResult.available,
+    views_error: viewsResult.error,
+    views_observed_start: viewsWindow.observed_start,
+    views_observed_end: viewsWindow.observed_end,
+    views_observed_points: viewsWindow.observed_points,
+    views_lag_days: viewsWindow.lag_days,
+    clones_14d: clonesResult.available ? Number(clones.count) || sum(clones.clones, "count") : null,
+    unique_cloners_14d: clonesResult.available ? Number(clones.uniques) || sum(clones.clones, "uniques") : null,
+    clones_available: clonesResult.available,
+    clones_error: clonesResult.error,
+    clones_observed_start: clonesWindow.observed_start,
+    clones_observed_end: clonesWindow.observed_end,
+    clones_observed_points: clonesWindow.observed_points,
+    clones_lag_days: clonesWindow.lag_days,
     ...referrerSummary,
     referrers_available: referrerResult.available,
     referrers_error: referrerResult.error,

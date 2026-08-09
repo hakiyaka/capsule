@@ -1,0 +1,57 @@
+name: Record GitHub visibility snapshot
+
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CAPSULE_GITHUB_REPO: ${{ github.repository }}
+      CAPSULE_GITHUB_MAX_BUFFER_BYTES: "16777216"
+    steps:
+      - name: Checkout the audited source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Capture metadata, traffic, and referral signals
+        run: npm run audit:github-visibility:write -- visibility.json
+
+      - name: Capture the fixed repository-search snapshot
+        run: npm run audit:github-visibility:search:write -- visibility-search.json
+
+      - name: Validate snapshot provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require("node:fs");
+          const expected = process.env.CAPSULE_GITHUB_REPO.toLowerCase();
+          for (const file of ["visibility.json", "visibility-search.json"]) {
+            const report = JSON.parse(fs.readFileSync(file, "utf8"));
+            if (report.current?.repo?.toLowerCase() !== expected) {
+              throw new Error(`${file}: repository provenance mismatch`);
+            }
+            if (report.schema_version !== 2) throw new Error(`${file}: unsupported schema`);
+          }
+          NODE
+
+      - name: Upload the read-only snapshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-visibility-${{ github.run_id }}
+          path: |
+            visibility.json
+            visibility-search.json
+          if-no-files-found: error
+          retention-days: 90

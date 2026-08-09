@@ -1,4 +1,4 @@
-# Capsule — exact-recoverable token efficiency for Codex
+# Capsule — Codex plugin MCP server for exact-recoverable token efficiency
 
 [![CI](https://github.com/hakiyaka/capsule/actions/workflows/ci.yml/badge.svg)](https://github.com/hakiyaka/capsule/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -135,6 +135,13 @@ Add the repository root as a local Codex plugin. The bundled
 `.codex-plugin/plugin.json` and `.mcp.json` register the `capsule` MCP server
 and its lifecycle hooks. Trust the hooks when Codex asks, then restart Codex.
 
+For a reproducible checkout instead of the moving `main` branch, use the
+[v1.0.2 release](https://github.com/hakiyaka/capsule/releases/tag/v1.0.2) and
+verify its [SHA-256 sidecar](https://github.com/hakiyaka/capsule/releases/download/v1.0.2/capsule-1.0.2-source.zip.sha256)
+before unpacking the source archive. Capsule is intentionally clone/release
+based (`package.json` remains private); it is not the unrelated public npm
+package named `capsule`.
+
 Verify that the server is loaded:
 
 ```json
@@ -259,8 +266,12 @@ npm run audit:github-visibility
 
 It reports stars, forks, releases, the exact topic names, repository surface
 flags, community health, Pages status, and the rolling 14-day views/clones
-window. Referrer uniques are explicitly a sum of GitHub's per-domain values,
-not a global unique-user count. Pass
+window. It also records the observed start/end timestamps, sample-point count,
+and API lag for the views and clones arrays so a stale rolling window is not
+mistaken for a current trend. If the authenticated traffic endpoints are not
+available, the report records `*_available:false` and the bounded API error
+instead of inventing zero traffic. Referrer uniques are explicitly a sum of
+GitHub's per-domain values, not a global unique-user count. Pass
 `--baseline path/to/snapshot.json` to compute
 ratios against a prior snapshot, or add `--write path/to/snapshot.json` to
 save the read-only report for the next comparison. It also records aggregate
@@ -328,6 +339,11 @@ The [GitHub discoverability guide](https://hakiyaka.github.io/capsule/guide/gith
 documents the repeatable metadata, traffic, referral, release, and repository-search audit.
 An intentionally concise [machine-readable summary](https://hakiyaka.github.io/capsule/llms.txt)
 keeps the canonical links and measurement caveat available to indexing tools.
+The repository also has a weekly and manually dispatchable read-only visibility
+workflow; it stores timestamped JSON snapshots as short-lived Actions artifacts,
+never comments, stars, forks, or edits the repository. Semver tags trigger the
+release workflow, which rebuilds the source archive and checksum from the exact
+tag before publishing them.
 Run `npm run audit:live` after a Pages deployment to verify the public HTML,
 FAQ metadata, PNG social card, sitemap, robots directive, RSS item, and
 machine-readable links over HTTPS. It is a smoke test, not proof of ranking.

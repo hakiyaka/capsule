@@ -1,0 +1,75 @@
+name: Publish tagged release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing semver tag to package and publish (for recovery only)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - name: Checkout the exact tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Verify tag, package, and tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$RELEASE_TAG" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "Expected a vMAJOR.MINOR.PATCH tag, got $RELEASE_TAG" >&2; exit 1 ;;
+          esac
+          version="${RELEASE_TAG#v}"
+          package_version="$(node -p "require('./package.json').version")"
+          test "$version" = "$package_version"
+          test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_TAG"
+          npm run verify
+
+      - name: Build and verify the source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          archive="capsule-${version}-source.zip"
+          git archive --format=zip --prefix="capsule-${version}/" --output="$archive" "$RELEASE_TAG"
+          sha256sum "$archive" > "$archive.sha256"
+          git ls-tree -r --name-only "$RELEASE_TAG" | sort > expected.paths
+          unzip -Z1 "$archive" | sed "s#^capsule-${version}/##" | sort > actual.paths
+          diff -u expected.paths actual.paths
+          echo "RELEASE_ARCHIVE=$archive" >> "$GITHUB_ENV"
+          echo "RELEASE_CHECKSUM=$archive.sha256" >> "$GITHUB_ENV"
+          printf '%s\n' "Capsule ${version}" > release-notes.md
+          printf '%s\n' >> release-notes.md
+          printf '%s\n' "The source archive is generated from the exact ${RELEASE_TAG} tag; its SHA-256 sidecar is uploaded beside it." >> release-notes.md
+
+      - name: Publish or repair the GitHub release
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$RELEASE_ARCHIVE" "$RELEASE_CHECKSUM" --clobber
+          else
+            gh release create "$RELEASE_TAG" "$RELEASE_ARCHIVE" "$RELEASE_CHECKSUM" \
+              --verify-tag --title "Capsule ${RELEASE_TAG#v}" --notes-file release-notes.md
+          fi

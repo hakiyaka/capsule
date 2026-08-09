@@ -3,7 +3,7 @@
   "version": "1.0.2+codex.20260809032042",
   "description": "Capsule is a portable, exact-recoverable token-efficiency, context, search, memory, evidence, and Codex hook-contract engine.",
   "author": {
-    "name": "Local developer"
+    "name": "Capsule contributors"
   },
   "license": "MIT",
   "keywords": [
@@ -20,7 +20,7 @@
     "displayName": "Capsule",
     "shortDescription": "Semantic-exact shell structure and cross-command reuse.",
     "longDescription": "A portable Windows, macOS, and Linux engine that detects whether the current Codex build supports plugin-bundled hooks and uses a Capsule-only global fallback when it does not. Its Terminal Lattice recognizes repeated line grammars inside a first-seen successful shell result, factors paths, URLs, versions, identifiers, timestamps, durations, sizes, percentages, and numbers into compact columns, compares mixed units by real magnitude, keeps unique and critical evidence visible, stores the exact result in an expandable capsule, and bypasses token-negative output. Its Universal Terminal Genome reuses only byte-semantic lines already carried by earlier commands. Explicit benchmark, performance, raw, exact, full, and verbatim shell evidence passes through literally. Capsule also provides local filters, gain analytics, compaction checkpoints, media deduplication, skill routing, evidence recovery, and finite reasoning offload.",
-    "developerName": "Local developer",
+    "developerName": "Capsule contributors",
     "category": "Productivity",
     "capabilities": [
       "Read",

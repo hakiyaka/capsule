@@ -5,7 +5,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
-const { compareSearchSnapshots, summarizeReleases, summarizeReferrers } = require("../scripts/github-visibility-metrics.cjs");
+const { compareSearchSnapshots, summarizeReleases, summarizeReferrers, summarizeTrafficWindow } = require("../scripts/github-visibility-metrics.cjs");
 const { collectPaginated, formatError, normalizeRepository } = require("../scripts/github-visibility-helpers.cjs");
 
 test("normalizes repository overrides and rejects API-path injection", () => {
@@ -63,6 +63,25 @@ test("summarizes release assets and downloads", () => {
   });
 });
 
+test("records the observed traffic window and reports API lag explicitly", () => {
+  const summary = summarizeTrafficWindow([
+    {timestamp: "2026-08-01T00:00:00Z", count: 2},
+    {timestamp: "2026-08-07T00:00:00Z", count: 3},
+  ], Date.parse("2026-08-09T12:00:00Z"));
+  assert.deepEqual(summary, {
+    observed_start: "2026-08-01T00:00:00.000Z",
+    observed_end: "2026-08-07T00:00:00.000Z",
+    observed_points: 2,
+    lag_days: 2.5,
+  });
+  assert.deepEqual(summarizeTrafficWindow([], Date.now()), {
+    observed_start: null,
+    observed_end: null,
+    observed_points: 0,
+    lag_days: null,
+  });
+});
+
 test("uses the GitHub popular referrers endpoint", () => {
   const source = fs.readFileSync(path.join(__dirname, "..", "scripts", "github-visibility-audit.cjs"), "utf8");
   assert.match(source, /traffic\/popular\/referrers/);
@@ -71,6 +90,8 @@ test("uses the GitHub popular referrers endpoint", () => {
   assert.match(source, /collectPaginated/);
   assert.match(source, /community_error/);
   assert.match(source, /pages_error/);
+  assert.match(source, /views_available/);
+  assert.match(source, /clones_available/);
 });
 
 test("compares repository-search snapshots without inventing missing ranks", () => {
