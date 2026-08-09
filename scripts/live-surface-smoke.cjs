@@ -20,6 +20,8 @@ const paths = [
   "/sitemap.xml",
   "/social-card.png",
   "/__capsule_live_missing__.html",
+  "https://github.com/hakiyaka/capsule/releases/download/v1.0.1/capsule-1.0.1-source.zip",
+  "https://github.com/hakiyaka/capsule/releases/download/v1.0.1/capsule-1.0.1-source.zip.sha256",
 ];
 const guidePaths = [
   "codex-token-efficiency.html",
@@ -36,7 +38,7 @@ const guidePaths = [
 const failures = [];
 
 async function get(pathname) {
-  const url = `${base}${pathname}`;
+  const url = /^https?:\/\//i.test(pathname) ? pathname : `${base}${pathname}`;
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const controller = new AbortController();
