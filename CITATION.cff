@@ -9,8 +9,14 @@ url: "https://hakiyaka.github.io/capsule/"
 license: MIT
 keywords:
   - codex
+  - openai-codex
+  - codex-cli
   - codex-plugin
   - model-context-protocol
+  - mcp-server
+  - llm-context
+  - context-window
+  - ai-agent-tools
   - token-efficiency
   - token-reduction
   - context-compression
