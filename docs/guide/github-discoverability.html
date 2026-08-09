@@ -22,7 +22,7 @@ npm run audit:github-visibility:search:write -- visibility-search.json
 
 # Later, compare the same fixed queries with the saved search snapshot.
 npm run audit:github-visibility:search:baseline -- visibility-search.json</code></pre>
-    <p>Use the same repository, query set, and authentication context at each measurement point. The private traffic endpoints cover a rolling 14-day window; repository metadata and release assets are point-in-time or cumulative.</p>
+    <p>Use the same repository, query set, and authentication context at each measurement point. Set <code>CAPSULE_GITHUB_REPO=owner/name</code> or invoke <code>node scripts/github-visibility-audit.cjs --repo owner/name</code> for a fork; otherwise the default is <code>hakiyaka/capsule</code>. Do not rely on <code>npm run ... -- --repo</code> option forwarding on Windows. The private traffic endpoints cover a rolling 14-day window; repository metadata and release assets are point-in-time or cumulative.</p>
     <h2>What the audit records</h2>
     <table>
       <thead><tr><th>Signal</th><th>Meaning</th><th>Limit</th></tr></thead>

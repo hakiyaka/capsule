@@ -268,6 +268,10 @@ referrer and popular-path counts so future outreach can be tied to observed
 traffic; traffic data is not written to Capsule state. Referrers come from
 GitHub's `traffic/popular/referrers` endpoint. If that endpoint is unavailable,
 the audit records an empty list and does not infer that traffic was zero.
+For a fork or another public repository, set `CAPSULE_GITHUB_REPO=owner/name`
+or invoke `node scripts/github-visibility-audit.cjs --repo owner/name`;
+otherwise the documented default is `hakiyaka/capsule`. Do not rely on
+`npm run ... -- --repo` option forwarding on Windows.
 
 On Windows, where npm can consume leading option names, the explicit helpers
 are reliable:
@@ -310,6 +314,9 @@ verified property in Google Search Console and submit
 `https://hakiyaka.github.io/capsule/sitemap.xml`; Google controls crawl and
 ranking decisions, so submission is a discovery signal rather than a ranking
 guarantee.
+The same owner-controlled verification and sitemap submission can be done in
+Bing Webmaster Tools; no verification token is included here because tokens
+must belong to the repository owner.
 GitHub's repository-level link card is separate from Pages metadata: upload
 [`docs/social-card.png`](docs/social-card.png) under **Settings → General →
 Social preview** when you control the repository, then verify it with
