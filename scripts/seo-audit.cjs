@@ -9,7 +9,7 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const site = path.join(root, "docs");
 const canonical = "https://hakiyaka.github.io/capsule/";
-const socialImage = `${canonical}social-card.svg`;
+const socialImage = `${canonical}social-card.png`;
 const failures = [];
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -22,6 +22,15 @@ function read(name) {
   return fs.readFileSync(file, "utf8");
 }
 
+function readBinary(name) {
+  const file = path.join(site, name);
+  if (!fs.existsSync(file)) {
+    failures.push(`missing ${name}`);
+    return null;
+  }
+  return fs.readFileSync(file);
+}
+
 function requireMatch(text, expression, label) {
   if (!expression.test(text)) failures.push(label);
 }
@@ -30,6 +39,7 @@ const html = read("index.html");
 const robots = read("robots.txt");
 const sitemap = read("sitemap.xml");
 const socialCard = read("social-card.svg");
+const socialCardPng = readBinary("social-card.png");
 const quickDemo = read("quick-demo.svg");
 const feed = read("feed.xml");
 const llms = read("llms.txt");
@@ -44,6 +54,14 @@ const guides = [
   "guide/terminal-output-token-savings.html",
 ];
 requireMatch(socialCard, /^\s*<svg\b[^>]*width="1200"[^>]*height="630"/i, "social card asset");
+if (socialCardPng) {
+  const pngSignature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  if (socialCardPng.length < 24 || !socialCardPng.subarray(0, 8).equals(pngSignature)) {
+    failures.push("social card PNG signature");
+  } else if (socialCardPng.readUInt32BE(16) !== 1200 || socialCardPng.readUInt32BE(20) !== 630) {
+    failures.push("social card PNG dimensions");
+  }
+}
 requireMatch(quickDemo, /^\s*<svg\b[^>]*width="1200"[^>]*height="560"/i, "quick demo asset");
 requireMatch(feed, /<rss\b[^>]*version="2\.0"/i, "RSS version");
 requireMatch(feed, new RegExp(`<link>${escapeRegExp(canonical)}</link>`, "i"), "RSS canonical link");
@@ -62,8 +80,10 @@ if (html.includes(`href="${canonical}"`)) {
 }
 requireMatch(html, /property=["']og:description["']/i, "Open Graph description");
 requireMatch(html, new RegExp(`<meta\\s+property=["']og:image["'][^>]+content=["']${escapeRegExp(socialImage)}["']`, "i"), "Open Graph image");
+requireMatch(html, /property=["']og:image:type["'][^>]+content=["']image\/png["']/i, "Open Graph image type");
 requireMatch(html, new RegExp(`<meta\\s+name=["']twitter:image["'][^>]+content=["']${escapeRegExp(socialImage)}["']`, "i"), "Twitter image");
-requireMatch(html, /name=["']twitter:card["'][^>]+content=["']summary["']/i, "Twitter card");
+requireMatch(html, /name=["']twitter:card["'][^>]+content=["']summary_large_image["']/i, "Twitter card");
+requireMatch(html, /name=["']twitter:image:alt["']/i, "Twitter image alt");
 requireMatch(html, /<h1\b[^>]*>[^<]+<\/h1>/i, "visible H1");
 requireMatch(html, /href=["']https:\/\/github\.com\/hakiyaka\/capsule(?:\/|["'])/i, "repository link");
 requireMatch(html, /application\/ld\+json/i, "JSON-LD block");
@@ -97,8 +117,10 @@ for (const relative of guides) {
   requireMatch(page, /property=["']og:title["']/i, `${relative}: Open Graph title`);
   requireMatch(page, /property=["']og:description["']/i, `${relative}: Open Graph description`);
   requireMatch(page, new RegExp(`<meta\\s+property=["']og:image["'][^>]+content=["']${escapeRegExp(socialImage)}["']`, "i"), `${relative}: Open Graph image`);
+  requireMatch(page, /property=["']og:image:type["'][^>]+content=["']image\/png["']/i, `${relative}: Open Graph image type`);
   requireMatch(page, new RegExp(`<meta\\s+name=["']twitter:image["'][^>]+content=["']${escapeRegExp(socialImage)}["']`, "i"), `${relative}: Twitter image`);
-  requireMatch(page, /name=["']twitter:card["'][^>]+content=["']summary["']/i, `${relative}: Twitter card`);
+  requireMatch(page, /name=["']twitter:card["'][^>]+content=["']summary_large_image["']/i, `${relative}: Twitter card`);
+  requireMatch(page, /name=["']twitter:image:alt["']/i, `${relative}: Twitter image alt`);
   requireMatch(page, /<h1\b[^>]*>[^<]+<\/h1>/i, `${relative}: visible H1`);
   requireMatch(page, /application\/ld\+json/i, `${relative}: JSON-LD block`);
   if (!/"@type"\s*:\s*"(?:WebPage|HowTo)"/i.test(page)) failures.push(`${relative}: JSON-LD type`);
@@ -110,7 +132,7 @@ for (const relative of guides) {
 const report = {
   audit: "seo",
   canonical,
-  files: ["docs/index.html", ...guides.map((file) => `docs/${file}`), "docs/robots.txt", "docs/sitemap.xml", "docs/feed.xml", "docs/llms.txt", "docs/social-card.svg", "docs/quick-demo.svg"],
+  files: ["docs/index.html", ...guides.map((file) => `docs/${file}`), "docs/robots.txt", "docs/sitemap.xml", "docs/feed.xml", "docs/llms.txt", "docs/social-card.svg", "docs/social-card.png", "docs/quick-demo.svg"],
   json_ld_blocks: jsonLdBlocks,
   failures,
   passed: failures.length === 0,
