@@ -22,7 +22,7 @@ All notable user-visible changes are recorded here.
   `mcpServers` contract, runtime verification, and relative-path
   compatibility boundaries.
 
-## 1.0.5 - 2026-08-09
+## 1.0.6 - 2026-08-09
 
 - Disabled automatic hook event, phase, and final-memory persistence by default;
   sanitized, bounded excerpts now require explicit `CAPSULE_CAPTURE_MEMORY=1`.
@@ -30,6 +30,8 @@ All notable user-visible changes are recorded here.
   documentation and hardened diagnostics so public receipts do not expose them.
 - Simplified plugin starter prompts to describe user-facing outcomes instead of
   internal implementation names and bounded them to the public plugin contract.
+- Declared the bundled `map-token-context` skill in the plugin manifest
+  so plugin hosts can discover the shipped workflow without static keyword pages.
 
 ## 1.0.4 - 2026-08-09
 

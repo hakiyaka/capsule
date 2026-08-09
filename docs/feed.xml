@@ -6,13 +6,13 @@
     <atom:link href="https://hakiyaka.github.io/capsule/feed.xml" rel="self" type="application/rss+xml" />
     <description>Measured guides and release notes for the Capsule Codex plugin and MCP server.</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 09 Aug 2026 08:01:34 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 09 Aug 2026 08:14:54 GMT</lastBuildDate>
     <item>
-      <title>Capsule 1.0.5 released</title>
-      <link>https://github.com/hakiyaka/capsule/releases/tag/v1.0.5</link>
-      <guid isPermaLink="true">https://github.com/hakiyaka/capsule/releases/tag/v1.0.5</guid>
-      <pubDate>Sun, 09 Aug 2026 08:01:34 GMT</pubDate>
-      <description>Privacy maintenance release: automatic memory excerpts are opt-in, diagnostics are bounded, and public documentation avoids unnecessary local telemetry.</description>
+      <title>Capsule 1.0.6 released</title>
+      <link>https://github.com/hakiyaka/capsule/releases/tag/v1.0.6</link>
+      <guid isPermaLink="true">https://github.com/hakiyaka/capsule/releases/tag/v1.0.6</guid>
+      <pubDate>Sun, 09 Aug 2026 08:14:54 GMT</pubDate>
+      <description>Plugin packaging maintenance release: the bundled map-token-context skill is declared for reliable discovery alongside the MCP server.</description>
     </item>
     <item>
       <title>Capsule guide index</title>

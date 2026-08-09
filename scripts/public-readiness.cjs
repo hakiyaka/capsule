@@ -32,6 +32,10 @@ if (missing.length) failures.push(`missing public files: ${missing.join(", ")}`)
 if (plugin.interface?.displayName !== "Capsule") failures.push("plugin displayName must be Capsule");
 if (packageJson.name !== "capsule") failures.push("package installation id must be capsule");
 if (!mcp.mcpServers?.capsule) failures.push("MCP server id must be capsule");
+if (plugin.skills !== "./skills/") failures.push("plugin skills path must point to bundled skills/");
+if (!fs.existsSync(path.join(root, "skills", "map-token-context", "SKILL.md"))) {
+  failures.push("bundled map-token-context skill is missing");
+}
 const normalizeRepositoryUrl = (value) => String(value || "").replace(/\/+$/, "").replace(/\.git$/i, "");
 if (plugin.homepage !== packageJson.homepage) failures.push("plugin homepage must match package homepage");
 if (normalizeRepositoryUrl(plugin.repository) !== normalizeRepositoryUrl(packageJson.repository?.url)) failures.push("plugin repository must match package repository");
