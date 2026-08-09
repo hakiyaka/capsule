@@ -45,18 +45,19 @@ result through.
   low-value stdout/stderr while preserving failures and critical lines.
   Plain PowerShell `Get-Content` reads use a verified local file fast path,
   query-focused evidence, and unchanged-file replay; unsafe or complex syntax
-  falls back to the normal shell.
+  falls back to the normal shell. See the [Get-Content guide](https://hakiyaka.github.io/capsule/guide/get-content-token-savings.html).
 - **Files:** bounded reads, replay detection, immutable-baseline edits, and
   exact range expansion.
 - **Projects:** incremental symbol/dependency indexing, impact cones, and
   proof packets for query and refactor work.
 - **Web:** bounded structured results plus an opt-in, lossless web lease for
-  exact text, URLs, and `ref_id` recovery.
+  exact text, URLs, and `ref_id` recovery. See the [web search guide](https://hakiyaka.github.io/capsule/guide/web-search-token-savings.html).
 - **Context:** compaction ledgers, memory loadouts, polling receipts, and
   pressure-aware summaries.
 - **Skills and tools:** abstaining skill routing, deferred action discovery,
   local filters, and batched execution.
-- **Measurement:** workload-specific A/B benchmarks and local gain telemetry.
+- **Measurement:** workload-specific A/B benchmarks and local gain telemetry;
+  start with the [benchmark methodology](https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html).
 - **Release quality:** shared atomic state primitives, portable verification,
   and a documentation/link audit for public installations.
 
