@@ -71,8 +71,8 @@ function compareSearchSnapshots(current, baseline) {
     const previous = baselineByQuery.get(query);
     const currentValid = entry && !entry.error && entry.incomplete_results !== true;
     const previousValid = previous && !previous.error && previous.incomplete_results !== true;
-    const currentRank = currentValid && Number.isInteger(entry.rank_in_first_100) ? entry.rank_in_first_100 : null;
-    const previousRank = previousValid && Number.isInteger(previous.rank_in_first_100) ? previous.rank_in_first_100 : null;
+    const currentRank = currentValid && Number.isInteger(entry.rank_in_first_100) && entry.rank_in_first_100 >= 1 && entry.rank_in_first_100 <= 100 ? entry.rank_in_first_100 : null;
+    const previousRank = previousValid && Number.isInteger(previous.rank_in_first_100) && previous.rank_in_first_100 >= 1 && previous.rank_in_first_100 <= 100 ? previous.rank_in_first_100 : null;
     const currentPresent = currentRank !== null;
     const previousPresent = previousRank !== null;
     const currentTotal = currentValid && Number.isFinite(entry?.total_count) ? Number(entry.total_count) : null;

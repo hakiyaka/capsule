@@ -74,6 +74,10 @@ function finiteNumber(value) {
   return Number.isFinite(number) ? number : null;
 }
 
+function isRecord(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
 function searchSnapshot(query) {
   try {
     const result = api(`search/repositories?q=${encodeURIComponent(query)}&per_page=100`);
@@ -110,17 +114,22 @@ try {
   const clonesResult = optionalApi(`repos/${repo}/traffic/clones`, null);
   const views = viewsResult.value || {};
   const clones = clonesResult.value || {};
+  const viewsShapeValid = viewsResult.available && isRecord(views) && Array.isArray(views.views);
+  const clonesShapeValid = clonesResult.available && isRecord(clones) && Array.isArray(clones.clones);
   const referrerResult = optionalApi(`repos/${repo}/traffic/popular/referrers`);
   const popularPathResult = optionalApi(`repos/${repo}/traffic/popular/paths`);
   const referrers = referrerResult.value;
   const popularPaths = popularPathResult.value;
   const releasePages = collectPaginated((endpoint) => api(endpoint), `repos/${repo}/releases`);
-  const releases = releasePages.items;
+  const allReleases = releasePages.items;
+  const releases = allReleases.filter((release) => release?.draft !== true);
+  const draftReleasesOmitted = allReleases.length - releases.length;
   const communityResult = optionalApi(`repos/${repo}/community/profile`, null);
   const pagesResult = optionalApi(`repos/${repo}/pages`, null);
   const community = communityResult.value;
   const pages = pagesResult.value;
-  const referrerSummary = referrerResult.available
+  const referrersShapeValid = referrerResult.available && Array.isArray(referrers);
+  const referrerSummary = referrersShapeValid
     ? summarizeReferrers(referrers)
     : {
         referrer_domains_14d: null,
@@ -129,9 +138,10 @@ try {
         top_referrer: null,
       };
   const releaseSummary = summarizeReleases(releases);
-  const viewsWindow = summarizeTrafficWindow(views.views, measuredAt.getTime());
-  const clonesWindow = summarizeTrafficWindow(clones.clones, measuredAt.getTime());
-  const pathSummary = popularPathResult.available
+  const viewsWindow = summarizeTrafficWindow(viewsShapeValid ? views.views : [], measuredAt.getTime());
+  const clonesWindow = summarizeTrafficWindow(clonesShapeValid ? clones.clones : [], measuredAt.getTime());
+  const pathsShapeValid = popularPathResult.available && Array.isArray(popularPaths);
+  const pathSummary = pathsShapeValid
     ? {
         popular_paths_14d: Array.isArray(popularPaths) ? popularPaths.length : 0,
         top_path: Array.isArray(popularPaths) && popularPaths[0] ? String(popularPaths[0].path || "") : "",
@@ -157,6 +167,7 @@ try {
     topics: Array.isArray(metadata.topics) ? metadata.topics.length : 0,
     topic_names: Array.isArray(metadata.topics) ? metadata.topics.map((topic) => String(topic)).sort() : [],
     releases: Array.isArray(releases) ? releases.length : 0,
+    draft_releases_omitted: draftReleasesOmitted,
     release_pages: releasePages.pages,
     release_pagination_complete: !releasePages.truncated,
     ...releaseSummary,
@@ -168,29 +179,29 @@ try {
     community_health: finiteNumber(community?.health_percentage),
     community_available: communityResult.available,
     community_error: communityResult.error,
-    views_14d: viewsResult.available ? Number(views.count) || sum(views.views, "count") : null,
+    views_14d: viewsShapeValid ? Number(views.count) || sum(views.views, "count") : null,
     // GitHub's top-level uniques is already the endpoint's aggregate. If it is
     // omitted, summing daily uniques would double-count people across days.
-    unique_viewers_14d: viewsResult.available ? finiteNumber(views.uniques) : null,
-    views_available: viewsResult.available,
-    views_error: viewsResult.error,
+    unique_viewers_14d: viewsShapeValid ? finiteNumber(views.uniques) : null,
+    views_available: viewsShapeValid,
+    views_error: viewsResult.error || (viewsResult.available && !viewsShapeValid ? "malformed traffic views response" : null),
     views_observed_start: viewsWindow.observed_start,
     views_observed_end: viewsWindow.observed_end,
     views_observed_points: viewsWindow.observed_points,
     views_lag_days: viewsWindow.lag_days,
-    clones_14d: clonesResult.available ? Number(clones.count) || sum(clones.clones, "count") : null,
-    unique_cloners_14d: clonesResult.available ? finiteNumber(clones.uniques) : null,
-    clones_available: clonesResult.available,
-    clones_error: clonesResult.error,
+    clones_14d: clonesShapeValid ? Number(clones.count) || sum(clones.clones, "count") : null,
+    unique_cloners_14d: clonesShapeValid ? finiteNumber(clones.uniques) : null,
+    clones_available: clonesShapeValid,
+    clones_error: clonesResult.error || (clonesResult.available && !clonesShapeValid ? "malformed traffic clones response" : null),
     clones_observed_start: clonesWindow.observed_start,
     clones_observed_end: clonesWindow.observed_end,
     clones_observed_points: clonesWindow.observed_points,
     clones_lag_days: clonesWindow.lag_days,
     ...referrerSummary,
-    referrers_available: referrerResult.available,
-    referrers_error: referrerResult.error,
-    popular_paths_available: popularPathResult.available,
-    popular_paths_error: popularPathResult.error,
+    referrers_available: referrersShapeValid,
+    referrers_error: referrerResult.error || (referrerResult.available && !referrersShapeValid ? "malformed popular referrers response" : null),
+    popular_paths_available: pathsShapeValid,
+    popular_paths_error: popularPathResult.error || (popularPathResult.available && !pathsShapeValid ? "malformed popular paths response" : null),
     ...pathSummary,
     homepage: metadata.homepage || "",
     pages_url: pages?.html_url || "",
@@ -233,7 +244,8 @@ try {
         report.baseline_warnings.push(`${prefix} traffic API is lagging: baseline_lag_days=${baselineLag}, current_lag_days=${currentLag}`);
       }
     }
-    report.ratios = Object.fromEntries(["stars", "forks", "topics", "releases", "release_assets", "release_downloads", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "referrer_uniques_sum_14d", "top_path_views_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
+    const releaseTotalsComparable = current.release_pagination_complete === true && report.baseline.release_pagination_complete === true;
+    report.ratios = Object.fromEntries(["stars", "forks", "topics", "releases", "release_assets", "release_downloads", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "referrer_uniques_sum_14d", "top_path_views_14d"].map((key) => [key, ["releases", "release_assets", "release_downloads"].includes(key) && !releaseTotalsComparable ? null : ratio(current[key], report.baseline[key])]));
     if (report.search && baseline.search) {
       report.search_deltas = compareSearchSnapshots(report.search, baseline.search);
     }

@@ -74,9 +74,22 @@ requireMatch(feed, /<rss\b[^>]*version="2\.0"/i, "RSS version");
 requireMatch(feed, new RegExp(`<link>${escapeRegExp(canonical)}</link>`, "i"), "RSS canonical link");
 requireMatch(feed, new RegExp(`<atom:link\\s+href="${escapeRegExp(canonical)}feed\\.xml"\\s+rel="self"`, "i"), "RSS self link");
 requireMatch(feed, /<item>[\s\S]*<guid\s+isPermaLink="true">https:\/\/hakiyaka\.github\.io\/capsule\/guide\//i, "RSS item");
+const feedItems = [...feed.matchAll(/<item>([\s\S]*?)<\/item>/gi)].map((match) => match[1]);
+const feedDates = feedItems.map((item) => Date.parse((item.match(/<pubDate>([^<]+)<\/pubDate>/i) || [])[1] || ""));
+if (!feedDates.length || feedDates.some((date) => !Number.isFinite(date))) {
+  failures.push("RSS publication dates");
+} else if (feedDates.some((date, index) => index > 0 && date > feedDates[index - 1])) {
+  failures.push("RSS items are not newest-first");
+}
+const lastBuildDate = Date.parse((feed.match(/<lastBuildDate>([^<]+)<\/lastBuildDate>/i) || [])[1] || "");
+if (!Number.isFinite(lastBuildDate) || (feedDates.length && lastBuildDate < Math.max(...feedDates))) {
+  failures.push("RSS lastBuildDate is older than an item");
+}
 requireMatch(llms, /^# Capsule\b/m, "machine-readable summary heading");
 requireMatch(llms, new RegExp(escapeRegExp("https://github.com/hakiyaka/capsule"), "i"), "machine-readable repository link");
 requireMatch(llms, new RegExp(escapeRegExp("https://hakiyaka.github.io/capsule/"), "i"), "machine-readable site link");
+requireMatch(llms, /https:\/\/github\.com\/hakiyaka\/capsule\/discussions\/1/i, "machine-readable measurement discussion");
+requireMatch(llms, /https:\/\/github\.com\/hakiyaka\/capsule\/blob\/main\/PRIVACY\.md/i, "machine-readable privacy policy");
 requireMatch(llms, new RegExp(`releases/download/${escapeRegExp(releaseTag)}/${escapeRegExp(releaseAsset)}`, "i"), "machine-readable release archive");
 requireMatch(llms, new RegExp(`releases/download/${escapeRegExp(releaseTag)}/${escapeRegExp(releaseAsset)}\\.sha256`, "i"), "machine-readable release checksum");
 requireMatch(html, /<title>[^<]{20,160}<\/title>/i, "descriptive title");

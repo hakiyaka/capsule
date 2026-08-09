@@ -348,7 +348,9 @@ artifacts. Incompatible or corrupt prior artifacts fail validation instead of
 silently erasing the comparison. It never comments, stars, forks, or edits the
 repository. Semver tags trigger the release workflow, which rebuilds the source
 archive and checksum from the exact tag before publishing them.
-Run `npm run audit:live` after a Pages deployment to verify the public HTML,
+The dedicated [live-surface workflow](.github/workflows/live.yml) runs after a
+successful Pages deployment and weekly; you can also run `npm run audit:live`
+after a Pages deployment to verify the public HTML,
 FAQ metadata, PNG social card, sitemap, robots directive, RSS item, and
 machine-readable links over HTTPS. It is a smoke test, not proof of ranking.
 
@@ -372,7 +374,8 @@ capsule/
 Automatic decisions store bounded counters and keyed fingerprints, not raw
 prompts. Explicit `index`, `remember`, and `memory capture` operations store
 only the content requested by the caller. State lives in the platform-appropriate
-local data directory.
+local data directory. See the full [privacy policy](PRIVACY.md) for the
+explicit web-search and GitHub-audit boundaries.
 
 Set `CAPSULE_STATE` to an absolute directory to choose a different local state
 root. Use the supported `purge` operation to remove cached projects or

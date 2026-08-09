@@ -6,7 +6,14 @@
     <atom:link href="https://hakiyaka.github.io/capsule/feed.xml" rel="self" type="application/rss+xml" />
     <description>Measured guides and release notes for the Capsule Codex plugin and MCP server.</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 09 Aug 2026 04:18:50 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 09 Aug 2026 04:23:25 GMT</lastBuildDate>
+    <item>
+      <title>Capsule MCP context compression guide</title>
+      <link>https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html</link>
+      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html</guid>
+      <pubDate>Sun, 09 Aug 2026 04:23:25 GMT</pubDate>
+      <description>Package a Codex plugin and bundled MCP server with a bounded, exact-recoverable context surface and explicit runtime checks.</description>
+    </item>
     <item>
       <title>Capsule 1.0.3 released</title>
       <link>https://github.com/hakiyaka/capsule/releases/tag/v1.0.3</link>
@@ -90,13 +97,6 @@
       <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/share-and-cite.html</guid>
       <pubDate>Sun, 09 Aug 2026 00:30:00 GMT</pubDate>
       <description>Use canonical project links, citation metadata, and measured claims when sharing Capsule.</description>
-    </item>
-    <item>
-      <title>Capsule MCP context compression guide</title>
-      <link>https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html</link>
-      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html</guid>
-      <pubDate>Sun, 09 Aug 2026 04:18:50 GMT</pubDate>
-      <description>Understand the single local-first MCP surface for bounded context and exact recovery.</description>
     </item>
     <item>
       <title>Capsule 1.0.0 released</title>

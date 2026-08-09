@@ -11,6 +11,8 @@ All notable user-visible changes are recorded here.
 - Make the weekly/manual visibility workflow retrieve its previous retained
   artifact, validate its provenance, and emit reproducible baseline ratios and
   repository-search deltas with a durable run/ref/SHA record.
+- Add install-surface plugin metadata parity, a visible privacy policy, newest-first
+  RSS ordering checks, and a post-Pages live-surface workflow.
 - Add a scenario-led Codex plugin/MCP packaging checklist covering the manifest,
   `mcpServers` contract, runtime verification, and relative-path
   compatibility boundaries.

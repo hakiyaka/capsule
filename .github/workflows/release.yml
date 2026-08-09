@@ -14,11 +14,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: capsule-release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
     steps:
       - name: Checkout the exact tag
@@ -26,6 +29,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -36,18 +40,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          case "$RELEASE_TAG" in
-            v[0-9]*.[0-9]*.[0-9]*) ;;
-            *) echo "Expected a vMAJOR.MINOR.PATCH tag, got $RELEASE_TAG" >&2; exit 1 ;;
-          esac
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a vMAJOR.MINOR.PATCH tag, got $RELEASE_TAG" >&2
+            exit 1
+          fi
           version="${RELEASE_TAG#v}"
           package_version="$(node -p "require('./package.json').version")"
           test "$version" = "$package_version"
           test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_TAG"
+          checked_out_sha="$(git rev-parse HEAD)"
+          remote_tag_sha="$(git ls-remote origin "refs/tags/${RELEASE_TAG}^{}" | awk '{print $1}')"
+          test -n "$remote_tag_sha"
+          test "$remote_tag_sha" = "$checked_out_sha"
           npm run verify
 
       - name: Build and verify the source archive
         shell: bash
+        env:
+          TZ: UTC
         run: |
           set -euo pipefail
           version="${RELEASE_TAG#v}"
@@ -65,6 +75,8 @@ jobs:
 
       - name: Publish or repair the GitHub release
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
@@ -73,3 +85,9 @@ jobs:
             gh release create "$RELEASE_TAG" "$RELEASE_ARCHIVE" "$RELEASE_CHECKSUM" \
               --verify-tag --title "Capsule ${RELEASE_TAG#v}" --notes-file release-notes.md
           fi
+          rm -rf release-verify
+          mkdir -p release-verify
+          gh release download "$RELEASE_TAG" \
+            --pattern "$RELEASE_ARCHIVE" --pattern "$RELEASE_CHECKSUM" \
+            --dir release-verify --clobber
+          (cd release-verify && sha256sum --check "$RELEASE_CHECKSUM")

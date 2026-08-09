@@ -30,7 +30,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          previous="$(gh run list --workflow visibility.yml --branch "$GITHUB_REF_NAME" --status success --limit 20 --json databaseId --jq '.[0].databaseId // empty')"
+          candidates="$(gh run list --workflow visibility.yml --branch "$GITHUB_REF_NAME" --status success --limit 20 --json databaseId --jq '.[].databaseId')"
+          previous=""
+          while IFS= read -r candidate; do
+            [[ -z "$candidate" ]] && continue
+            artifact_name="github-visibility-$candidate"
+            artifact_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${candidate}/artifacts?per_page=100")"
+            artifact_present="$(printf '%s' "$artifact_json" | node -e 'const fs=require("node:fs"); const name=process.argv[1]; const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data.artifacts?.some((item) => item.name === name && item.expired !== true) ? "yes" : "no");' "$artifact_name")"
+            if [[ "$artifact_present" == "yes" ]]; then
+              previous="$candidate"
+              break
+            fi
+          done <<< "$candidates"
           printf 'run_id=%s\n' "$previous" >> "$GITHUB_OUTPUT"
           if [[ -n "$previous" ]]; then
             echo "Using previous successful visibility run $previous as the comparison source."
@@ -67,8 +78,22 @@ jobs:
             }
           }
           const search = JSON.parse(fs.readFileSync("previous/visibility-search.json", "utf8"));
-          if (!Array.isArray(search.search?.queries) || search.search.queries.length === 0) {
+          const expectedQueries = [
+            "codex token efficiency",
+            "mcp context compression",
+            "codex-plugin mcp",
+            "token reduction codex",
+            "exact recoverable context",
+          ];
+          const actualQueries = search.search?.queries?.map((entry) => entry?.query);
+          if (!Array.isArray(actualQueries) || JSON.stringify(actualQueries) !== JSON.stringify(expectedQueries)) {
             throw new Error("previous/visibility-search.json: missing query snapshots");
+          }
+          const provenance = JSON.parse(fs.readFileSync("previous/visibility-provenance.json", "utf8"));
+          if (provenance.schema_version !== 1 || provenance.repository.toLowerCase() !== expected ||
+              provenance.workflow_file !== ".github/workflows/visibility.yml" ||
+              provenance.run_id !== Number(process.env.PREVIOUS_RUN_ID) || !provenance.sha || !provenance.ref) {
+            throw new Error("previous/visibility-provenance.json: incompatible provenance");
           }
           NODE
 
@@ -151,5 +176,6 @@ jobs:
             visibility.json
             visibility-search.json
             visibility-provenance.json
+          overwrite: true
           if-no-files-found: error
           retention-days: 90

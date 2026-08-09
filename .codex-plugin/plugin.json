@@ -1,27 +1,42 @@
 {
   "name": "capsule",
   "version": "1.0.3+codex.20260809035243",
-  "description": "Capsule is a portable, exact-recoverable token-efficiency, context, search, memory, evidence, and Codex hook-contract engine.",
+  "description": "Capsule is a local-first Codex plugin and MCP server for exact-recoverable token and context compression across terminal, files, projects, web, memory, and evidence.",
   "author": {
     "name": "Capsule contributors"
   },
+  "homepage": "https://hakiyaka.github.io/capsule/",
+  "repository": "https://github.com/hakiyaka/capsule",
   "license": "MIT",
   "keywords": [
+    "codex",
+    "openai-codex",
+    "codex-plugin",
+    "codex-plugin-mcp",
     "context",
+    "context-compression",
+    "context-window",
     "token-efficiency",
+    "token-reduction",
     "reasoning-efficiency",
     "compaction",
     "evidence",
+    "evidence-recovery",
     "media",
-    "mcp"
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "developer-tools"
   ],
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Capsule",
-    "shortDescription": "Semantic-exact shell structure and cross-command reuse.",
-    "longDescription": "A portable Windows, macOS, and Linux engine that detects whether the current Codex build supports plugin-bundled hooks and uses a Capsule-only global fallback when it does not. Its Terminal Lattice recognizes repeated line grammars inside a first-seen successful shell result, factors paths, URLs, versions, identifiers, timestamps, durations, sizes, percentages, and numbers into compact columns, compares mixed units by real magnitude, keeps unique and critical evidence visible, stores the exact result in an expandable capsule, and bypasses token-negative output. Its Universal Terminal Genome reuses only byte-semantic lines already carried by earlier commands. Explicit benchmark, performance, raw, exact, full, and verbatim shell evidence passes through literally. Capsule also provides local filters, gain analytics, compaction checkpoints, media deduplication, skill routing, evidence recovery, and finite reasoning offload.",
+    "shortDescription": "Codex plugin and MCP server for exact-recoverable token and context compression.",
+    "longDescription": "Capsule is a local-first Codex plugin and MCP server for exact-recoverable token and context compression. It compacts terminal, file, project, web, memory, and evidence results while keeping full local recovery available. It also provides conservative skill routing, lifecycle hooks, bounded memory, compaction checkpoints, and measurement tools. Explicit full, raw, benchmark, and verbatim requests pass through literally; provider billing and universal-savings claims remain outside local measurements.",
     "developerName": "Capsule contributors",
     "category": "Productivity",
+    "websiteURL": "https://hakiyaka.github.io/capsule/",
+    "privacyPolicyURL": "https://github.com/hakiyaka/capsule/blob/main/PRIVACY.md",
     "capabilities": [
       "Read",
       "Local",

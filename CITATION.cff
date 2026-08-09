@@ -23,5 +23,6 @@ keywords:
   - mcp-context-compression
   - codex-token-efficiency
   - exact-recoverable-context
+  - exact-recoverable
 authors:
   - name: "Capsule contributors"

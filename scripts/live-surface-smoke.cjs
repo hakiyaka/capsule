@@ -19,6 +19,11 @@ const releaseArchiveUrl = `https://github.com/hakiyaka/capsule/releases/download
 const releaseChecksumUrl = `${releaseArchiveUrl}.sha256`;
 const paths = [
   "/",
+  "/guide/codex-token-efficiency.html",
+  "/guide/mcp-context-compression.html",
+  "/guide/get-content-token-savings.html",
+  "/guide/install-capsule.html",
+  "/guide/share-and-cite.html",
   "/guide/faq.html",
   "/guide/benchmarks-and-methodology.html",
   "/guide/github-discoverability.html",
@@ -119,6 +124,8 @@ async function main() {
   check(byPath["/feed.xml"], () => /<atom:link\s+href="https:\/\/hakiyaka\.github\.io\/capsule\/feed\.xml"\s+rel="self"/i.test(feed), "RSS self link");
   check(byPath["/feed.xml"], () => feed.includes(`releases/tag/${releaseTag}`), "release RSS item");
   check(byPath["/llms.txt"], () => /guide\/faq\.html/i.test(llms), "FAQ machine-readable link");
+  check(byPath["/llms.txt"], () => /https:\/\/github\.com\/hakiyaka\/capsule\/discussions\/1/i.test(llms), "measurement discussion machine-readable link");
+  check(byPath["/llms.txt"], () => /https:\/\/github\.com\/hakiyaka\/capsule\/blob\/main\/PRIVACY\.md/i.test(llms), "privacy policy machine-readable link");
   check(byPath["/llms.txt"], () => llms.includes(releaseArchiveUrl), "release archive machine-readable link");
   check(byPath["/llms.txt"], () => llms.includes(releaseChecksumUrl), "release checksum machine-readable link");
   for (const guidePath of guidePaths) {

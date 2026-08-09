@@ -87,10 +87,13 @@ test("keeps unavailable or missing aggregate values unknown", () => {
   assert.equal(ratio(10, null), null);
   assert.equal(ratio(20, 10), 2);
   const source = fs.readFileSync(path.join(__dirname, "..", "scripts", "github-visibility-audit.cjs"), "utf8");
-  assert.match(source, /unique_viewers_14d: viewsResult\.available \? finiteNumber\(views\.uniques\) : null/);
-  assert.match(source, /unique_cloners_14d: clonesResult\.available \? finiteNumber\(clones\.uniques\) : null/);
+  assert.match(source, /unique_viewers_14d: viewsShapeValid \? finiteNumber\(views\.uniques\) : null/);
+  assert.match(source, /unique_cloners_14d: clonesShapeValid \? finiteNumber\(clones\.uniques\) : null/);
   assert.match(source, /referrer_domains_14d: null/);
   assert.match(source, /popular_paths_14d: null/);
+  assert.match(source, /malformed traffic views response/);
+  assert.match(source, /draft_releases_omitted/);
+  assert.match(source, /releaseTotalsComparable/);
   assert.match(source, /traffic windows differ/);
 });
 
@@ -132,6 +135,13 @@ test("does not convert errored or incomplete search snapshots into rank loss", (
   ), [{query: "codex", rank_improvement: null, present_in_first_100_delta: null, total_count_delta: null}]);
 });
 
+test("rejects impossible repository-search ranks", () => {
+  assert.deepEqual(compareSearchSnapshots(
+    {queries: [{query: "codex", rank_in_first_100: 0, total_count: 8}]},
+    {queries: [{query: "codex", rank_in_first_100: 101, total_count: 8}]},
+  ), [{query: "codex", rank_improvement: null, present_in_first_100_delta: 0, total_count_delta: 0}]);
+});
+
 test("keeps Windows-safe search snapshot helpers and rejects unknown flags", () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
   assert.equal(packageJson.scripts["audit:github-visibility:search:write"], "node scripts/github-visibility-audit.cjs --search --write");
@@ -152,5 +162,8 @@ test("visibility workflow compares against the previous retained artifact", () =
   assert.match(workflow, /--baseline previous\/visibility\.json/);
   assert.match(workflow, /--search --baseline previous\/visibility-search\.json/);
   assert.match(workflow, /visibility-provenance\.json/);
+  assert.match(workflow, /overwrite:\s*true/);
+  assert.match(workflow, /exact recoverable context/);
+  assert.match(workflow, /incompatible provenance/);
   assert.match(workflow, /github-visibility-\$\{\{ github\.run_id \}\}/);
 });

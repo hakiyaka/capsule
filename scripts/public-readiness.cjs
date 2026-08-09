@@ -8,11 +8,16 @@ const requiredFiles = [
   "README.md",
   "LICENSE",
   "SECURITY.md",
+  "PRIVACY.md",
   "CONTRIBUTING.md",
   "CODE_OF_CONDUCT.md",
   "CHANGELOG.md",
   ".gitignore",
   ".github/workflows/ci.yml",
+  ".github/workflows/pages.yml",
+  ".github/workflows/live.yml",
+  ".github/workflows/visibility.yml",
+  ".github/workflows/release.yml",
   ".github/ISSUE_TEMPLATE/bug_report.yml",
   ".github/ISSUE_TEMPLATE/feature_request.yml",
   ".github/pull_request_template.md",
@@ -27,6 +32,22 @@ if (missing.length) failures.push(`missing public files: ${missing.join(", ")}`)
 if (plugin.interface?.displayName !== "Capsule") failures.push("plugin displayName must be Capsule");
 if (packageJson.name !== "capsule") failures.push("package installation id must be capsule");
 if (!mcp.mcpServers?.capsule) failures.push("MCP server id must be capsule");
+const normalizeRepositoryUrl = (value) => String(value || "").replace(/\/+$/, "").replace(/\.git$/i, "");
+if (plugin.homepage !== packageJson.homepage) failures.push("plugin homepage must match package homepage");
+if (normalizeRepositoryUrl(plugin.repository) !== normalizeRepositoryUrl(packageJson.repository?.url)) failures.push("plugin repository must match package repository");
+if (plugin.interface?.websiteURL !== packageJson.homepage) failures.push("plugin websiteURL must match package homepage");
+if (plugin.interface?.privacyPolicyURL !== "https://github.com/hakiyaka/capsule/blob/main/PRIVACY.md") {
+  failures.push("plugin privacyPolicyURL must point to the public privacy policy");
+}
+const discoveryKeywords = ["codex", "codex-plugin", "mcp", "mcp-server", "token-efficiency", "context-compression"];
+for (const keyword of discoveryKeywords) {
+  if (!Array.isArray(plugin.keywords) || !plugin.keywords.includes(keyword)) {
+    failures.push(`plugin keywords must include ${keyword}`);
+  }
+}
+if (!/Codex|MCP|context compression|token/i.test(String(plugin.interface?.shortDescription || ""))) {
+  failures.push("plugin shortDescription must identify its Codex/MCP context-compression purpose");
+}
 if (!String(plugin.version).startsWith(`${packageJson.version}+`)) {
   failures.push("package and plugin versions differ");
 }

@@ -19,8 +19,10 @@
 - RSS feed: https://hakiyaka.github.io/capsule/feed.xml
 - Sitemap: https://hakiyaka.github.io/capsule/sitemap.xml
 - Citation metadata: https://github.com/hakiyaka/capsule/blob/main/CITATION.cff
+- Privacy policy: https://github.com/hakiyaka/capsule/blob/main/PRIVACY.md
 - Issues: https://github.com/hakiyaka/capsule/issues
 - Discussions: https://github.com/hakiyaka/capsule/discussions
+- Measurement discussion: https://github.com/hakiyaka/capsule/discussions/1
 - Methodology source: https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md
 - Releases: https://github.com/hakiyaka/capsule/releases
 - v1.0.3 source archive: https://github.com/hakiyaka/capsule/releases/download/v1.0.3/capsule-1.0.3-source.zip
