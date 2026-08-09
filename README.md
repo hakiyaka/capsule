@@ -71,6 +71,8 @@ and verification evidence.
 Questions and workflow comparisons belong in the public
 [Discussions](https://github.com/hakiyaka/capsule/discussions); reproducible
 defects belong in [Issues](https://github.com/hakiyaka/capsule/issues).
+The pinned starting point is [How to measure Capsule visibility and
+token-efficiency results](https://github.com/hakiyaka/capsule/discussions/1).
 
 ## A measured first web call
 
