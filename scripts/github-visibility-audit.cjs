@@ -30,7 +30,7 @@ const baselineFile = baselineIndex >= 0 ? String(argv[baselineIndex + 1] || "") 
 const writeIndex = argv.indexOf("--write");
 const writeFile = writeIndex >= 0 ? String(argv[writeIndex + 1] || "") : "";
 const searchEnabled = argv.includes("--search") || process.env.CAPSULE_GITHUB_SEARCH === "1";
-const searchCorpusVersion = 3;
+const searchCorpusVersion = 4;
 const searchQueries = [
   "codex token efficiency",
   "mcp context compression",
@@ -44,6 +44,7 @@ const searchQueries = [
   "codex plugin skills",
   "skill routing codex",
   "map token context",
+  "codex plugin mcp context compression",
 ];
 const schemaVersion = 2;
 // Bump this when the meaning of an existing metric changes without changing

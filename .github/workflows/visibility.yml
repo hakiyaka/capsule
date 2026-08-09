@@ -84,7 +84,7 @@ jobs:
             throw new Error(`${metadataFile}: repository provenance mismatch`);
           }
           const search = JSON.parse(fs.readFileSync(searchFile, "utf8"));
-          const expectedSearchCorpusVersion = 3;
+          const expectedSearchCorpusVersion = 4;
           const expectedQueries = [
             "codex token efficiency",
             "mcp context compression",
@@ -98,6 +98,7 @@ jobs:
             "codex plugin skills",
             "skill routing codex",
             "map token context",
+            "codex plugin mcp context compression",
           ];
           if (search.search?.search_corpus_version !== expectedSearchCorpusVersion) {
             remove(searchFile, `previous/visibility-search.json: incompatible search intent corpus version (expected ${expectedSearchCorpusVersion}); search baseline skipped`);
@@ -192,7 +193,7 @@ jobs:
             throw new Error("visibility-provenance.json: run identity mismatch");
           }
           const search = JSON.parse(fs.readFileSync("visibility-search.json", "utf8"));
-          if (search.search?.search_corpus_version !== 3) {
+          if (search.search?.search_corpus_version !== 4) {
             throw new Error("visibility-search.json: unsupported search corpus");
           }
           NODE

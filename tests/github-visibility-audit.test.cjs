@@ -149,7 +149,7 @@ test("compares repository-search snapshots without inventing missing ranks", () 
 test("keeps the fixed search-intent corpus versioned and synchronized", () => {
   const source = fs.readFileSync(path.join(__dirname, "..", "scripts", "github-visibility-audit.cjs"), "utf8");
   const workflow = fs.readFileSync(path.join(__dirname, "..", ".github", "workflows", "visibility.yml"), "utf8");
-  assert.match(source, /const searchCorpusVersion = 3/);
+  assert.match(source, /const searchCorpusVersion = 4/);
   for (const query of [
     "codex mcp server",
     "mcp server token efficiency",
@@ -158,12 +158,13 @@ test("keeps the fixed search-intent corpus versioned and synchronized", () => {
     "codex plugin skills",
     "skill routing codex",
     "map token context",
+    "codex plugin mcp context compression",
   ]) {
     assert.match(source, new RegExp(`\\"${query.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\"`));
     assert.match(workflow, new RegExp(`\\"${query.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\"`));
   }
-  assert.match(workflow, /const expectedSearchCorpusVersion = 3/);
-  assert.match(workflow, /search\.search\?\.search_corpus_version !== 3/);
+  assert.match(workflow, /const expectedSearchCorpusVersion = 4/);
+  assert.match(workflow, /search\.search\?\.search_corpus_version !== 4/);
 });
 
 test("does not convert errored or incomplete search snapshots into rank loss", () => {
@@ -217,6 +218,7 @@ test("visibility workflow compares against the previous retained artifact", () =
   assert.match(workflow, /mcp server token efficiency/);
   assert.match(workflow, /token optimization codex/);
   assert.match(workflow, /codex plugin/);
+  assert.match(workflow, /codex plugin mcp context compression/);
   assert.match(workflow, /incompatible provenance/);
   assert.match(workflow, /github-visibility-\$\{\{ github\.run_id \}\}/);
 });
