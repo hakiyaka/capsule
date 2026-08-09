@@ -52,6 +52,7 @@ const guides = [
   "guide/benchmarks-and-methodology.html",
   "guide/web-search-token-savings.html",
   "guide/terminal-output-token-savings.html",
+  "guide/faq.html",
 ];
 requireMatch(socialCard, /^\s*<svg\b[^>]*width="1200"[^>]*height="630"/i, "social card asset");
 if (socialCardPng) {
@@ -123,7 +124,7 @@ for (const relative of guides) {
   requireMatch(page, /name=["']twitter:image:alt["']/i, `${relative}: Twitter image alt`);
   requireMatch(page, /<h1\b[^>]*>[^<]+<\/h1>/i, `${relative}: visible H1`);
   requireMatch(page, /application\/ld\+json/i, `${relative}: JSON-LD block`);
-  if (!/"@type"\s*:\s*"(?:WebPage|HowTo)"/i.test(page)) failures.push(`${relative}: JSON-LD type`);
+  if (!/"@type"\s*:\s*"(?:WebPage|HowTo|FAQPage)"/i.test(page)) failures.push(`${relative}: JSON-LD type`);
   if (!sitemap.includes(`<loc>${expected}</loc>`)) failures.push(`${relative}: sitemap URL`);
   const sitemapBlock = new RegExp(`<url>[\\s\\S]*?<loc>${escapeRegExp(expected)}</loc>[\\s\\S]*?<lastmod>\\d{4}-\\d{2}-\\d{2}</lastmod>[\\s\\S]*?</url>`, "i");
   if (!sitemapBlock.test(sitemap)) failures.push(`${relative}: sitemap lastmod`);

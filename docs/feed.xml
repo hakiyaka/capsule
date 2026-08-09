@@ -7,6 +7,13 @@
     <language>en-us</language>
     <lastBuildDate>Sun, 09 Aug 2026 00:43:00 GMT</lastBuildDate>
     <item>
+      <title>Capsule FAQ</title>
+      <link>https://hakiyaka.github.io/capsule/guide/faq.html</link>
+      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/faq.html</guid>
+      <pubDate>Sun, 09 Aug 2026 01:30:00 GMT</pubDate>
+      <description>Answers about observable token efficiency, exact recovery, compatibility, privacy, and workload-specific measurement.</description>
+    </item>
+    <item>
       <title>Capsule benchmarks and methodology</title>
       <link>https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html</link>
       <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html</guid>
