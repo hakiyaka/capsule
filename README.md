@@ -246,6 +246,14 @@ save the read-only report for the next comparison. It also records aggregate
 referrer and popular-path counts so future outreach can be tied to observed
 traffic; traffic data is not written to Capsule state.
 
+On Windows, where npm can consume leading option names, the explicit helpers
+are reliable:
+
+```sh
+npm run audit:github-visibility:write -- path/to/snapshot.json
+npm run audit:github-visibility:baseline -- path/to/snapshot.json
+```
+
 For a consistent public reference, use the [share and cite guide](https://hakiyaka.github.io/capsule/guide/share-and-cite.html),
 the canonical [GitHub repository](https://github.com/hakiyaka/capsule), or
 [CITATION.cff](CITATION.cff). Describe the workload and version beside any

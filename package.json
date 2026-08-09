@@ -54,6 +54,8 @@
     "audit:docs": "node scripts/docs-audit.cjs",
     "audit:seo": "node scripts/seo-audit.cjs",
     "audit:github-visibility": "node scripts/github-visibility-audit.cjs",
+    "audit:github-visibility:write": "node scripts/github-visibility-audit.cjs --write",
+    "audit:github-visibility:baseline": "node scripts/github-visibility-audit.cjs --baseline",
     "verify": "npm test && npm run audit:source && npm run audit:public && npm run audit:docs && npm run audit:seo",
     "audit:sessions": "node scripts/session-audit.cjs",
     "audit:router-history": "node bench/router_history_audit.cjs",
