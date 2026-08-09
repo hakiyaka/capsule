@@ -9,7 +9,11 @@ All notable user-visible changes are recorded here.
   zeroes; label the REST watcher field as the legacy stars alias and warn when
   rolling traffic windows or API lag make a comparison non-equivalent.
 - Make the weekly/manual visibility workflow retrieve its previous retained
-  artifact and emit reproducible baseline ratios and repository-search deltas.
+  artifact, validate its provenance, and emit reproducible baseline ratios and
+  repository-search deltas with a durable run/ref/SHA record.
+- Add a scenario-led Codex plugin/MCP packaging checklist covering the manifest,
+  `mcpServers` contract, runtime verification, and relative-path
+  compatibility boundaries.
 
 ## 1.0.3 - 2026-08-09
 

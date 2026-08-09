@@ -343,10 +343,11 @@ keeps the canonical links and measurement caveat available to indexing tools.
 The repository also has a weekly and manually dispatchable read-only visibility
 workflow; it retrieves the previous retained artifact when available and emits
 null-safe baseline ratios and search deltas before storing the new timestamped
-JSON snapshots as short-lived Actions artifacts. It never comments, stars,
-forks, or edits the repository. Semver tags trigger the release workflow, which
-rebuilds the source archive and checksum from the exact tag before publishing
-them.
+JSON snapshots plus a run/ref/SHA provenance record as short-lived Actions
+artifacts. Incompatible or corrupt prior artifacts fail validation instead of
+silently erasing the comparison. It never comments, stars, forks, or edits the
+repository. Semver tags trigger the release workflow, which rebuilds the source
+archive and checksum from the exact tag before publishing them.
 Run `npm run audit:live` after a Pages deployment to verify the public HTML,
 FAQ metadata, PNG social card, sitemap, robots directive, RSS item, and
 machine-readable links over HTTPS. It is a smoke test, not proof of ranking.

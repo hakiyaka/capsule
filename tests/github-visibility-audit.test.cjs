@@ -146,7 +146,11 @@ test("visibility workflow compares against the previous retained artifact", () =
   assert.match(workflow, /actions:\s*read/);
   assert.match(workflow, /gh run list --workflow visibility\.yml/);
   assert.match(workflow, /gh run download/);
+  assert.doesNotMatch(workflow, /gh run list[\s\S]*\|\| true/);
+  assert.match(workflow, /gh api .*actions\/runs/);
+  assert.match(workflow, /incompatible audit schema/);
   assert.match(workflow, /--baseline previous\/visibility\.json/);
   assert.match(workflow, /--search --baseline previous\/visibility-search\.json/);
+  assert.match(workflow, /visibility-provenance\.json/);
   assert.match(workflow, /github-visibility-\$\{\{ github\.run_id \}\}/);
 });

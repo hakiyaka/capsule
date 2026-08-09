@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          previous="$(gh run list --workflow visibility.yml --branch "$GITHUB_REF_NAME" --status success --limit 20 --json databaseId --jq '.[0].databaseId // empty' || true)"
+          previous="$(gh run list --workflow visibility.yml --branch "$GITHUB_REF_NAME" --status success --limit 20 --json databaseId --jq '.[0].databaseId // empty')"
           printf 'run_id=%s\n' "$previous" >> "$GITHUB_OUTPUT"
           if [[ -n "$previous" ]]; then
             echo "Using previous successful visibility run $previous as the comparison source."
@@ -40,15 +40,37 @@ jobs:
 
       - name: Download the previous snapshot when available
         if: steps.previous.outputs.run_id != ''
+        env:
+          PREVIOUS_RUN_ID: ${{ steps.previous.outputs.run_id }}
         shell: bash
         run: |
           set -euo pipefail
-          previous="${{ steps.previous.outputs.run_id }}"
-          mkdir -p previous
-          if ! gh run download "$previous" --name "github-visibility-$previous" --dir previous; then
+          artifact_name="github-visibility-$PREVIOUS_RUN_ID"
+          artifact_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${PREVIOUS_RUN_ID}/artifacts?per_page=100")"
+          artifact_present="$(printf '%s' "$artifact_json" | node -e 'const fs=require("node:fs"); const name=process.argv[1]; const data=JSON.parse(fs.readFileSync(0,"utf8")); process.stdout.write(data.artifacts?.some((item) => item.name === name && item.expired !== true) ? "yes" : "no");' "$artifact_name")"
+          if [[ "$artifact_present" != "yes" ]]; then
             echo "The previous artifact is unavailable or expired; continuing without a baseline."
-            rm -rf previous
+            exit 0
           fi
+          mkdir -p previous
+          gh run download "$PREVIOUS_RUN_ID" --name "$artifact_name" --dir previous
+          node <<'NODE'
+          const fs = require("node:fs");
+          const expected = process.env.CAPSULE_GITHUB_REPO.toLowerCase();
+          for (const file of ["previous/visibility.json", "previous/visibility-search.json"]) {
+            const report = JSON.parse(fs.readFileSync(file, "utf8"));
+            if (report.audit !== "github-visibility" || report.schema_version !== 2) {
+              throw new Error(`${file}: incompatible audit schema`);
+            }
+            if (report.current?.repo?.toLowerCase() !== expected) {
+              throw new Error(`${file}: repository provenance mismatch`);
+            }
+          }
+          const search = JSON.parse(fs.readFileSync("previous/visibility-search.json", "utf8"));
+          if (!Array.isArray(search.search?.queries) || search.search.queries.length === 0) {
+            throw new Error("previous/visibility-search.json: missing query snapshots");
+          }
+          NODE
 
       - name: Capture metadata, traffic, and referral signals
         shell: bash
@@ -70,6 +92,34 @@ jobs:
             node scripts/github-visibility-audit.cjs --search --write visibility-search.json
           fi
 
+      - name: Write snapshot provenance
+        env:
+          PREVIOUS_RUN_ID: ${{ steps.previous.outputs.run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require("node:fs");
+          const report = JSON.parse(fs.readFileSync("visibility.json", "utf8"));
+          const baselineUsed = Boolean(report.baseline) && fs.existsSync("previous/visibility.json");
+          const previousRun = process.env.PREVIOUS_RUN_ID || null;
+          const provenance = {
+            schema_version: 1,
+            repository: process.env.GITHUB_REPOSITORY,
+            workflow_file: ".github/workflows/visibility.yml",
+            workflow: process.env.GITHUB_WORKFLOW,
+            run_id: Number(process.env.GITHUB_RUN_ID),
+            run_attempt: Number(process.env.GITHUB_RUN_ATTEMPT),
+            ref: process.env.GITHUB_REF,
+            sha: process.env.GITHUB_SHA,
+            captured_at: report.current?.measured_at || null,
+            baseline_used: baselineUsed,
+            baseline_run_id: baselineUsed && previousRun ? Number(previousRun) : null,
+            baseline_artifact_name: baselineUsed && previousRun ? `github-visibility-${previousRun}` : null,
+          };
+          fs.writeFileSync("visibility-provenance.json", `${JSON.stringify(provenance, null, 2)}\n`, "utf8");
+          NODE
+
       - name: Validate snapshot provenance
         shell: bash
         run: |
@@ -84,6 +134,13 @@ jobs:
             }
             if (report.schema_version !== 2) throw new Error(`${file}: unsupported schema`);
           }
+          const provenance = JSON.parse(fs.readFileSync("visibility-provenance.json", "utf8"));
+          if (provenance.schema_version !== 1 || provenance.repository.toLowerCase() !== expected) {
+            throw new Error("visibility-provenance.json: invalid provenance");
+          }
+          if (provenance.sha !== process.env.GITHUB_SHA || provenance.run_id !== Number(process.env.GITHUB_RUN_ID)) {
+            throw new Error("visibility-provenance.json: run identity mismatch");
+          }
           NODE
 
       - name: Upload the read-only snapshots
@@ -93,5 +150,6 @@ jobs:
           path: |
             visibility.json
             visibility-search.json
+            visibility-provenance.json
           if-no-files-found: error
           retention-days: 90

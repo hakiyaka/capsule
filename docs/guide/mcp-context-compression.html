@@ -18,6 +18,15 @@
     <p class="lead">MCP servers can save a round trip only when they also control the shape of the result. Capsule keeps a single action surface and applies task-specific, exact-recoverable views instead of injecting every tool catalogue and every old result into every turn.</p>
     <h2>The action map</h2>
     <div class="grid"><article class="card"><h3><code>run</code> / <code>batch</code></h3><p>Execute commands with bounded stdout/stderr projections and preserved failure evidence.</p></article><article class="card"><h3><code>file</code> / <code>project</code></h3><p>Read files or understand a codebase through ranges, symbols, impact cones, and exact expansion.</p></article><article class="card"><h3><code>fetch</code> / <code>execute</code></h3><p>Keep web text and generated data bounded while retaining real URLs and structured recovery paths.</p></article><article class="card"><h3><code>index</code> / <code>search</code></h3><p>Recall durable local facts without replaying an unbounded memory store into the model.</p></article></div>
+    <h2>Codex plugin and MCP packaging checklist</h2>
+    <p>Capsule keeps the plugin manifest and the MCP server configuration as two explicit files. The manifest points to <code>./.mcp.json</code>; the JSON file contains a camel-case <code>mcpServers</code> map. Keeping those contracts visible prevents a common failure mode where a plugin installs successfully but its bundled server is not discovered.</p>
+    <pre><code>// .codex-plugin/plugin.json
+{"name":"capsule","version":"1.0.3+codex.BUILD","mcpServers":"./.mcp.json"}
+
+// .mcp.json
+{"mcpServers":{"capsule":{"command":"node","args":["--no-warnings","./mcp/server.cjs"],"cwd":"."}}}</code></pre>
+    <div class="grid"><article class="card"><h3>Verify the two layers</h3><p>Run <code>npm run audit:public</code> after installation and inspect <code>codex mcp list</code> for the expected server name. A plugin card alone is not proof that the runtime exposed the tools.</p></article><article class="card"><h3>Test path resolution</h3><p>Do not assume every Codex build resolves relative MCP arguments from the plugin root. Keep bundled commands portable, test the installed archive on the target OS, and use the release-pinned fallback when path resolution differs.</p></article><article class="card"><h3>Keep one surface</h3><p>Do not register a second manually copied Capsule server when the plugin already owns the entry. Duplicate registrations add startup work and make tool discovery ambiguous.</p></article></div>
+    <p>For the current platform-level packaging contract, compare this example with the <a href="https://developers.openai.com/plugins/build/plugins">official Codex plugin packaging documentation</a>; runtime behavior can change between Codex builds, so keep the local verification step.</p>
     <h2>Why exact recovery matters</h2>
     <p>A small output is useful only when the omitted evidence is still available and the model can request the right portion. Capsule writes content-addressed local capsules, emits a compact proof marker, and invalidates replay when the source changes.</p>
     <h2>Compatibility and fallbacks</h2>
