@@ -69,5 +69,12 @@
       <pubDate>Sun, 09 Aug 2026 00:24:00 GMT</pubDate>
       <description>Understand the single local-first MCP surface for bounded context and exact recovery.</description>
     </item>
+    <item>
+      <title>Capsule 1.0.0 released</title>
+      <link>https://github.com/hakiyaka/capsule/releases/tag/v1.0.0</link>
+      <guid isPermaLink="true">https://github.com/hakiyaka/capsule/releases/tag/v1.0.0</guid>
+      <pubDate>Sun, 09 Aug 2026 00:14:35 GMT</pubDate>
+      <description>Stable public release with exact-recoverable workflows, reproducible benchmarks, and a checksummed source archive.</description>
+    </item>
   </channel>
 </rss>
