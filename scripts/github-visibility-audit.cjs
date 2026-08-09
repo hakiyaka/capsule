@@ -34,6 +34,9 @@ try {
   const views = api(`repos/${repo}/traffic/views`);
   const clones = api(`repos/${repo}/traffic/clones`);
   const releases = api(`repos/${repo}/releases?per_page=100`);
+  const community = (() => {
+    try { return api(`repos/${repo}/community/profile`); } catch { return null; }
+  })();
   const pages = (() => {
     try { return api(`repos/${repo}/pages`); } catch { return null; }
   })();
@@ -46,6 +49,12 @@ try {
     open_issues: Number(metadata.open_issues_count) || 0,
     topics: Array.isArray(metadata.topics) ? metadata.topics.length : 0,
     releases: Array.isArray(releases) ? releases.length : 0,
+    description_chars: String(metadata.description || "").length,
+    has_issues: Boolean(metadata.has_issues),
+    has_discussions: Boolean(metadata.has_discussions),
+    has_pages: Boolean(metadata.has_pages),
+    has_wiki: Boolean(metadata.has_wiki),
+    community_health: Number(community?.health_percentage) || null,
     views_14d: Number(views.count) || sum(views.views, "count"),
     unique_viewers_14d: Number(views.uniques) || sum(views.views, "uniques"),
     clones_14d: Number(clones.count) || sum(clones.clones, "count"),
@@ -54,12 +63,12 @@ try {
     pages_url: pages?.html_url || "",
     pages_build_type: pages?.build_type || "",
   };
-  const report = { audit: "github-visibility", current, baseline: null, ratios: null, caveat: "Traffic endpoints cover a rolling 14-day window; stars, forks, and releases are cumulative. This measures discoverability inputs, not guaranteed search ranking." };
+  const report = { audit: "github-visibility", current, baseline: null, ratios: null, caveat: "Traffic endpoints cover a rolling 14-day window; stars, forks, releases, and topics are cumulative or point-in-time metadata. This measures discoverability inputs, not guaranteed search ranking." };
   if (baselineFile) {
     const fs = require("node:fs");
     const baseline = JSON.parse(fs.readFileSync(baselineFile, "utf8"));
     report.baseline = baseline.current || baseline;
-    report.ratios = Object.fromEntries(["stars", "forks", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
+    report.ratios = Object.fromEntries(["stars", "forks", "topics", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
   }
   if (writeFile) {
     const fs = require("node:fs");

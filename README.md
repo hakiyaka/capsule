@@ -229,8 +229,9 @@ For the GitHub visibility goal, run the read-only authenticated snapshot:
 npm run audit:github-visibility
 ```
 
-It reports stars, forks, releases, topics, Pages status, and the rolling
-14-day views/clones window. Pass `--baseline path/to/snapshot.json` to compute
+It reports stars, forks, releases, topics, repository surface flags, community
+health, Pages status, and the rolling 14-day views/clones window. Pass
+`--baseline path/to/snapshot.json` to compute
 ratios against a prior snapshot, or add `--write path/to/snapshot.json` to
 save the read-only report for the next comparison; traffic data is not written
 to Capsule state.
