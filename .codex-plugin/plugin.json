@@ -1,6 +1,6 @@
 {
   "name": "capsule",
-  "version": "1.0.3+codex.20260809035243",
+  "version": "1.0.4+codex.20260809071839",
   "description": "Capsule is a local-first Codex plugin and MCP server for exact-recoverable token and context compression across terminal, files, projects, web, memory, and evidence.",
   "author": {
     "name": "Capsule contributors"

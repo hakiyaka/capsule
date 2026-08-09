@@ -22,6 +22,16 @@ All notable user-visible changes are recorded here.
   `mcpServers` contract, runtime verification, and relative-path
   compatibility boundaries.
 
+## 1.0.4 - 2026-08-09
+
+- Removed internal research ledgers and raw benchmark/session identifiers from
+  public documentation and receipts while retaining the runtime contracts.
+- Added a crawlable guide link mesh and factual citation abstract, with an
+  audit requiring one visible guide-hub link for every leaf guide.
+- Expanded the versioned repository-search intent corpus and made the weekly
+  workflow skip incompatible historical baselines instead of manufacturing
+  unlike-for-like deltas.
+
 ## 1.0.3 - 2026-08-09
 
 - Added a tag-driven release workflow that rebuilds and path-checks the source
