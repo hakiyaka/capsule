@@ -78,6 +78,10 @@ benchmarks, installation instructions, and release history remain on GitHub.
 Use the site for a concise overview and the repository for exact implementation
 and verification evidence.
 
+In search terms, Capsule is a **codex-plugin MCP server** for **token reduction**
+and **exact-recoverable context**; each phrase describes a shipped capability,
+not a ranking promise.
+
 Questions and workflow comparisons belong in the public
 [Discussions](https://github.com/hakiyaka/capsule/discussions); reproducible
 defects belong in [Issues](https://github.com/hakiyaka/capsule/issues).
