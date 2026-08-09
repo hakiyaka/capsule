@@ -11,6 +11,11 @@
 > Capsule reduces model-visible terminal, file, project, web, and context
 > output while keeping the complete result locally recoverable.
 
+![Illustrative Capsule terminal evidence view](docs/quick-demo.svg)
+
+The graphic is illustrative, not a universal percentage claim; reproduce the
+paired workload with the benchmark commands below.
+
 Codex does not need to reread the same terminal output, whole files, project
 neighbours, web pages, or tool catalogues on every turn. Capsule turns that
 repetition into compact, exact-recoverable evidence.

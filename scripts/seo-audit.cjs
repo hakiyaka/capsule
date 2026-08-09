@@ -30,6 +30,7 @@ const html = read("index.html");
 const robots = read("robots.txt");
 const sitemap = read("sitemap.xml");
 const socialCard = read("social-card.svg");
+const quickDemo = read("quick-demo.svg");
 const feed = read("feed.xml");
 const llms = read("llms.txt");
 const guides = [
@@ -41,6 +42,7 @@ const guides = [
   "guide/benchmarks-and-methodology.html",
 ];
 requireMatch(socialCard, /^\s*<svg\b[^>]*width="1200"[^>]*height="630"/i, "social card asset");
+requireMatch(quickDemo, /^\s*<svg\b[^>]*width="1200"[^>]*height="560"/i, "quick demo asset");
 requireMatch(feed, /<rss\b[^>]*version="2\.0"/i, "RSS version");
 requireMatch(feed, new RegExp(`<link>${escapeRegExp(canonical)}</link>`, "i"), "RSS canonical link");
 requireMatch(feed, /<item>[\s\S]*<guid\s+isPermaLink="true">https:\/\/hakiyaka\.github\.io\/capsule\/guide\//i, "RSS item");
@@ -106,7 +108,7 @@ for (const relative of guides) {
 const report = {
   audit: "seo",
   canonical,
-  files: ["docs/index.html", ...guides.map((file) => `docs/${file}`), "docs/robots.txt", "docs/sitemap.xml", "docs/feed.xml", "docs/llms.txt", "docs/social-card.svg"],
+  files: ["docs/index.html", ...guides.map((file) => `docs/${file}`), "docs/robots.txt", "docs/sitemap.xml", "docs/feed.xml", "docs/llms.txt", "docs/social-card.svg", "docs/quick-demo.svg"],
   json_ld_blocks: jsonLdBlocks,
   failures,
   passed: failures.length === 0,
