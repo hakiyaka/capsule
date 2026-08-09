@@ -82,6 +82,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          checked_out_sha="$(git rev-parse HEAD)"
+          remote_tag_sha="$(git ls-remote origin "refs/tags/${RELEASE_TAG}^{}" | awk '{print $1}')"
+          if [[ -z "$remote_tag_sha" ]]; then
+            remote_tag_sha="$(git ls-remote origin "refs/tags/${RELEASE_TAG}" | awk '{print $1}')"
+          fi
+          test -n "$remote_tag_sha"
+          test "$remote_tag_sha" = "$checked_out_sha"
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" "$RELEASE_ARCHIVE" "$RELEASE_CHECKSUM" --clobber
           else

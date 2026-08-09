@@ -94,6 +94,9 @@ test("keeps unavailable or missing aggregate values unknown", () => {
   assert.match(source, /malformed traffic views response/);
   assert.match(source, /draft_releases_omitted/);
   assert.match(source, /releaseTotalsComparable/);
+  assert.match(source, /metrics_semantics_version/);
+  assert.match(source, /metric semantics differ/);
+  assert.match(source, /report\.search_deltas = null/);
   assert.match(source, /traffic windows differ/);
 });
 

@@ -38,6 +38,10 @@ const searchQueries = [
   "exact recoverable context",
 ];
 const schemaVersion = 2;
+// Bump this when the meaning of an existing metric changes without changing
+// the outer report shape. Older artifacts remain readable, but are not used
+// for ratios or search deltas until a like-for-like snapshot exists.
+const metricsSemanticsVersion = 2;
 const configuredMaxBuffer = Number(process.env.CAPSULE_GITHUB_MAX_BUFFER_BYTES);
 const apiMaxBuffer = Number.isSafeInteger(configuredMaxBuffer) && configuredMaxBuffer >= 64 * 1024
   ? configuredMaxBuffer
@@ -154,6 +158,7 @@ try {
       };
   const current = {
     schema_version: schemaVersion,
+    metrics_semantics_version: metricsSemanticsVersion,
     measured_at: new Date().toISOString(),
     repo,
     stars: Number(metadata.stargazers_count) || 0,
@@ -230,6 +235,10 @@ try {
     if (baselineCurrent.repo && baselineCurrent.repo.toLowerCase() !== repo.toLowerCase()) {
       report.baseline_warnings.push(`repository differs: baseline=${baselineCurrent.repo}, current=${repo}`);
     }
+    const metricsComparable = baselineCurrent.metrics_semantics_version === metricsSemanticsVersion;
+    if (!metricsComparable) {
+      report.baseline_warnings.push(`metric semantics differ: baseline=${baselineCurrent.metrics_semantics_version ?? "missing"}, current=${metricsSemanticsVersion}`);
+    }
     for (const prefix of ["views", "clones"]) {
       const currentStart = current[`${prefix}_observed_start`];
       const currentEnd = current[`${prefix}_observed_end`];
@@ -245,9 +254,21 @@ try {
       }
     }
     const releaseTotalsComparable = current.release_pagination_complete === true && report.baseline.release_pagination_complete === true;
-    report.ratios = Object.fromEntries(["stars", "forks", "topics", "releases", "release_assets", "release_downloads", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "referrer_uniques_sum_14d", "top_path_views_14d"].map((key) => [key, ["releases", "release_assets", "release_downloads"].includes(key) && !releaseTotalsComparable ? null : ratio(current[key], report.baseline[key])]));
-    if (report.search && baseline.search) {
+    if (metricsComparable) {
+      const ratioKeys = ["stars", "forks", "topics", "releases", "release_assets", "release_downloads", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d", "referrer_views_14d", "referrer_uniques_sum_14d", "top_path_views_14d"];
+      report.ratios = Object.fromEntries(ratioKeys.map((key) => [
+        key,
+        ["releases", "release_assets", "release_downloads"].includes(key) && !releaseTotalsComparable
+          ? null
+          : ratio(current[key], report.baseline[key]),
+      ]));
+    } else {
+      report.ratios = null;
+    }
+    if (report.search && baseline.search && metricsComparable) {
       report.search_deltas = compareSearchSnapshots(report.search, baseline.search);
+    } else if (report.search && baseline.search) {
+      report.search_deltas = null;
     }
   }
   if (writeFile) {
