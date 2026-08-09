@@ -40,6 +40,7 @@ const guides = [
   "guide/install-capsule.html",
   "guide/share-and-cite.html",
   "guide/benchmarks-and-methodology.html",
+  "guide/web-search-token-savings.html",
 ];
 requireMatch(socialCard, /^\s*<svg\b[^>]*width="1200"[^>]*height="630"/i, "social card asset");
 requireMatch(quickDemo, /^\s*<svg\b[^>]*width="1200"[^>]*height="560"/i, "quick demo asset");
