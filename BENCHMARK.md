@@ -51,7 +51,7 @@ bounded metadata without opening or archiving the log. Session logs can contain
 prompts, tool data, and secrets, so explicit literal access must be treated as a
 security-sensitive action; the guard is not a general secret detector.
 
-The capability-airlock plan estimated **20,568 characters / about 5,142 tokens**
+The capability-routing plan estimated **20,568 characters / about 5,142 tokens**
 of static skill metadata avoided per request and a **1,319-character / about
 330-token** dynamic anchor, for a net estimate of about **4,812 tokens per
 request**. This is a configuration-size estimator, not provider telemetry or a
@@ -96,22 +96,22 @@ dropping unrelated `PASS` rows. These are output-projection fixtures only; the
 exact raw result remains in a Capsule and no provider-wire or hidden-reasoning
 saving is inferred.
 
-## Quota-to-Progress Exchange and Context Antimatter
+## Quota-aware progress and stale-state controls
 
 The following controller measurements address limits that raw compression alone
 cannot solve: generated output/reasoning can dominate credits, long threads can
 re-read state after compaction, and stale resolved state can re-enter a
 continuation. Third-party reports are not treated as product measurements.
 
-The Quota-to-Progress Exchange prices each turn with provider-reported uncached input, discounted cached input, and six-times-weighted generated tokens, then relates that cost to mutation, verification, tool, and completion receipts. It stores no raw prompt or final response. An expensive low-progress turn causes one bounded next-turn policy targeted at its dominant component; efficient verified work remains silent.
+The quota-aware controller prices each turn with provider-reported uncached input, discounted cached input, and six-times-weighted generated tokens, then relates that cost to mutation, verification, tool, and completion receipts. It stores no raw prompt or final response. An expensive low-progress turn causes one bounded next-turn policy targeted at its dominant component; efficient verified work remains silent.
 
-Context Antimatter makes invalidation first-class. Verified/resolved prompt fingerprints and superseded generational roots become bounded tombstones in the PreCompact live graph. A matching unchanged-epoch repeat receives a compact anti-memory receipt instead of silently reopening finished exploration. Tombstones are exact-recoverable with the generation capsule and cannot delete current positive state.
+The stale-state controller makes invalidation explicit. Verified/resolved prompt fingerprints and superseded generational roots become bounded tombstones in the PreCompact live graph. A matching unchanged-epoch repeat receives a compact anti-memory receipt instead of silently reopening finished exploration. Tombstones are exact-recoverable with the generation capsule and cannot delete current positive state.
 
 `npm run benchmark:qpx:write` exercises ten synthetic frequent verified-repeat continuations and ten changed-epoch neutral controls. Policy and neutral oracles pass **10/10 + 10/10**. On the eligible repeated-state context only, exposure falls from **5,146 to 770 estimated tokens: 85.04%**. This is a synthetic activation measurement, not a workload frequency, hidden-reasoning, cache, limit, or billing percentage. Low-progress brakes add a bounded instruction and are deliberately excluded from the direct-savings row.
 
 No universal provider-billing percentage is claimed. The controller changes future behavior, so executable safety/activation tests and post-install live receipts are reported separately from deterministic context-exposure benchmarks. Full rows are in `bench/quota-progress-exchange-results.json`.
 
-## Intent-evidence routing and synthetic regression controls
+## Intent routing and synthetic regression controls
 
 A bounded synthetic audit checks that weak single-word matches abstain while explicit modality and ownership signals still route correctly. Public receipts use aggregate outcomes and synthetic case identifiers; they do not copy local prompts, session events, skill names, or catalog paths.
 
@@ -122,9 +122,9 @@ deliverable or modality could still receive a high score. The benchmark now uses
 small synthetic catalogs and explicit negative controls so abstention quality is
 measured without publishing catalog details.
 
-The intent-evidence router removes the multi-term single-word shortcut,
+The intent router removes the multi-term single-word shortcut,
 recognizes explicit modality and ownership signals, and accepts the canonical
-`query` field. The generated airlock instruction requires a conservative
+`query` field. The generated routing instruction requires a conservative
 literal paraphrase instead of an embellished inferred intent.
 
 `npm run benchmark:router-quality:write` runs eight bounded negative controls
@@ -134,15 +134,15 @@ publishes catalog names or paths. The companion skill-routing benchmark follows
 the same rule. These are routing-quality measurements, not provider billing or
 universal task savings.
 
-## Audited semantic-exact terminal wire
+## Terminal output exactness audit
 
-The semantic-exact terminal audit found and fixed two correctness defects in the preceding implementation: Terminal Genome normalized timestamps and durations before cross-command hashing, so a material change such as `100ms -> 10s` could disappear from the visible projection; and mixed size/duration columns were ordered by their bare number, so `2MB..900KB` could be reported backwards. It also corrected hidden-line counters, reserved visible budget for critical/new evidence, added literal bypass for benchmark/performance/raw/full/verbatim shell requests, and unified native matching for shell, Bash/sh/zsh/fish, PowerShell/pwsh, cmd, terminal, exec, local-shell, and write-stdin tool names.
+The terminal exactness audit found and fixed two correctness defects in the preceding implementation: the prior terminal projection normalized timestamps and durations before cross-command hashing, so a material change such as `100ms -> 10s` could disappear from the visible projection; and mixed size/duration columns were ordered by their bare number, so `2MB..900KB` could be reported backwards. It also corrected hidden-line counters, reserved visible budget for critical/new evidence, added literal bypass for benchmark/performance/raw/full/verbatim shell requests, and unified native matching for shell, Bash/sh/zsh/fish, PowerShell/pwsh, cmd, terminal, exec, local-shell, and write-stdin tool names.
 
-`npm run benchmark:terminal-real:write` executes read-only commands against this actual checkout and feeds their complete shell envelopes through the real `node scripts/hook.cjs posttooluse` stdin/stdout process. It includes first-seen listings and hashes, a warm partial-overlap pair, source search, focused and full tests, hook/plugin status, runtime/npm output, a real failed command, and literal performance/verbatim negative controls. All **15/15** wire, exact-recovery, critical-evidence, and passthrough oracles pass. In the recorded 2026-07-28 run, the Terminal Lattice/Genome layer activates on four cases and reduces exact `o200k_base` model-visible output from **2,712 to 545 tokens: 79.90%**. The complete existing shell pipeline, including non-Terminal exact compressors and control-envelope removal, reduces **16,713 to 4,415 tokens: 73.58%** across all fifteen cases. The latter is not attributable to Terminal Lattice/Genome alone; small run-to-run token variation is possible because real wall times and content-addressed capsule IDs are part of the wire payload.
+`npm run benchmark:terminal-real:write` executes read-only commands against this actual checkout and feeds their complete shell envelopes through the real `node scripts/hook.cjs posttooluse` stdin/stdout process. It includes first-seen listings and hashes, a warm partial-overlap pair, source search, focused and full tests, hook/plugin status, runtime/npm output, a real failed command, and literal performance/verbatim negative controls. All **15/15** wire, exact-recovery, critical-evidence, and passthrough oracles pass. In the recorded 2026-07-28 run, the terminal deduplication layer activates on four cases and reduces exact `o200k_base` model-visible output from **2,712 to 545 tokens: 79.90%**. The complete existing shell pipeline, including non-terminal exact compressors and control-envelope removal, reduces **16,713 to 4,415 tokens: 73.58%** across all fifteen cases. The latter is not attributable to the terminal deduplication layer alone; small run-to-run token variation is possible because real wall times and content-addressed capsule IDs are part of the wire payload.
 
 `npm run benchmark:terminal-fuzz:write` runs 320 deterministic property cases covering structured, Unicode, critical-safe, critical-heavy, unstructured, failed, literal, and warm semantic-change outputs. All **320/320** pass; 160 activate; exact `o200k_base` token regressions, false activations, and missed expected activations are all **0**. Activated synthetic stress output falls from **566,744 to 28,117 tokens: 95.04%**. This is a robustness result, not a real-usage percentage.
 
-The original activation fixtures remain useful only as upper-bound feature tests. Re-measured under the semantic-exact implementation, first-seen synthetic output falls from **34,694 to 1,358 tokens: 96.09%**, and the synthetic four-command chain falls from **57,932 to 2,188: 96.22%**. Full reports are in `bench/terminal-real-wire-results.json`, `bench/terminal-pareto-fuzz-results.json`, `bench/terminal-lattice-results.json`, and `bench/terminal-genome-results.json`.
+The original activation fixtures remain useful only as upper-bound feature tests. Re-measured under the corrected implementation, first-seen synthetic output falls from **34,694 to 1,358 tokens: 96.09%**, and the synthetic four-command chain falls from **57,932 to 2,188: 96.22%**. Full reports are in `bench/terminal-real-wire-results.json`, `bench/terminal-pareto-fuzz-results.json`, `bench/terminal-lattice-results.json`, and `bench/terminal-genome-results.json`.
 
 These measurements cover model-visible local hook output, not hidden prompts, hidden reasoning, provider caching, subscription quota accounting, or billing. Short, unstructured, failed, literal-evidence, critical-heavy, and token-negative results intentionally pass through.
 
@@ -183,17 +183,17 @@ as non-replayable. Increase or bound the scan explicitly with
 `CAPSULE_HISTORY_MAX_BYTES`; the default is 2 GB to keep an audit local and
 predictable.
 
-## Terminal Lattice and Universal Terminal Genome synthetic activation A/B
+## Synthetic terminal-family activation A/B
 
-The original Terminal Lattice fixture repeats one generated line grammar under ten shell-family labels; it is synthetic activation evidence, not ten independently captured shell formats. Under the corrected implementation, all **10/10** cases activate and pass, and exact `o200k_base` output falls from **34,694 to 1,358 tokens: 96.09% saved**.
+The first synthetic terminal-family fixture repeats one generated line grammar under ten shell-family labels; it is synthetic activation evidence, not ten independently captured shell formats. Under the corrected implementation, all **10/10** cases activate and pass, and exact `o200k_base` output falls from **34,694 to 1,358 tokens: 96.09% saved**.
 
-The Terminal Genome fixture likewise uses generated shared boilerplate. Across ten labels and four commands each, all **10/10** family oracles pass and output falls from **57,932 to 2,188 tokens: 96.22% saved**. These are synthetic upper-bound feature results.
+The cross-command terminal fixture likewise uses generated shared boilerplate. Across ten labels and four commands each, all **10/10** family oracles pass and output falls from **57,932 to 2,188 tokens: 96.22% saved**. These are synthetic upper-bound feature results.
 
-## Universal Terminal Genome A/B
+## Cross-command terminal deduplication A/B
 
-The Terminal Genome benchmark runs ten shell families with four different successful commands per family. It preserves the first output, then removes task-visible semantic lines already carried by earlier commands while retaining every new line and an exact capsule. The selector is command-name independent and Pareto-bypasses small, unique, failed, or token-negative output. Full measured results are in bench/terminal-genome-results.json.
+The cross-command terminal benchmark runs ten shell families with four different successful commands per family. It preserves the first output, then removes task-visible semantic lines already carried by earlier commands while retaining every new line and an exact capsule. The selector is command-name independent and Pareto-bypasses small, unique, failed, or token-negative output. Full measured results are in bench/terminal-genome-results.json.
 
-## Zero-Inference Poll Reactor A/B
+## Bounded status polling A/B
 
 `npm run benchmark:zero-poll:write` measures 15 warm-state status-wait scenarios: GitHub Actions, Kubernetes, and a Git worktree at 8K, 32K, 96K, 160K, and 240K context sizes. Arm A returns five successive status observations through five model re-entries. Arm B recognizes the second unchanged observation, coalesces four bounded local observations in the native shell wrapper, and returns only when the semantic state changes.
 
@@ -258,7 +258,7 @@ Control notices are now self-describing compact tags, so a transformed result no
 
 The full executable suite passes **99/99** tests.
 
-## Predictive runway and loop A/B
+## Adaptive scheduling and loop A/B
 
 These controls use bounded fixture inputs and report scheduling/context effects,
 not user-session history.
@@ -358,7 +358,7 @@ separately.
 
 The deployed selector saved tokens on 26 tasks and routed 22 tiny, non-applicable, or unsafe-to-compress tasks unchanged. That produced **100% task-level non-regression** and zero deterministic evidence failures. Positive-task savings ranged from 50.60% to 99.92%; transformed tasks saved **99.69%** in aggregate.
 
-## Virtual skill-catalog A/B
+## Skill catalog routing A/B
 
 `npm run benchmark:skills` compares the active direct-skill catalog with one
 compact route result using `o200k_base`. Arm A exposed all metadata on every
@@ -376,11 +376,11 @@ Both arms were correct on **7/7** tasks. Provider-reported `reasoning_output_tok
 
 The deterministic companion benchmark moved **626,404 symbolic search states** outside generation across seven fixtures, returned 2,732 model-visible characters, passed **7/7** known optima, added zero hook context to **10/10** trivial prompts, and detected **7/7** branch-heavy prompts. Search states are not equated to provider tokens.
 
-## Closed-loop reasoning governor
+## Reasoning budget guard
 
-At each user prompt, the governor snapshots the cumulative provider-recorded reasoning counter for that Codex session. Pre/post-tool boundaries read only later `token_count` records and emit at most one warning at 512 reasoning tokens and one brake at 1,536 by default. The brake asks the model to finish the minimum verified path instead of opening new branches. Tests cover exact baseline/delta parsing, warning and brake transitions, duplicate suppression, hook delivery, and status reporting.
+At each user prompt, the reasoning budget guard snapshots the cumulative provider-recorded reasoning counter for that Codex session. Pre/post-tool boundaries read only later `token_count` records and emit at most one warning at 512 reasoning tokens and one brake at 1,536 by default. The brake asks the model to finish the minimum verified path instead of opening new branches. Tests cover exact baseline/delta parsing, warning and brake transitions, duplicate suppression, hook delivery, and status reporting.
 
-The governor does not inspect prompts, responses, hidden reasoning, or tool content. It cannot retract reasoning already spent before the first tool boundary, so no standalone percentage is attributed to it. Its value is closed-loop control across multi-step tool-using turns; the 99.23% figure above belongs specifically to deterministic cognitive certificates, not to the governor.
+The guard does not inspect prompts, responses, hidden reasoning, or tool content. It cannot retract reasoning already spent before the first tool boundary, so no standalone percentage is attributed to it. Its value is feedback control across multi-step tool-using turns; the 99.23% figure above belongs specifically to deterministic cognitive certificates, not to this guard.
 
 ## Corpus
 
