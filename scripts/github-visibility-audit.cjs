@@ -30,12 +30,17 @@ const baselineFile = baselineIndex >= 0 ? String(argv[baselineIndex + 1] || "") 
 const writeIndex = argv.indexOf("--write");
 const writeFile = writeIndex >= 0 ? String(argv[writeIndex + 1] || "") : "";
 const searchEnabled = argv.includes("--search") || process.env.CAPSULE_GITHUB_SEARCH === "1";
+const searchCorpusVersion = 2;
 const searchQueries = [
   "codex token efficiency",
   "mcp context compression",
   "codex-plugin mcp",
   "token reduction codex",
   "exact recoverable context",
+  "codex mcp server",
+  "mcp server token efficiency",
+  "token optimization codex",
+  "codex plugin",
 ];
 const schemaVersion = 2;
 // Bump this when the meaning of an existing metric changes without changing
@@ -269,10 +274,11 @@ try {
     pages_available: pagesResult.available,
     pages_error: pagesResult.error,
   };
-  const report = { audit: "github-visibility", schema_version: schemaVersion, current, baseline: null, ratios: null, caveat: "Traffic endpoints cover a rolling 14-day window; API aggregate uniques are preserved and missing aggregates remain unknown; referrer uniques are summed per-domain values rather than global uniques; REST watchers_count is a legacy stars alias; stars, forks, releases, and topics are cumulative or point-in-time metadata. This measures discoverability inputs, not guaranteed search ranking." };
+  const report = { audit: "github-visibility", schema_version: schemaVersion, current, baseline: null, ratios: null, caveat: "Traffic endpoints cover a rolling 14-day window; API aggregate uniques are preserved and missing aggregates remain unknown; referrer uniques are summed per-domain values rather than global uniques; release_downloads is the sum of asset requests across releases, not unique users or installations; REST watchers_count is a legacy stars alias; stars, forks, releases, and topics are cumulative or point-in-time metadata. This measures discoverability inputs, not guaranteed search ranking." };
   if (searchEnabled) {
     report.search = {
       schema_version: schemaVersion,
+      search_corpus_version: searchCorpusVersion,
       measured_at: new Date().toISOString(),
       queries: searchQueries.map(searchSnapshot),
       caveat: "GitHub repository-search order and totals are volatile snapshots, not search-engine ranking or traffic guarantees.",
@@ -293,6 +299,10 @@ try {
     const metricsComparable = baselineCurrent.metrics_semantics_version === metricsSemanticsVersion;
     if (!metricsComparable) {
       report.baseline_warnings.push(`metric semantics differ: baseline=${baselineCurrent.metrics_semantics_version ?? "missing"}, current=${metricsSemanticsVersion}`);
+    }
+    const searchCorpusComparable = !baseline.search || baseline.search.search_corpus_version === searchCorpusVersion;
+    if (baseline.search && !searchCorpusComparable) {
+      report.baseline_warnings.push(`search intent corpus differs: baseline=${baseline.search.search_corpus_version ?? "missing"}, current=${searchCorpusVersion}`);
     }
     for (const prefix of ["views", "clones"]) {
       const currentStart = current[`${prefix}_observed_start`];
@@ -320,7 +330,7 @@ try {
     } else {
       report.ratios = null;
     }
-    if (report.search && baseline.search && metricsComparable) {
+    if (report.search && baseline.search && metricsComparable && searchCorpusComparable) {
       report.search_deltas = compareSearchSnapshots(report.search, baseline.search);
     } else if (report.search && baseline.search) {
       report.search_deltas = null;

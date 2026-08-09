@@ -94,6 +94,7 @@ test("keeps unavailable or missing aggregate values unknown", () => {
   assert.match(source, /malformed traffic views response/);
   assert.match(source, /draft_releases_omitted/);
   assert.match(source, /releaseTotalsComparable/);
+  assert.match(source, /release_downloads is the sum of asset requests/);
   assert.match(source, /metrics_semantics_version/);
   assert.match(source, /is:public/);
   assert.match(source, /metric semantics differ/);
@@ -119,18 +120,41 @@ test("uses the GitHub popular referrers endpoint", () => {
 });
 
 test("compares repository-search snapshots without inventing missing ranks", () => {
-  const current = { queries: [
+  const current = { search_corpus_version: 2, queries: [
     {query: "codex token efficiency", rank_in_first_100: 12, total_count: 40, incomplete_results: false},
     {query: "mcp context compression", rank_in_first_100: null, total_count: 118, incomplete_results: false},
+    {query: "codex mcp server", rank_in_first_100: 31, total_count: 2_135, incomplete_results: false},
+    {query: "mcp server token efficiency", rank_in_first_100: 9, total_count: 21, incomplete_results: false},
+    {query: "token optimization codex", rank_in_first_100: null, total_count: 65, incomplete_results: false},
+    {query: "codex plugin", rank_in_first_100: null, total_count: 5_215, incomplete_results: false},
   ]};
-  const baseline = { queries: [
+  const baseline = { search_corpus_version: 2, queries: [
     {query: "codex token efficiency", rank_in_first_100: 20, total_count: 34, incomplete_results: false},
     {query: "mcp context compression", rank_in_first_100: 99, total_count: 117, incomplete_results: false},
+    {query: "codex mcp server", rank_in_first_100: 44, total_count: 2_100, incomplete_results: false},
+    {query: "mcp server token efficiency", rank_in_first_100: 10, total_count: 20, incomplete_results: false},
+    {query: "token optimization codex", rank_in_first_100: null, total_count: 64, incomplete_results: false},
+    {query: "codex plugin", rank_in_first_100: null, total_count: 5_100, incomplete_results: false},
   ]};
   assert.deepEqual(compareSearchSnapshots(current, baseline), [
     {query: "codex token efficiency", rank_improvement: 8, present_in_first_100_delta: 0, total_count_delta: 6},
     {query: "mcp context compression", rank_improvement: null, present_in_first_100_delta: -1, total_count_delta: 1},
+    {query: "codex mcp server", rank_improvement: 13, present_in_first_100_delta: 0, total_count_delta: 35},
+    {query: "mcp server token efficiency", rank_improvement: 1, present_in_first_100_delta: 0, total_count_delta: 1},
+    {query: "token optimization codex", rank_improvement: null, present_in_first_100_delta: 0, total_count_delta: 1},
+    {query: "codex plugin", rank_improvement: null, present_in_first_100_delta: 0, total_count_delta: 115},
   ]);
+});
+
+test("keeps the fixed search-intent corpus versioned and synchronized", () => {
+  const source = fs.readFileSync(path.join(__dirname, "..", "scripts", "github-visibility-audit.cjs"), "utf8");
+  const workflow = fs.readFileSync(path.join(__dirname, "..", ".github", "workflows", "visibility.yml"), "utf8");
+  assert.match(source, /const searchCorpusVersion = 2/);
+  for (const query of ["codex mcp server", "mcp server token efficiency", "token optimization codex", "codex plugin"]) {
+    assert.match(source, new RegExp(`\\"${query.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\"`));
+    assert.match(workflow, new RegExp(`\\"${query.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\"`));
+  }
+  assert.match(workflow, /const expectedSearchCorpusVersion = 2/);
 });
 
 test("does not convert errored or incomplete search snapshots into rank loss", () => {
@@ -174,6 +198,13 @@ test("visibility workflow compares against the previous retained artifact", () =
   assert.match(workflow, /visibility-provenance\.json/);
   assert.match(workflow, /overwrite:\s*true/);
   assert.match(workflow, /exact recoverable context/);
+  assert.match(workflow, /search\.search\?\.search_corpus_version/);
+  assert.match(workflow, /incompatible search intent corpus version/);
+  assert.match(workflow, /continuing without a baseline/);
+  assert.match(workflow, /codex mcp server/);
+  assert.match(workflow, /mcp server token efficiency/);
+  assert.match(workflow, /token optimization codex/);
+  assert.match(workflow, /codex plugin/);
   assert.match(workflow, /incompatible provenance/);
   assert.match(workflow, /github-visibility-\$\{\{ github\.run_id \}\}/);
 });

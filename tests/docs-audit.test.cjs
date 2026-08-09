@@ -14,4 +14,5 @@ test("public documentation audit passes", () => {
   const report = JSON.parse(output);
   assert.equal(report.passed, true, JSON.stringify(report));
   assert.ok(report.inspected_files >= 10);
+  assert.equal(report.guide_hub_links, report.leaf_guides);
 });

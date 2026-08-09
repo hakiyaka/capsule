@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: "If you use Capsule, please cite the repository or link to the canonical project page."
 title: "Capsule"
 type: software
+abstract: "Capsule is a local-first Codex plugin and MCP server that reduces repetitive terminal, file, project, web, memory, and context output while preserving exact local recovery and conservative passthrough behavior."
 version: 1.0.3
 date-released: 2026-08-09
 repository-code: "https://github.com/hakiyaka/capsule"

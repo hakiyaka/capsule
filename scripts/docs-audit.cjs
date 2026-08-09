@@ -51,6 +51,13 @@ function localLinks(text) {
     .filter((target) => target && !/^(?:[a-z]+:|#|\/\/)/i.test(target));
 }
 
+function htmlAnchors(text) {
+  return [...text.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].map((match) => ({
+    target: (match[1].match(/\bhref=["']([^"']+)["']/i) || [])[1] || "",
+    label: match[2].replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim(),
+  }));
+}
+
 function githubSourceLinks(text) {
   return [...text.matchAll(/https:\/\/github\.com\/hakiyaka\/capsule\/(?:blob|tree)\/main\/([^"'<>?#\s]+)/gi)]
     .map((match) => decodeURIComponent(match[1]));
@@ -87,10 +94,32 @@ for (const file of files) {
 const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
 if (!readme.includes("npm run verify")) failures.push({ file: "README.md", issue: "missing verify command" });
 
+const guideRoot = path.join(root, "docs", "guide");
+const guideFiles = walk(guideRoot).filter((file) => path.extname(file).toLowerCase() === ".html");
+const guideHub = path.join(guideRoot, "index.html");
+const leafGuides = guideFiles.filter((file) => path.resolve(file) !== path.resolve(guideHub));
+let guideHubLinks = 0;
+for (const file of leafGuides) {
+  const anchors = htmlAnchors(fs.readFileSync(file, "utf8"));
+  const hasHubLink = anchors.some(({ target, label }) => {
+    if (!target || /^(?:[a-z]+:|#|\/\/)/i.test(target)) return false;
+    const cleanTarget = target.split("#", 1)[0].split("?", 1)[0];
+    const resolved = path.resolve(path.dirname(file), cleanTarget);
+    return resolved === path.resolve(guideHub) && /^all guides$/i.test(label);
+  });
+  if (hasHubLink) {
+    guideHubLinks += 1;
+  } else {
+    failures.push({ file: relative(file), issue: "guide page missing visible All guides link" });
+  }
+}
+
 const report = {
   audit: "docs",
   passed: failures.length === 0,
   inspected_files: files.length,
+  leaf_guides: leafGuides.length,
+  guide_hub_links: guideHubLinks,
   failures,
 };
 process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);

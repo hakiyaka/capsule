@@ -65,29 +65,42 @@ jobs:
           fi
           mkdir -p previous
           gh run download "$PREVIOUS_RUN_ID" --name "$artifact_name" --dir previous
+          set +e
           node <<'NODE'
           const fs = require("node:fs");
           const expected = process.env.CAPSULE_GITHUB_REPO.toLowerCase();
+          const incompatible = (message) => {
+            console.error(message);
+            process.exit(2);
+          };
           for (const file of ["previous/visibility.json", "previous/visibility-search.json"]) {
             const report = JSON.parse(fs.readFileSync(file, "utf8"));
             if (report.audit !== "github-visibility" || report.schema_version !== 2) {
-              throw new Error(`${file}: incompatible audit schema`);
+              incompatible(`${file}: incompatible audit schema`);
             }
             if (report.current?.repo?.toLowerCase() !== expected) {
               throw new Error(`${file}: repository provenance mismatch`);
             }
           }
           const search = JSON.parse(fs.readFileSync("previous/visibility-search.json", "utf8"));
+          const expectedSearchCorpusVersion = 2;
           const expectedQueries = [
             "codex token efficiency",
             "mcp context compression",
             "codex-plugin mcp",
             "token reduction codex",
             "exact recoverable context",
+            "codex mcp server",
+            "mcp server token efficiency",
+            "token optimization codex",
+            "codex plugin",
           ];
+          if (search.search?.search_corpus_version !== expectedSearchCorpusVersion) {
+            incompatible(`previous/visibility-search.json: incompatible search intent corpus version (expected ${expectedSearchCorpusVersion})`);
+          }
           const actualQueries = search.search?.queries?.map((entry) => entry?.query);
           if (!Array.isArray(actualQueries) || JSON.stringify(actualQueries) !== JSON.stringify(expectedQueries)) {
-            throw new Error("previous/visibility-search.json: missing query snapshots");
+            incompatible("previous/visibility-search.json: missing query snapshots");
           }
           const provenance = JSON.parse(fs.readFileSync("previous/visibility-provenance.json", "utf8"));
           if (provenance.schema_version !== 1 || provenance.repository.toLowerCase() !== expected ||
@@ -96,6 +109,14 @@ jobs:
             throw new Error("previous/visibility-provenance.json: incompatible provenance");
           }
           NODE
+          status=$?
+          set -e
+          if [[ "$status" -eq 2 ]]; then
+            echo "Previous snapshot is from an incompatible schema or search corpus; continuing without a baseline."
+            rm -rf previous
+          elif [[ "$status" -ne 0 ]]; then
+            exit "$status"
+          fi
 
       - name: Capture metadata, traffic, and referral signals
         shell: bash
@@ -160,11 +181,16 @@ jobs:
             if (report.schema_version !== 2) throw new Error(`${file}: unsupported schema`);
           }
           const provenance = JSON.parse(fs.readFileSync("visibility-provenance.json", "utf8"));
-          if (provenance.schema_version !== 1 || provenance.repository.toLowerCase() !== expected) {
+          if (provenance.schema_version !== 1 || provenance.repository.toLowerCase() !== expected ||
+              provenance.workflow_file !== ".github/workflows/visibility.yml" || !provenance.ref || !provenance.sha) {
             throw new Error("visibility-provenance.json: invalid provenance");
           }
           if (provenance.sha !== process.env.GITHUB_SHA || provenance.run_id !== Number(process.env.GITHUB_RUN_ID)) {
             throw new Error("visibility-provenance.json: run identity mismatch");
+          }
+          const search = JSON.parse(fs.readFileSync("visibility-search.json", "utf8"));
+          if (search.search?.search_corpus_version !== 2) {
+            throw new Error("visibility-search.json: unsupported search corpus");
           }
           NODE
 
