@@ -7,7 +7,10 @@
 - Repository: https://github.com/hakiyaka/capsule
 - Project site: https://hakiyaka.github.io/capsule/
 - Installation: https://hakiyaka.github.io/capsule/guide/install-capsule.html
+- FAQ: https://hakiyaka.github.io/capsule/guide/faq.html
 - Benchmarks: https://hakiyaka.github.io/capsule/guide/benchmarks-and-methodology.html
+- Web search guide: https://hakiyaka.github.io/capsule/guide/web-search-token-savings.html
+- Terminal guide: https://hakiyaka.github.io/capsule/guide/terminal-output-token-savings.html
 - Methodology source: https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md
 - Releases: https://github.com/hakiyaka/capsule/releases
 
