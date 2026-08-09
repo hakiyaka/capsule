@@ -259,6 +259,8 @@ verified property in Google Search Console and submit
 `https://hakiyaka.github.io/capsule/sitemap.xml`; Google controls crawl and
 ranking decisions, so submission is a discovery signal rather than a ranking
 guarantee.
+The same site exposes a small [RSS feed](https://hakiyaka.github.io/capsule/feed.xml)
+for release and guide updates so real users and aggregators can follow changes.
 
 ## Repository map
 
