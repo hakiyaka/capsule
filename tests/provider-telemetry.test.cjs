@@ -43,10 +43,16 @@ test("provider telemetry reports exact reasoning, context, cache, and limit coun
   const result = telemetry.snapshot({ session_file: session }).response;
   assert.equal(result.available, true);
   assert.equal(result.exact_provider_counters, true);
+  assert.equal(Object.hasOwn(result, "session_file"), false);
+  assert.equal(Object.hasOwn(result, "session_id"), false);
   assert.equal(result.last_request.reasoning_output_tokens, 500);
   assert.equal(result.last_request.uncached_input_tokens, 10_000);
   assert.equal(result.last_request.cache_hit_percent, 75);
   assert.equal(result.context.used_percent, 40);
   assert.equal(result.limits.primary.used_percent, 72);
   assert.equal(result.limits.secondary.window_minutes, 10_080);
+
+  const verbose = telemetry.snapshot({ session_file: session, session: "fixture-session", include_identity: true }).response;
+  assert.equal(verbose.session_file, path.resolve(session));
+  assert.equal(verbose.session_id, "fixture-session");
 });

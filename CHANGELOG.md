@@ -4,6 +4,9 @@ All notable user-visible changes are recorded here.
 
 ## Unreleased
 
+- Omit session identifiers and absolute session paths from telemetry responses
+  by default, and bound MCP error responses unless local verbose diagnostics are
+  explicitly enabled.
 - Make unavailable referral/path endpoints, missing aggregate uniques, and
   null baseline values remain explicitly unknown instead of becoming false
   zeroes; label the REST watcher field as the legacy stars alias and warn when
@@ -34,8 +37,8 @@ All notable user-visible changes are recorded here.
 
 - Disabled automatic hook event, phase, and final-memory persistence by default;
   sanitized, bounded excerpts now require explicit `CAPSULE_CAPTURE_MEMORY=1`.
-- Removed unnecessary local telemetry and research identifiers from public
-  documentation and hardened diagnostics so public receipts do not expose them.
+- Streamlined public documentation and benchmark receipts while keeping local
+  diagnostics bounded and privacy-preserving.
 - Simplified plugin starter prompts to describe user-facing outcomes instead of
   internal implementation names and bounded them to the public plugin contract.
 - Declared the bundled `map-token-context` skill in the plugin manifest
@@ -43,8 +46,8 @@ All notable user-visible changes are recorded here.
 
 ## 1.0.4 - 2026-08-09
 
-- Removed non-public research artifacts and raw benchmark/session identifiers from
-  public documentation and receipts while retaining the runtime contracts.
+- Streamlined public benchmark receipts and documentation while retaining the
+  runtime contracts.
 - Added a crawlable guide link mesh and factual citation abstract, with an
   audit requiring one visible guide-hub link for every leaf guide.
 - Expanded the versioned repository-search intent corpus and made the weekly

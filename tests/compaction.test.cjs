@@ -73,6 +73,9 @@ test("context pressure detects high occupancy, compaction thrash, and retained i
 
     const result = compaction.contextPressure({ session_file: file }).response;
     assert.equal(result.available, true);
+    assert.equal(Object.hasOwn(result, "session_file"), false);
+    const diagnostic = compaction.contextPressure({ session_file: file, include_identity: true }).response;
+    assert.equal(diagnostic.session_file, path.resolve(file));
     assert.equal(result.input_tokens, 85_000);
     assert.equal(result.context_window, 100_000);
     assert.equal(result.used_percent, 85);

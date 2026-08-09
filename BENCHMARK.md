@@ -203,25 +203,40 @@ This is a warm repeated-poll result, not an all-task or billing percentage. Cold
 
 ## Real Codex hook-wire A/B
 
-`npm run benchmark:hook-contract:write` runs isolated A/B workers from the same hook-contract fixture, with a deterministic seed (`549519342`), separate state roots, 30 eligible plus 30 negative controls per family, and one exact `tiktoken 0.12.0` `o200k_base` batch over 360 model-visible strings. The treatment uses Codex's supported `PostToolUse` replacement shape (`continue:false` plus `reason`); the control returns the original tool result.
+`npm run benchmark:hook-contract:write` compares isolated control and treatment
+runs from the same hook-contract fixture. It covers 90 eligible and 90 negative
+controls and uses exact `o200k_base` input-token accounting. The treatment uses
+Codex's supported `PostToolUse` replacement contract; the control returns the
+original tool result.
 
 Across 90 eligible cases, model-visible payloads fell from **394,080 to 13,731 tokens: 96.52% saved**. Across all 180 cases, including 90 deliberately untouched controls, they fell from **434,596 to 54,247: 87.52% saved**. The three eligible-family results are **99.65%** for large hook-contract outputs, **78.68%** for exact quiet poll repeats, and **55.62% incremental** for structured `.codex/sessions` projection compared with the existing generic transcript shield. All 90 negative controls have **0 token change and 0 false positives**; all 180 treatment quality oracles pass. Full results are in `bench/hook-contract-results.json`.
 
 These are feature-activation task-set results, not a universal usage percentage. Fixed prompts, hidden reasoning, provider cache/billing, host compaction envelopes, short novel outputs, failures, terminal polls, and explicit full-output requests are excluded or intentionally pass through. Local live telemetry is therefore reported separately and is expected to be lower.
 
-### Correction to the historical simulated figures
+### Limit of the historical simulation
 
-The legacy simulated benchmark below measured a compressor candidate exposed through `updatedMCPToolOutput`. Current Codex parses that field but does not support it as a `PostToolUse` replacement, so **97.76% eligible and 56.95% mixed were simulation/projection figures, not verified real Codex delivery**. The contract-valid benchmark retains those rows only as historical compressor tests, excludes legacy hook events from default `gain`, and uses the verified A/B above for its shipped claim.
+The historical rows below model an older compressor delivery path. Their
+**97.76% eligible** and **56.95% mixed** reductions are simulation/projection
+figures, not verified live Codex delivery. They remain useful regression data;
+the contract-valid hook-wire A/B above is the shipped result.
 
 ## Historical simulated round-trip A/B
 
-`npm run benchmark:roundtrip-contract:write` compares two isolated arms of the same code fixture: A disables the five policies with environment switches; B enables them. The deterministic seed is `549519342`. Exact model-visible payload counts use one batched `tiktoken 0.12.0` `o200k_base` pass over 481 strings rather than a character approximation.
+`npm run benchmark:roundtrip-contract:write` compares a disabled-policy arm
+with a treatment arm on the same deterministic fixture. Exact input-token counts
+use `o200k_base` rather than a character approximation.
 
 The direct corpus has 90 eligible and 90 negative-control tasks, with 30+30 cases each for successful exec control envelopes, normal-pressure oversized-output circuits, and subagent fork exposure. On the 90 activated cases, exact input-token exposure fell from **4,363,296 to 97,541: 97.76% saved**. On the mixed 180-case corpus—including all deliberately untouched failures, live/timing outputs, bounded/history-dependent forks, and below-threshold payloads—exposure fell from **7,489,644 to 3,224,084: 56.95% saved**.
 
 Per eligible family, exact-token savings are **52.56%** for redundant successful exec envelopes, **97.82%** for oversized high-entropy output, and **94.67%** for self-contained subagent fork exposure. Oversized-output exact recovery is **100%**. All 90 negative controls are byte-preserving passthroughs, with **0 false positives**.
 
-The read/plan sequence fuse and cache-aware round-trip tax use 30 positive and 30 negative detection cases each. Detection is **100%**, false positives are **0**, and cache-tax duplicate suppression plus changed-sample re-detection are **100%**. These warnings are not counted as direct savings because a warning alone does not prove that a future model/tool call was avoided. The cache-tax signal also tightens output/history budgets mechanically; provider caching, billing, hidden prompts, output tokens, latency, and image tokens remain outside this benchmark.
+The read/plan sequence fuse and cache-aware round-trip tax use 30 positive and 30
+negative detection cases each. Detection is **100%**, false positives are **0**,
+and cache-tax duplicate suppression plus changed-sample re-detection are **100%**.
+These warnings are not counted as direct savings because a warning alone does not
+prove that a future model/tool call was avoided; provider caching, billing,
+hidden prompts, output tokens, latency, and image tokens remain outside this
+benchmark.
 
 The historical suite passed **107/107** tests. Full rows and gates are in `bench/roundtrip-contract-results.json`; they do not prove host delivery.
 

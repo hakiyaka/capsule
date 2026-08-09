@@ -231,7 +231,6 @@ function writeHeartbeat(event, input) {
       at: new Date().toISOString(),
       event: normalized,
       pid: process.pid,
-      session_id: sessionId(input),
       script: path.resolve(__filename),
     };
     fs.writeFileSync(temporary, `${JSON.stringify(heartbeat)}\n`, "utf8");
@@ -340,7 +339,6 @@ function recordProviderSessionPointer(input) {
   ]);
   if (!sessionFile || !fs.existsSync(sessionFile)) return;
   writeHookState(path.join(hookRoot(), "provider-telemetry-current.json"), {
-    session_id: explicitSessionId(input),
     session_file: path.resolve(sessionFile),
     project: projectDir(input),
     timestamp: new Date().toISOString(),

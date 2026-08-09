@@ -130,4 +130,12 @@ test("stdio MCP handshake and tool call", async (context) => {
     ledgerBody.dollar_estimate.range_usd.all_uncached >
     ledgerBody.dollar_estimate.range_usd.all_cached
   );
+
+  const missingPath = path.join(workspace, "private", "missing.txt");
+  const failed = await request("tools/call", {
+    name: "capsule",
+    arguments: { action: "file", payload: { path: missingPath } },
+  });
+  assert.equal(failed.result.isError, true);
+  assert.doesNotMatch(failed.result.content[0].text, new RegExp(workspace.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 });

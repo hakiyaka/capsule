@@ -62,6 +62,16 @@ function sessionFile(args = {}) {
   return cognition.locateSessionFile(args);
 }
 
+function includeIdentity(args = {}) {
+  return args.include_identity === true ||
+    args.include_session_metadata === true ||
+    process.env.CAPSULE_INCLUDE_SESSION_METADATA === "1";
+}
+
+function identityFields(args, file) {
+  return includeIdentity(args) ? { session_file: path.resolve(file) } : {};
+}
+
 function tokenUsage(record) {
   if (record?.type !== "event_msg" || record?.payload?.type !== "token_count") return null;
   const info = record.payload.info || {};
@@ -146,7 +156,7 @@ function auditSession(args = {}) {
   return {
     response: {
       available: true,
-      session_file: path.resolve(file),
+      ...identityFields(args, file),
       compactions: events.length,
       measured_transitions: complete.length,
       direct_compaction_tokens: {
@@ -674,7 +684,7 @@ function contextPressure(args = {}) {
   return {
     response: {
       available: Boolean(latest),
-      session_file: path.resolve(file),
+      ...identityFields(args, file),
       input_tokens: input,
       cached_input_tokens: cachedInput,
       uncached_input_tokens: uncachedInput,

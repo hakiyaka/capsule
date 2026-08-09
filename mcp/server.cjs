@@ -6,6 +6,18 @@ const unified = require("./unified.cjs");
 const tools = require("./schema.cjs");
 const packageMetadata = require("../package.json");
 
+function errorSummary(error) {
+  const name = String(error?.name || "Error").replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 80) || "Error";
+  const code = error?.code == null
+    ? ""
+    : ` (${String(error.code).replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 40)})`;
+  if (process.env.CAPSULE_VERBOSE_ERRORS === "1") {
+    const detail = String(error?.message || error || "").replace(/[\r\n\t]+/g, " ").slice(0, 240);
+    return `${name}${code}: ${detail}`;
+  }
+  return `${name}${code}`;
+}
+
 function send(message) {
   process.stdout.write(`${JSON.stringify(message)}\n`);
 }
@@ -69,7 +81,7 @@ async function handle(message) {
       }
       result(message.id, { content: [{ type: "text", text }], isError: false });
     } catch (error) {
-      const text = JSON.stringify({ error: error.message });
+      const text = JSON.stringify({ error: errorSummary(error) });
       core.recordExposure("capsule:error", 0, text.length);
       result(message.id, { content: [{ type: "text", text }], isError: true });
     }
@@ -91,16 +103,16 @@ process.stdin.on("data", (chunk) => {
     if (!line) continue;
     try {
       Promise.resolve(handle(JSON.parse(line))).catch((error) => {
-        protocolError(null, -32603, `Internal error: ${error.message}`);
+        protocolError(null, -32603, `Internal error: ${errorSummary(error)}`);
       });
     } catch (error) {
-      protocolError(null, -32700, `Parse error: ${error.message}`);
+      protocolError(null, -32700, `Parse error: ${errorSummary(error)}`);
     }
   }
 });
 
 process.stdin.on("end", () => process.exit(0));
 process.on("uncaughtException", (error) => {
-  process.stderr.write(`capsule fatal: ${error.stack || error.message}\n`);
+  process.stderr.write(`capsule fatal: ${errorSummary(error)}\n`);
   process.exit(1);
 });

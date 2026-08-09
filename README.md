@@ -327,7 +327,8 @@ for the explicit web-search and GitHub-audit boundaries.
 
 Set `CAPSULE_STATE` to an absolute directory to choose a different local state
 root. Use the supported `purge` operation to remove cached projects or
-capsules.
+capsules. Telemetry responses omit session identities and absolute paths by
+default; request `include_identity:true` only for a local diagnostic.
 
 ## Contributing
 

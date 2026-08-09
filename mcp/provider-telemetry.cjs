@@ -30,6 +30,21 @@ function normalizeLimit(value) {
   };
 }
 
+function includeIdentity(args = {}) {
+  return args.include_identity === true ||
+    args.include_session_metadata === true ||
+    process.env.CAPSULE_INCLUDE_SESSION_METADATA === "1";
+}
+
+function identityFields(args, file, session = "") {
+  return includeIdentity(args)
+    ? {
+      session_id: String(session || ""),
+      session_file: path.resolve(file),
+    }
+    : {};
+}
+
 function eachJsonLine(file, callback) {
   const descriptor = fs.openSync(file, "r");
   const buffer = Buffer.alloc(256 * 1024);
@@ -129,7 +144,7 @@ function snapshot(args = {}) {
       response: {
         available: false,
         source: "Codex provider token_count events",
-        session_file: path.resolve(file),
+        ...identityFields(args, file, resolved.args.session),
         caveat: "The session is readable but contains no provider token_count event.",
       },
       capturedChars: 0,
@@ -145,8 +160,7 @@ function snapshot(args = {}) {
       source: "Codex provider token_count and rate_limits events",
       session_selection: resolved.selection,
       pointer_timestamp: resolved.pointer_timestamp || null,
-      session_id: String(resolved.args.session || ""),
-      session_file: path.resolve(file),
+      ...identityFields(args, file, resolved.args.session),
       samples: samples.length,
       latest_timestamp: latest.timestamp,
       cumulative: latest.total,

@@ -20,6 +20,12 @@ explicitly selects an external operation.
 - Hook failure diagnostics keep only an error class, optional code, bounded
   length, and a short message fingerprint; stack traces, paths, and error text
   are not persisted by the hook logger.
+- Provider/compaction telemetry responses omit session identifiers and absolute
+  session paths by default. Use `include_identity:true` (or the explicit
+  `CAPSULE_INCLUDE_SESSION_METADATA=1` setting) only for local diagnostics.
+- MCP error responses expose only a bounded error class by default. Set
+  `CAPSULE_VERBOSE_ERRORS=1` temporarily when a local diagnostic needs the
+  bounded message detail.
 - GitHub Pages, GitHub Actions, and any other hosting provider process their own
   access logs under their policies. Those services are not Capsule telemetry.
 
