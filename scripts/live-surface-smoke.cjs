@@ -92,6 +92,7 @@ async function main() {
   check(byPath["/sitemap.xml"], () => /guide\/faq\.html/i.test(sitemap) && /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/i.test(sitemap), "FAQ and lastmod");
   check(byPath["/robots.txt"], () => /Sitemap:\s*https:\/\/hakiyaka\.github\.io\/capsule\/sitemap\.xml/i.test(robots), "sitemap directive");
   check(byPath["/feed.xml"], () => /guide\/faq\.html/i.test(feed), "FAQ RSS item");
+  check(byPath["/feed.xml"], () => /releases\/tag\/v1\.0\.0/i.test(feed), "release RSS item");
   check(byPath["/llms.txt"], () => /guide\/faq\.html/i.test(llms), "FAQ machine-readable link");
   for (const guidePath of guidePaths) {
     const escaped = guidePath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
