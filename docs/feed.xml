@@ -6,7 +6,21 @@
     <atom:link href="https://hakiyaka.github.io/capsule/feed.xml" rel="self" type="application/rss+xml" />
     <description>Measured guides and release notes for the Capsule Codex plugin and MCP server.</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 09 Aug 2026 08:14:54 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 09 Aug 2026 08:30:24 GMT</lastBuildDate>
+    <item>
+      <title>Capsule 1.0.7 released</title>
+      <link>https://github.com/hakiyaka/capsule/releases/tag/v1.0.7</link>
+      <guid isPermaLink="true">https://github.com/hakiyaka/capsule/releases/tag/v1.0.7</guid>
+      <pubDate>Sun, 09 Aug 2026 08:30:24 GMT</pubDate>
+      <description>Added a crawlable Codex plugin skills guide and versioned repository-search intents for the bundled map-token-context router.</description>
+    </item>
+    <item>
+      <title>Codex plugin skills guide</title>
+      <link>https://hakiyaka.github.io/capsule/guide/codex-plugin-skills.html</link>
+      <guid isPermaLink="true">https://hakiyaka.github.io/capsule/guide/codex-plugin-skills.html</guid>
+      <pubDate>Sun, 09 Aug 2026 08:20:00 GMT</pubDate>
+      <description>Verify the bundled map-token-context routing, plugin manifest, and no-match safety before relying on token-context guidance.</description>
+    </item>
     <item>
       <title>Capsule 1.0.6 released</title>
       <link>https://github.com/hakiyaka/capsule/releases/tag/v1.0.6</link>

@@ -22,6 +22,14 @@ All notable user-visible changes are recorded here.
   `mcpServers` contract, runtime verification, and relative-path
   compatibility boundaries.
 
+## 1.0.7 - 2026-08-09
+
+- Added a substantive Codex plugin skills guide for the bundled
+  `map-token-context` router, manifest verification, no-match safety, and
+  exact-recovery boundaries.
+- Expanded the fixed GitHub repository-search corpus with skill-routing intents
+  so future snapshots measure the new surface without treating rank as traffic.
+
 ## 1.0.6 - 2026-08-09
 
 - Disabled automatic hook event, phase, and final-memory persistence by default;

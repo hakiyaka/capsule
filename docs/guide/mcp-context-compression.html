@@ -22,7 +22,7 @@
     <h2>Codex plugin and MCP packaging checklist</h2>
     <p>Capsule keeps the bundled skill, plugin manifest, and MCP server configuration as explicit components. The manifest points to <code>./skills/</code> and <code>./.mcp.json</code>; the JSON file contains a camel-case <code>mcpServers</code> map. Keeping those contracts visible prevents a common failure mode where a plugin installs successfully but its bundled skill or server is not discovered.</p>
     <pre><code>// .codex-plugin/plugin.json
-{"name":"capsule","version":"1.0.6+codex.BUILD","skills":"./skills/","mcpServers":"./.mcp.json"}
+{"name":"capsule","version":"1.0.7+codex.BUILD","skills":"./skills/","mcpServers":"./.mcp.json"}
 
 // .mcp.json
 {"mcpServers":{"capsule":{"command":"node","args":["--no-warnings","./mcp/server.cjs"],"cwd":"."}}}</code></pre>

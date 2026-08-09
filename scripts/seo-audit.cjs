@@ -67,6 +67,7 @@ const guides = [
   "guide/mcp-context-compression.html",
   "guide/get-content-token-savings.html",
   "guide/install-capsule.html",
+  "guide/codex-plugin-skills.html",
   "guide/share-and-cite.html",
   "guide/benchmarks-and-methodology.html",
   "guide/github-discoverability.html",

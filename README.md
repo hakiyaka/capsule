@@ -91,6 +91,7 @@ token-efficiency results](https://github.com/hakiyaka/capsule/discussions/1).
 For concise boundary and compatibility answers, see the [Capsule FAQ](https://hakiyaka.github.io/capsule/guide/faq.html).
 
 Public guides: [install](https://hakiyaka.github.io/capsule/guide/install-capsule.html),
+[Codex plugin skills](https://hakiyaka.github.io/capsule/guide/codex-plugin-skills.html),
 [Codex token efficiency](https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html),
 [MCP context compression](https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html),
 [Get-Content](https://hakiyaka.github.io/capsule/guide/get-content-token-savings.html),
@@ -136,8 +137,8 @@ Add the repository root as a local Codex plugin. The bundled
 and its lifecycle hooks. Trust the hooks when Codex asks, then restart Codex.
 
 For a reproducible checkout instead of the moving `main` branch, use the
-[v1.0.6 release](https://github.com/hakiyaka/capsule/releases/tag/v1.0.6) and
-verify its [SHA-256 sidecar](https://github.com/hakiyaka/capsule/releases/download/v1.0.6/capsule-1.0.6-source.zip.sha256)
+[v1.0.7 release](https://github.com/hakiyaka/capsule/releases/tag/v1.0.7) and
+verify its [SHA-256 sidecar](https://github.com/hakiyaka/capsule/releases/download/v1.0.7/capsule-1.0.7-source.zip.sha256)
 before unpacking the source archive. Capsule is intentionally clone/release
 based (`package.json` remains private); it is not the unrelated public npm
 package named `capsule`.
@@ -290,7 +291,7 @@ GitHub's repository-level link card is separate from Pages metadata: upload
 [`docs/social-card.png`](docs/social-card.png) under **Settings → General →
 Social preview** when you control the repository.
 The same site exposes a small [RSS feed](https://hakiyaka.github.io/capsule/feed.xml)
-for release and all ten guide pages so real users and aggregators can follow
+for releases and all guide pages so real users and aggregators can follow
 changes without relying on a search result.
 The [GitHub discoverability guide](https://hakiyaka.github.io/capsule/guide/github-discoverability.html)
 summarizes repeatable measurement limits, while the concise

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Codex Plugin Skills: Safe Routing with Capsule</title>
+    <meta name="description" content="Install, verify, and safely route Capsule's bundled map-token-context Codex plugin skill without loading unrelated specialist context.">
+    <link rel="canonical" href="https://hakiyaka.github.io/capsule/guide/codex-plugin-skills.html">
+    <link rel="alternate" type="application/rss+xml" href="../feed.xml" title="Capsule updates">
+    <meta property="og:type" content="article"><meta property="og:site_name" content="Capsule"><meta property="og:title" content="Codex Plugin Skills: Safe Routing with Capsule"><meta property="og:description" content="Install and verify Capsule's bundled map-token-context skill, then route specialist expertise conservatively with a no-match safety floor."><meta property="og:url" content="https://hakiyaka.github.io/capsule/guide/codex-plugin-skills.html"><meta property="og:image" content="https://hakiyaka.github.io/capsule/social-card.png"><meta property="og:image:alt" content="Capsule exact-recoverable context compression for Codex"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Codex Plugin Skills: Safe Routing with Capsule"><meta name="twitter:description" content="Install and verify Capsule's bundled map-token-context skill, then route specialist expertise conservatively with a no-match safety floor."><meta name="twitter:url" content="https://hakiyaka.github.io/capsule/guide/codex-plugin-skills.html"><meta name="twitter:image" content="https://hakiyaka.github.io/capsule/social-card.png"><meta name="twitter:image:alt" content="Capsule exact-recoverable context compression for Codex">
+    <link rel="stylesheet" href="../styles.css">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Codex Plugin Skills: Safe Routing with Capsule","description":"Install, verify, and safely route Capsule's bundled map-token-context Codex plugin skill.","url":"https://hakiyaka.github.io/capsule/guide/codex-plugin-skills.html","isPartOf":{"@type":"WebSite","url":"https://hakiyaka.github.io/capsule/"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Capsule","item":"https://hakiyaka.github.io/capsule/"},{"@type":"ListItem","position":2,"name":"Codex plugin skills","item":"https://hakiyaka.github.io/capsule/guide/codex-plugin-skills.html"}]}</script>
+  </head>
+  <body><main>
+    <nav aria-label="Primary navigation"><a href="../">Capsule home</a><a href="index.html">All guides</a><a href="https://github.com/hakiyaka/capsule">GitHub source</a><a href="../guide/install-capsule.html">Install</a></nav>
+    <p class="eyebrow">Codex plugin skills</p>
+    <h1>Route useful expertise without importing the whole catalog.</h1>
+    <p class="lead">Capsule bundles <code>map-token-context</code> as the control-plane skill for large or reasoning-heavy Codex work. It compiles finite branching decisions outside model generation, routes virtualized specialist skills on demand, and keeps model-visible input and output bounded across tools, files, history, images, subagents, search, and recall.</p>
+
+    <h2>What the bundled skill is for</h2>
+    <div class="grid">
+      <article class="card"><h3>Compile bounded decisions</h3><p>Use the Capsule action surface and its deterministic decision helpers to settle finite covers, assignments, paths, or other branch-heavy choices before asking the model to narrate them. The model still supplies judgment that is not encoded in the input.</p></article>
+      <article class="card"><h3>Route specialist work</h3><p>A short English intent is matched against installed <code>SKILL.md</code> descriptions. The default route returns one domain-anchored match with a compact description and a real <code>skill_file</code> path; the selected skill is read only when it is relevant.</p></article>
+      <article class="card"><h3>Keep evidence recoverable</h3><p>Terminal, file, project, web, memory, and subagent results can use bounded views with exact local recovery. Compression is a local context decision, not a promise about provider-side billing, hidden reasoning, or cache behavior.</p></article>
+    </div>
+    <p>The bundled source is <a href="https://github.com/hakiyaka/capsule/tree/main/skills/map-token-context"><code>skills/map-token-context/</code></a>, with its contract in <a href="https://github.com/hakiyaka/capsule/blob/main/skills/map-token-context/SKILL.md"><code>SKILL.md</code></a>, the default Codex-facing prompt in <a href="https://github.com/hakiyaka/capsule/blob/main/skills/map-token-context/agents/openai.yaml"><code>agents/openai.yaml</code></a>, and recovery details in <a href="https://github.com/hakiyaka/capsule/blob/main/skills/map-token-context/references/capsule-contract.md"><code>references/capsule-contract.md</code></a>. These are ordinary repository files: the router does not copy the entire skill catalog into every turn.</p>
+
+    <h2>How the manifest exposes it</h2>
+    <p>The Codex plugin manifest points at the bundled skill root and the single MCP configuration. Keep these paths relative to the plugin root when registering a local checkout.</p>
+    <pre><code>// .codex-plugin/plugin.json
+{
+  "name": "capsule",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}
+
+// .mcp.json
+{"mcpServers":{"capsule":{"command":"node","args":["--no-warnings","./mcp/server.cjs"],"cwd":"."}}}</code></pre>
+    <p>Compare the exact files in the <a href="https://github.com/hakiyaka/capsule/blob/main/.codex-plugin/plugin.json">plugin manifest</a> and <a href="https://github.com/hakiyaka/capsule/blob/main/.mcp.json">MCP manifest</a>. The <code>skills</code> pointer means a normal install discovers <code>skills/map-token-context/SKILL.md</code>; it does not mean every optional or personal skill is automatically activated.</p>
+
+    <h2>Route an installed skill</h2>
+    <p>Call the one <code>capsule</code> MCP tool with a public query that paraphrases the literal task. The query is required; keep it specific enough to identify a domain rather than repeating generic status or context-control language.</p>
+    <pre><code>{"action":"skills","payload":{"operation":"route","query":"Audit an API authorization bypass"}}</code></pre>
+    <p>A successful response contains a short <code>matches</code> array. Each match can include the skill name, bounded description, score, and a real <code>skill_file</code> path. Read that selected file, not every candidate. The default is one result; pass a larger limit only when the task genuinely needs multiple independent specialists. The route never moves or edits the installed catalog.</p>
+    <p>If the MCP transport is unavailable, the bundled implementation has the same dispatch behavior through <a href="https://github.com/hakiyaka/capsule/blob/main/scripts/skill-router.cjs"><code>scripts/skill-router.cjs</code></a>:</p>
+    <pre><code>node scripts/skill-router.cjs route "Audit an API authorization bypass"</code></pre>
+
+    <h2>No match is a safety result</h2>
+    <div class="panel"><p>When no installed specialist clears the relevance floor, Capsule returns <code>matches: []</code> with a no-relevant-match reason. Continue on the normal Capsule route; do not guess a skill or treat abstention as an installation failure.</p></div>
+    <div class="grid">
+      <article class="card"><h3>Overlap is not enough</h3><p>Phrase overlap alone cannot clear the floor, and adjacent phrases do not bridge removed stopwords. A generic word such as “status” or “continue” is not mailbox, architecture, presentation, PDF, or security intent.</p></article>
+      <article class="card"><h3>Control-plane queries stay local</h3><p>Token, context, routing, compaction, and other generic Capsule control-plane questions cannot accidentally load an unrelated specialist. Ask for the specialist domain explicitly when you really need one.</p></article>
+      <article class="card"><h3>Security has a domain gate</h3><p>Security-oriented specialists require explicit security intent. A normal product, mailbox, or documentation request that happens to contain “audit” should remain on the base route.</p></article>
+    </div>
+    <p>This abstention behavior is deliberate: a false positive injects irrelevant instructions and consumes context, while a no-match leaves the core task available. The router also returns at most the requested bounded metadata; it does not re-inject a large specialist description.</p>
+
+    <h2>Install and verify</h2>
+    <p>Use the same local plugin workflow as the <a href="../guide/install-capsule.html">Capsule installation guide</a>. Node.js 18 or newer and a Codex build with local plugin/MCP support are required.</p>
+    <pre><code>git clone https://github.com/hakiyaka/capsule.git
+cd capsule
+npm test
+npm run verify</code></pre>
+    <ol>
+      <li>Add the repository root as a local Codex plugin. Trust the bundled hooks if Codex asks, then restart Codex.</li>
+      <li>Confirm the manifest pointers before debugging routing:
+        <pre><code>node -e "const p=require('./.codex-plugin/plugin.json'); if(p.skills!=='./skills/'||p.mcpServers!=='./.mcp.json') process.exit(1); console.log(p.skills,p.mcpServers)"</code></pre>
+      </li>
+      <li>Exercise the local router with an intent that names a real domain:
+        <pre><code>node scripts/skill-router.cjs route "Compile a branch-heavy token task and route specialist skills"</code></pre>
+      </li>
+      <li>Check the live MCP state with <code>{"action":"doctor","payload":{}}</code>. For documentation and public-link regressions, run <code>npm run audit:public</code>, <code>npm run audit:docs</code>, and <code>npm run audit:seo</code>.</li>
+    </ol>
+    <p>For a reproducible checkout, pin a release such as <a href="https://github.com/hakiyaka/capsule/releases/tag/v1.0.7">v1.0.7</a> and verify its <a href="https://github.com/hakiyaka/capsule/releases/download/v1.0.7/capsule-1.0.7-source.zip.sha256">SHA-256 sidecar</a> before unpacking. The repository is clone/release based; it is not the unrelated public npm package named <code>capsule</code>.</p>
+
+    <h2>Limitations and boundaries</h2>
+    <table><thead><tr><th>Boundary</th><th>What to expect</th></tr></thead><tbody>
+      <tr><td>Catalog size</td><td>Routing is a compact selector, not a full specialist index. A match points to a file; reading and following that file still costs context.</td></tr>
+      <tr><td>Ambiguous intent</td><td>Low-confidence, generic, unsafe, or token-negative requests pass through or return no match. Make the query more domain-specific instead of raising <code>limit</code> blindly.</td></tr>
+      <tr><td>Provider visibility</td><td>Local characters, token estimates, hashes, and recovery IDs describe model-facing exposure. Capsule cannot see hidden provider reasoning, provider cache keys, subscription limits, latency, or billing counters.</td></tr>
+      <tr><td>Hook scope</td><td>Codex hooks can rewrite allowed tool input, replace eligible tool results, and add bounded context. They cannot remove the base system/developer/user prompt, make waits event-driven, or retract an answer after generation.</td></tr>
+      <tr><td>Recovery and privacy</td><td>Exact expansion requires a real capsule ID returned by an earlier call; IDs are never invented. Local state is bounded and content-addressed, but captured files and session logs can contain sensitive material—use the documented privacy controls and explicit full-read modes carefully.</td></tr>
+    </tbody></table>
+    <p>Read the <a href="https://github.com/hakiyaka/capsule/blob/main/README.md">README</a>, <a href="https://github.com/hakiyaka/capsule/blob/main/SECURITY.md">security policy</a>, and <a href="https://github.com/hakiyaka/capsule/blob/main/PRIVACY.md">privacy policy</a> for the complete contracts. Skill routing is a conservative convenience layer; it is not an authorization boundary or a substitute for reviewing the selected skill.</p>
+
+    <footer><a href="../">Capsule</a> · <a href="https://github.com/hakiyaka/capsule/releases">Releases</a> · <a href="https://github.com/hakiyaka/capsule/blob/main/CONTRIBUTING.md">Contributing</a></footer>
+  </main></body>
+</html>

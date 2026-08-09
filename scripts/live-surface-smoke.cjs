@@ -24,6 +24,7 @@ const paths = [
   "/guide/mcp-context-compression.html",
   "/guide/get-content-token-savings.html",
   "/guide/install-capsule.html",
+  "/guide/codex-plugin-skills.html",
   "/guide/share-and-cite.html",
   "/guide/faq.html",
   "/guide/benchmarks-and-methodology.html",
@@ -46,6 +47,7 @@ const guidePaths = [
   "mcp-context-compression.html",
   "get-content-token-savings.html",
   "install-capsule.html",
+  "codex-plugin-skills.html",
   "share-and-cite.html",
   "benchmarks-and-methodology.html",
   "github-discoverability.html",
@@ -113,7 +115,7 @@ async function main() {
     if (result.method !== "HEAD") check(result, (value) => value.bytes.length > 0, "non-empty body");
   }
   const byPath = Object.fromEntries(results.map((result) => [result.pathname, result]));
-  const home = text(byPath["/"]); const guideIndex = text(byPath["/guide/index.html"]); const faq = text(byPath["/guide/faq.html"]); const discoverability = text(byPath["/guide/github-discoverability.html"]);
+  const home = text(byPath["/"]); const guideIndex = text(byPath["/guide/index.html"]); const faq = text(byPath["/guide/faq.html"]); const discoverability = text(byPath["/guide/github-discoverability.html"]); const pluginSkills = text(byPath["/guide/codex-plugin-skills.html"]);
   const sitemap = text(byPath["/sitemap.xml"]); const robots = text(byPath["/robots.txt"]);
   const feed = text(byPath["/feed.xml"]); const llms = text(byPath["/llms.txt"]);
   check(byPath["/"], (value) => /<link\s+rel=["']canonical["']\s+href=["']https:\/\/hakiyaka\.github\.io\/capsule\/["']/i.test(text(value)), "canonical home");
@@ -121,6 +123,7 @@ async function main() {
   check(byPath["/guide/index.html"], () => /CollectionPage/i.test(guideIndex) && /Capsule Guides/i.test(guideIndex) && /social-card\.png/i.test(guideIndex), "guide index metadata");
   check(byPath["/guide/faq.html"], () => /FAQPage/i.test(faq) && /social-card\.png/i.test(faq), "FAQ structured metadata");
   check(byPath["/guide/github-discoverability.html"], () => /GitHub Discoverability/i.test(discoverability) && /social-card\.png/i.test(discoverability), "discoverability guide metadata");
+  check(byPath["/guide/codex-plugin-skills.html"], () => /Codex Plugin Skills/i.test(pluginSkills) && /social-card\.png/i.test(pluginSkills), "plugin skills guide metadata");
   check(byPath["/sitemap.xml"], () => /guide\/faq\.html/i.test(sitemap) && /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/i.test(sitemap), "FAQ and lastmod");
   check(byPath["/robots.txt"], () => /Sitemap:\s*https:\/\/hakiyaka\.github\.io\/capsule\/sitemap\.xml/i.test(robots), "sitemap directive");
   check(byPath["/feed.xml"], () => /guide\/faq\.html/i.test(feed), "FAQ RSS item");
