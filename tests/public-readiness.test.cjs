@@ -26,4 +26,6 @@ test("tagged release workflow pins the tree and verifies a deterministic archive
   assert.match(workflow, /if \[\[ -z "\$remote_tag_sha" \]\]/);
   assert.match(workflow, /TZ:\s*UTC/);
   assert.match(workflow, /sha256sum --check/);
+  const liveWorkflow = fs.readFileSync(path.join(root, ".github", "workflows", "live.yml"), "utf8");
+  assert.match(liveWorkflow, /workflow_run\.head_sha/);
 });
