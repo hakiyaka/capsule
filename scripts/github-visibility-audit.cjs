@@ -11,6 +11,8 @@ const repoIndex = argv.indexOf("--repo");
 const repo = repoIndex >= 0 ? String(argv[repoIndex + 1] || "") : (process.env.CAPSULE_GITHUB_REPO || "hakiyaka/capsule");
 const baselineIndex = argv.indexOf("--baseline");
 const baselineFile = baselineIndex >= 0 ? String(argv[baselineIndex + 1] || "") : "";
+const writeIndex = argv.indexOf("--write");
+const writeFile = writeIndex >= 0 ? String(argv[writeIndex + 1] || "") : "";
 
 function api(endpoint) {
   const result = spawnSync("gh", ["api", endpoint], { encoding: "utf8", windowsHide: true });
@@ -58,6 +60,11 @@ try {
     const baseline = JSON.parse(fs.readFileSync(baselineFile, "utf8"));
     report.baseline = baseline.current || baseline;
     report.ratios = Object.fromEntries(["stars", "forks", "views_14d", "unique_viewers_14d", "clones_14d", "unique_cloners_14d"].map((key) => [key, ratio(current[key], report.baseline[key])]));
+  }
+  if (writeFile) {
+    const fs = require("node:fs");
+    fs.writeFileSync(writeFile, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+    report.written_to = writeFile;
   }
   process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
 } catch (error) {

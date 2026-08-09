@@ -45,7 +45,8 @@
     "SECURITY.md",
     "CONTRIBUTING.md",
     "CODE_OF_CONDUCT.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "CITATION.cff"
   ],
   "scripts": {
     "audit:source": "node bench/source_integrity_audit.cjs",

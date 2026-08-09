@@ -3,6 +3,8 @@
 [![CI](https://github.com/hakiyaka/capsule/actions/workflows/ci.yml/badge.svg)](https://github.com/hakiyaka/capsule/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/website-GitHub%20Pages-222?logo=github)](https://hakiyaka.github.io/capsule/)
+[![GitHub release](https://img.shields.io/github/v/release/hakiyaka/capsule?display_name=tag)](https://github.com/hakiyaka/capsule/releases)
+[![GitHub stars](https://img.shields.io/github/stars/hakiyaka/capsule?style=social)](https://github.com/hakiyaka/capsule)
 
 > **A local-first Codex plugin and MCP server for exact-recoverable context compression.**
 >
@@ -225,7 +227,14 @@ npm run audit:github-visibility
 
 It reports stars, forks, releases, topics, Pages status, and the rolling
 14-day views/clones window. Pass `--baseline path/to/snapshot.json` to compute
-ratios against a prior snapshot; traffic data is not written to Capsule state.
+ratios against a prior snapshot, or add `--write path/to/snapshot.json` to
+save the read-only report for the next comparison; traffic data is not written
+to Capsule state.
+
+For a consistent public reference, use the [share and cite guide](https://hakiyaka.github.io/capsule/guide/share-and-cite.html),
+the canonical [GitHub repository](https://github.com/hakiyaka/capsule), or
+[CITATION.cff](CITATION.cff). Describe the workload and version beside any
+measurement; do not present one benchmark as a universal saving or ranking claim.
 
 The historical Get-Content replay benchmark is bounded by
 `CAPSULE_HISTORY_MAX_BYTES` (2 GB by default) and reports only aggregate,
@@ -258,6 +267,7 @@ capsule/
 |-- bench/           reproducible A/B benchmarks
 |-- tests/           contract and parity tests
 |-- skills/          optional skill packages
+|-- docs/            crawlable Pages site and search-intent guides
 `-- .codex-plugin/  Codex plugin manifest
 ```
 

@@ -32,6 +32,7 @@ const guides = [
   "guide/mcp-context-compression.html",
   "guide/get-content-token-savings.html",
   "guide/install-capsule.html",
+  "guide/share-and-cite.html",
 ];
 requireMatch(html, /<title>[^<]{20,160}<\/title>/i, "descriptive title");
 requireMatch(html, /<meta\s+name=["']description["'][^>]+content="[^"]{80,220}"/i, "meta description");

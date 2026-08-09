@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Installation and usage guide
+    url: https://hakiyaka.github.io/capsule/guide/install-capsule.html
+    about: Check the portable Codex plugin and MCP setup before opening an issue.
+  - name: Security disclosure
+    url: https://github.com/hakiyaka/capsule/security/policy
+    about: Report vulnerabilities privately instead of posting credentials or exploit details publicly.
+  - name: Measured benchmarks
+    url: https://github.com/hakiyaka/capsule/blob/main/BENCHMARK.md
+    about: Review workload-specific A/B methodology and limitations.
