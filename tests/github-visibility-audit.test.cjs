@@ -197,6 +197,7 @@ test("keeps Windows-safe search snapshot helpers and rejects unknown flags", () 
 test("visibility workflow compares against the previous retained artifact", () => {
   const workflow = fs.readFileSync(path.join(__dirname, "..", ".github", "workflows", "visibility.yml"), "utf8");
   assert.match(workflow, /actions:\s*read/);
+  assert.match(workflow, /secrets\.CAPSULE_GITHUB_TOKEN \|\| github\.token/);
   assert.match(workflow, /gh run list --workflow visibility\.yml/);
   assert.match(workflow, /gh run download/);
   assert.doesNotMatch(workflow, /gh run list[\s\S]*\|\| true/);

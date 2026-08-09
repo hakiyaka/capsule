@@ -13,7 +13,10 @@ jobs:
   snapshot:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ github.token }}
+      # Optional owner-managed token enables private traffic endpoints. The
+      # default Actions token remains safe and reports unavailable traffic as
+      # unknown when the secret is absent.
+      GH_TOKEN: ${{ secrets.CAPSULE_GITHUB_TOKEN || github.token }}
       CAPSULE_GITHUB_REPO: ${{ github.repository }}
       CAPSULE_GITHUB_MAX_BUFFER_BYTES: "16777216"
     steps:
