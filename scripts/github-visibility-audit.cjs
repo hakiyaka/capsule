@@ -68,6 +68,38 @@ function api(endpoint) {
   }
 }
 
+function graphql(query, variables = {}) {
+  const args = ["api", "graphql", "-f", `query=${query}`];
+  for (const [name, value] of Object.entries(variables)) {
+    args.push("-F", `${name}=${value}`);
+  }
+  const result = spawnSync("gh", args, {
+    encoding: "utf8",
+    windowsHide: true,
+    maxBuffer: apiMaxBuffer,
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    const detail = String(result.stderr || result.stdout || "gh api graphql failed").trim();
+    const error = new Error(detail || "gh api graphql failed");
+    error.exitCode = result.status;
+    throw error;
+  }
+  try {
+    const response = JSON.parse(result.stdout);
+    if (Array.isArray(response?.errors) && response.errors.length) {
+      const detail = response.errors
+        .map((entry) => String(entry?.message || "GraphQL error"))
+        .join("; ");
+      throw new Error(detail);
+    }
+    return response;
+  } catch (error) {
+    if (error instanceof Error && !/Unexpected token|JSON/.test(error.message)) throw error;
+    throw new Error(`gh api graphql returned invalid JSON: ${formatError(error)}`);
+  }
+}
+
 function sum(rows, key) {
   return Array.isArray(rows) ? rows.reduce((total, row) => total + (Number(row?.[key]) || 0), 0) : 0;
 }
@@ -110,11 +142,27 @@ function optionalApi(endpoint, fallback) {
   }
 }
 
+function optionalGraphql(query, variables, fallback = null) {
+  try {
+    return { value: graphql(query, variables), available: true, error: null };
+  } catch (error) {
+    return { value: fallback, available: false, error: formatError(error) };
+  }
+}
+
 try {
   validateArgs();
   repo = normalizeRepository(configuredRepo);
   const measuredAt = new Date();
   const metadata = api(`repos/${repo}`);
+  const [repoOwner, repoName] = repo.split("/");
+  const socialPreviewResult = optionalGraphql(
+    "query($owner:String!, $name:String!) { repository(owner:$owner, name:$name) { usesCustomOpenGraphImage openGraphImageUrl } }",
+    { owner: repoOwner, name: repoName },
+  );
+  const socialPreview = socialPreviewResult.value?.data?.repository;
+  const socialPreviewShapeValid = isRecord(socialPreview)
+    && typeof socialPreview.usesCustomOpenGraphImage === "boolean";
   const viewsResult = optionalApi(`repos/${repo}/traffic/views`, null);
   const clonesResult = optionalApi(`repos/${repo}/traffic/clones`, null);
   const views = viewsResult.value || {};
@@ -178,6 +226,12 @@ try {
     release_pagination_complete: !releasePages.truncated,
     ...releaseSummary,
     description_chars: String(metadata.description || "").length,
+    social_preview_custom: socialPreviewShapeValid ? socialPreview.usesCustomOpenGraphImage : null,
+    social_preview_url: socialPreviewShapeValid
+      ? (typeof socialPreview.openGraphImageUrl === "string" ? socialPreview.openGraphImageUrl : null)
+      : (typeof metadata.open_graph_image_url === "string" ? metadata.open_graph_image_url : null),
+    social_preview_available: socialPreviewShapeValid,
+    social_preview_error: socialPreviewResult.error || (socialPreviewResult.available && !socialPreviewShapeValid ? "malformed social preview response" : null),
     has_issues: Boolean(metadata.has_issues),
     has_discussions: Boolean(metadata.has_discussions),
     has_pages: Boolean(metadata.has_pages),

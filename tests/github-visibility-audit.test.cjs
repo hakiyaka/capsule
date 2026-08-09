@@ -111,6 +111,11 @@ test("uses the GitHub popular referrers endpoint", () => {
   assert.match(source, /pages_error/);
   assert.match(source, /views_available/);
   assert.match(source, /clones_available/);
+  assert.match(source, /usesCustomOpenGraphImage/);
+  assert.match(source, /gh api graphql/);
+  assert.match(source, /social_preview_error/);
+  assert.match(source, /social_preview_custom/);
+  assert.match(source, /social_preview_available/);
 });
 
 test("compares repository-search snapshots without inventing missing ranks", () => {
