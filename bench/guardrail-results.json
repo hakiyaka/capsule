@@ -1,7 +1,7 @@
 {
   "method": {
-    "baseline": "C:\\Users\\90530\\.codex\\plugins\\cache\\personal\\capsule\\0.18.0+codex.20260728004657",
-    "treatment": "C:\\Users\\90530\\Documents\\Codex\\2026-07-26\\c\\outputs\\capsule",
+    "baseline": "installed Capsule baseline",
+    "treatment": "working tree",
     "routing_dataset": "Nine local task intents: two control-plane negatives, two observed domain/name collisions, two direct-skill negatives, and three positive security controls.",
     "failure_dataset": "One deterministic 420-frame repeated error; first occurrences cancel, changed evidence is a safety control.",
     "plan_dataset": "One unchanged repeated plan plus a real-mutation reset control.",

@@ -19,6 +19,7 @@ const releaseArchiveUrl = `https://github.com/hakiyaka/capsule/releases/download
 const releaseChecksumUrl = `${releaseArchiveUrl}.sha256`;
 const paths = [
   "/",
+  "/guide/index.html",
   "/guide/codex-token-efficiency.html",
   "/guide/mcp-context-compression.html",
   "/guide/get-content-token-savings.html",
@@ -40,6 +41,7 @@ const paths = [
 ];
 const headOnlyPaths = new Set(paths.filter((pathname) => /^https:\/\/github\.com\/hakiyaka\/capsule\/releases\/download\//i.test(pathname)));
 const guidePaths = [
+  "index.html",
   "codex-token-efficiency.html",
   "mcp-context-compression.html",
   "get-content-token-savings.html",
@@ -111,11 +113,12 @@ async function main() {
     if (result.method !== "HEAD") check(result, (value) => value.bytes.length > 0, "non-empty body");
   }
   const byPath = Object.fromEntries(results.map((result) => [result.pathname, result]));
-  const home = text(byPath["/"]); const faq = text(byPath["/guide/faq.html"]); const discoverability = text(byPath["/guide/github-discoverability.html"]);
+  const home = text(byPath["/"]); const guideIndex = text(byPath["/guide/index.html"]); const faq = text(byPath["/guide/faq.html"]); const discoverability = text(byPath["/guide/github-discoverability.html"]);
   const sitemap = text(byPath["/sitemap.xml"]); const robots = text(byPath["/robots.txt"]);
   const feed = text(byPath["/feed.xml"]); const llms = text(byPath["/llms.txt"]);
   check(byPath["/"], (value) => /<link\s+rel=["']canonical["']\s+href=["']https:\/\/hakiyaka\.github\.io\/capsule\/["']/i.test(text(value)), "canonical home");
   check(byPath["/"], () => /social-card\.png/i.test(home) && /summary_large_image/i.test(home), "PNG social metadata");
+  check(byPath["/guide/index.html"], () => /CollectionPage/i.test(guideIndex) && /Capsule Guides/i.test(guideIndex) && /social-card\.png/i.test(guideIndex), "guide index metadata");
   check(byPath["/guide/faq.html"], () => /FAQPage/i.test(faq) && /social-card\.png/i.test(faq), "FAQ structured metadata");
   check(byPath["/guide/github-discoverability.html"], () => /GitHub Discoverability/i.test(discoverability) && /social-card\.png/i.test(discoverability), "discoverability guide metadata");
   check(byPath["/sitemap.xml"], () => /guide\/faq\.html/i.test(sitemap) && /<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/i.test(sitemap), "FAQ and lastmod");

@@ -128,7 +128,7 @@ function collect(files) {
         calls.set(payload.call_id, { name, input });
         if (/(?:^|[._-])(?:wait|wait_agent)(?:$|[._-])/i.test(name) &&
             (Object.hasOwn(input, "yield_time_ms") || Object.hasOwn(input, "timeout_ms"))) {
-          waits.push({ session: path.basename(file), name, input });
+          waits.push({ name, input });
         }
         continue;
       }
@@ -144,7 +144,7 @@ function collect(files) {
         continue;
       }
       if (/data:(?:image|audio|video)\//i.test(output)) continue;
-      reads.push({ session: path.basename(file), name: call.name, input: call.input, output });
+      reads.push({ name: call.name, input: call.input, output });
     }
   }
   return { waits: waits.slice(0, 100), reads: reads.slice(0, 20) };
@@ -195,7 +195,6 @@ const replayRows = dataset.reads.map((sample, index) => {
   const baseline = replayArm(baselineHook, sample, "a", index);
   const treatment = replayArm(currentHook, sample, "b", index);
   return {
-    session: sample.session,
     raw_chars: sample.output.length,
     baseline_chars: baseline.chars,
     treatment_chars: treatment.chars,
@@ -216,7 +215,7 @@ const waitRows = dataset.waits.map((sample, index) => {
   });
   const updated = result?.hookSpecificOutput?.updatedInput || sample.input;
   const after = Number(updated.yield_time_ms || updated.timeout_ms || before);
-  return { session: sample.session, before_ms: before, after_ms: after };
+  return { before_ms: before, after_ms: after };
 });
 const beforeCadence = waitRows.reduce((sum, row) => sum + (row.before_ms ? 1 / row.before_ms : 0), 0);
 const afterCadence = waitRows.reduce((sum, row) => sum + (row.after_ms ? 1 / row.after_ms : 0), 0);

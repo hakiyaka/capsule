@@ -1,11 +1,11 @@
 {
   "method": {
     "dataset": "Non-media tool outputs from the most recently modified local Codex sessions.",
-    "arm_a": "Installed Capsule baseline at C:\\Users\\90530\\.codex\\plugins\\cache\\personal\\capsule\\0.17.0+codex.20260728002409.",
+    "arm_a": "Installed Capsule baseline.",
     "arm_b": "Working-tree Capsule with silent control tags, near-duplicate delta replay, and adaptive reasoning thresholds.",
     "exact_replay": "Each real output is replayed byte-identically; accounting includes replacement plus hook-added context.",
     "delta_replay": "Actual changed outputs are paired only when the tool name and serialized input are identical.",
-    "privacy": "The report stores only session basenames, tool names, sizes, booleans, and aggregates; content is not copied.",
+    "privacy": "The report stores only bounded sample metadata, tool names, sizes, booleans, and aggregates; content and session identifiers are not copied.",
     "caveat": "Characters are a model-visible text proxy, not billing. Reasoning thresholds are policy activation points, not a claimed model-token reduction."
   },
   "exact_replay_control_plane": {
@@ -18,7 +18,6 @@
     "exact_recovery_pass": true,
     "rows": [
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "raw_chars": 66158,
         "baseline_chars": 221,
         "treatment_chars": 63,
@@ -26,7 +25,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
         "raw_chars": 48023,
         "baseline_chars": 169,
         "treatment_chars": 78,
@@ -34,7 +32,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-42-01-019f8eff-43f4-7101-b149-7914a1289643.jsonl",
         "raw_chars": 48018,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -42,7 +39,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T22-50-23-019f95ad-ccc7-7e21-83a4-7f870cded5a5.jsonl",
         "raw_chars": 48015,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -50,7 +46,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T17-46-23-019f99bd-d978-7c40-9422-4b2406f7d8c3.jsonl",
         "raw_chars": 47954,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -58,7 +53,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "raw_chars": 47937,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -66,7 +60,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "raw_chars": 47929,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -74,7 +67,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T17-46-23-019f99bd-d978-7c40-9422-4b2406f7d8c3.jsonl",
         "raw_chars": 47905,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -82,7 +74,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T17-46-23-019f99bd-d978-7c40-9422-4b2406f7d8c3.jsonl",
         "raw_chars": 47890,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -90,7 +81,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T23-53-15-019f9b0d-b904-76b2-b363-6f0abbd9f038.jsonl",
         "raw_chars": 47873,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -98,7 +88,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T17-46-23-019f99bd-d978-7c40-9422-4b2406f7d8c3.jsonl",
         "raw_chars": 47830,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -106,7 +95,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T21-59-28-019f9058-d4c9-7432-abe3-f0eaaac95b63.jsonl",
         "raw_chars": 47811,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -114,7 +102,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
         "raw_chars": 47645,
         "baseline_chars": 169,
         "treatment_chars": 78,
@@ -122,7 +109,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "raw_chars": 47531,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -130,7 +116,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
         "raw_chars": 47490,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -138,7 +123,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T17-46-23-019f99bd-d978-7c40-9422-4b2406f7d8c3.jsonl",
         "raw_chars": 46885,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -146,7 +130,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-16-12-019f9a10-10c7-7c53-8d88-8de1cdadc0ae.jsonl",
         "raw_chars": 46517,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -154,7 +137,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "raw_chars": 46025,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -162,7 +144,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T17-46-23-019f99bd-d978-7c40-9422-4b2406f7d8c3.jsonl",
         "raw_chars": 45757,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -170,7 +151,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T23-34-49-019f95d6-7cd4-75d2-ac0f-9d3b2eb1d36a.jsonl",
         "raw_chars": 45730,
         "baseline_chars": 410,
         "treatment_chars": 251,
@@ -178,7 +158,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-41-29-019f8efe-c6e8-7f43-9f16-82e4d55fff2f.jsonl",
         "raw_chars": 45484,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -186,7 +165,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T11-38-29-019f986d-04a6-78a2-9661-af54cb0cb970.jsonl",
         "raw_chars": 45320,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -194,7 +172,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "raw_chars": 45187,
         "baseline_chars": 45187,
         "treatment_chars": 63,
@@ -202,7 +179,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T13-28-24-019f98d1-a868-79c2-a7dd-a128a9075ed1.jsonl",
         "raw_chars": 45004,
         "baseline_chars": 169,
         "treatment_chars": 78,
@@ -210,7 +186,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "raw_chars": 44852,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -218,7 +193,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "raw_chars": 44595,
         "baseline_chars": 44595,
         "treatment_chars": 63,
@@ -226,7 +200,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-46-50-019f9a2c-1e44-71a0-b826-f0d63c09169e.jsonl",
         "raw_chars": 44477,
         "baseline_chars": 44477,
         "treatment_chars": 63,
@@ -234,7 +207,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "raw_chars": 44462,
         "baseline_chars": 44462,
         "treatment_chars": 63,
@@ -242,7 +214,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-46-50-019f9a2c-1e44-71a0-b826-f0d63c09169e.jsonl",
         "raw_chars": 44447,
         "baseline_chars": 44447,
         "treatment_chars": 63,
@@ -250,7 +221,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T23-43-34-019f95de-7d2e-72d2-893c-dc46d4f26ae0.jsonl",
         "raw_chars": 44252,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -258,7 +228,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T15-26-20-019f993d-a121-7370-8f75-ba81f8381ade.jsonl",
         "raw_chars": 44032,
         "baseline_chars": 169,
         "treatment_chars": 78,
@@ -266,7 +235,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T23-06-20-019f95bc-67f9-7380-ae6a-8fd95a7123d7.jsonl",
         "raw_chars": 43926,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -274,7 +242,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-21T00-57-36-019f8188-d610-71b0-9b79-afb3c1360fd1.jsonl",
         "raw_chars": 43737,
         "baseline_chars": 43737,
         "treatment_chars": 63,
@@ -282,7 +249,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-41-29-019f8efe-c6e8-7f43-9f16-82e4d55fff2f.jsonl",
         "raw_chars": 43737,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -290,7 +256,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "raw_chars": 43463,
         "baseline_chars": 43463,
         "treatment_chars": 63,
@@ -298,7 +263,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -306,7 +270,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -314,7 +277,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -322,7 +284,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T18-45-43-019f9f1a-85f4-7af3-a578-7bcae2781124.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -330,7 +291,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -338,7 +298,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-58-24-019f9b49-5ca5-7130-9eb8-b2feaacf139c.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -346,7 +305,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-47-59-019f9b3f-d2c1-7fc1-8a50-6ddda9a6e798.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -354,7 +312,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T23-53-15-019f9b0d-b904-76b2-b363-6f0abbd9f038.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -362,7 +319,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-31-06-019f9a1d-b694-78d2-b355-bfe8595e3b6e.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -370,7 +326,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-34-47-019f997c-491a-7833-9589-cab5d48ac295.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -378,7 +333,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-33-00-019f997a-a676-7621-8815-34c0a92ab5c0.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -386,7 +340,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T15-49-25-019f9952-c319-7140-8922-f60f9d329c74.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -394,7 +347,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T12-50-12-019f98ae-ae64-7090-ae4a-9346c6d59795.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -402,7 +354,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T12-20-07-019f9893-2481-7cb2-89d8-e828f3aa0bee.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -410,7 +361,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T10-38-40-019f9836-4058-77a3-b2cd-ab2cdc67a1ab.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -418,7 +368,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T08-02-35-019f97a7-5b2b-7f20-a36e-d4c1e24c4871.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -426,7 +375,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T06-14-44-019f9744-9f16-7301-bd75-87c50dccfa5e.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -434,7 +382,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T06-14-44-019f9744-9f16-7301-bd75-87c50dccfa5e.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -442,7 +389,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T01-24-20-019f963a-c1c7-7e02-87d2-614e87b21610.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -450,7 +396,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T23-06-13-019f95bc-4dc3-7250-b6f5-09a5600374e0.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -458,7 +403,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T01-24-33-019f963a-f2bf-70f2-bc7b-33ee7b37f001.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -466,7 +410,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T23-06-20-019f95bc-67f9-7380-ae6a-8fd95a7123d7.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -474,7 +417,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T22-50-23-019f95ad-ccc7-7e21-83a4-7f870cded5a5.jsonl",
         "raw_chars": 43450,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -482,7 +424,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T11-48-31-019f9876-34b9-74d1-bdca-2fdf8de102c8.jsonl",
         "raw_chars": 43338,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -490,7 +431,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "raw_chars": 43249,
         "baseline_chars": 43249,
         "treatment_chars": 63,
@@ -498,7 +438,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T23-06-13-019f95bc-4dc3-7250-b6f5-09a5600374e0.jsonl",
         "raw_chars": 43202,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -506,7 +445,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T15-27-39-019f993e-d337-75b0-ad06-f3175f36548c.jsonl",
         "raw_chars": 43191,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -514,7 +452,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-21T00-57-36-019f8188-d610-71b0-9b79-afb3c1360fd1.jsonl",
         "raw_chars": 43167,
         "baseline_chars": 43167,
         "treatment_chars": 63,
@@ -522,7 +459,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "raw_chars": 43098,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -530,7 +466,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
         "raw_chars": 43069,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -538,7 +473,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-58-24-019f9b49-5ca5-7130-9eb8-b2feaacf139c.jsonl",
         "raw_chars": 43069,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -546,7 +480,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "raw_chars": 43069,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -554,7 +487,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-16-16-019f9a10-23c8-74f2-8e35-e84f50224fad.jsonl",
         "raw_chars": 43060,
         "baseline_chars": 43060,
         "treatment_chars": 63,
@@ -562,7 +494,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "raw_chars": 42976,
         "baseline_chars": 42976,
         "treatment_chars": 63,
@@ -570,7 +501,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T23-06-13-019f95bc-4dc3-7250-b6f5-09a5600374e0.jsonl",
         "raw_chars": 42961,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -578,7 +508,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T21-59-28-019f9058-d4c9-7432-abe3-f0eaaac95b63.jsonl",
         "raw_chars": 42870,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -586,7 +515,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "raw_chars": 42837,
         "baseline_chars": 42837,
         "treatment_chars": 63,
@@ -594,7 +522,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "raw_chars": 42191,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -602,7 +529,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "raw_chars": 42156,
         "baseline_chars": 42156,
         "treatment_chars": 63,
@@ -610,7 +536,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-32-44-019f997a-695c-7d62-8a4d-f0cd31178bd1.jsonl",
         "raw_chars": 42053,
         "baseline_chars": 42053,
         "treatment_chars": 63,
@@ -618,7 +543,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "raw_chars": 42026,
         "baseline_chars": 42026,
         "treatment_chars": 63,
@@ -626,7 +550,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T21-59-28-019f9058-d4c9-7432-abe3-f0eaaac95b63.jsonl",
         "raw_chars": 41895,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -634,7 +557,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "raw_chars": 41877,
         "baseline_chars": 168,
         "treatment_chars": 63,
@@ -642,7 +564,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-16-16-019f9a10-23c8-74f2-8e35-e84f50224fad.jsonl",
         "raw_chars": 41876,
         "baseline_chars": 41876,
         "treatment_chars": 63,
@@ -650,7 +571,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "raw_chars": 41828,
         "baseline_chars": 41828,
         "treatment_chars": 63,
@@ -658,7 +578,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "raw_chars": 41782,
         "baseline_chars": 41782,
         "treatment_chars": 63,
@@ -666,7 +585,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T01-24-20-019f963a-c1c7-7e02-87d2-614e87b21610.jsonl",
         "raw_chars": 41716,
         "baseline_chars": 41716,
         "treatment_chars": 63,
@@ -674,7 +592,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "raw_chars": 41689,
         "baseline_chars": 41689,
         "treatment_chars": 63,
@@ -682,7 +599,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-46-50-019f9a2c-1e44-71a0-b826-f0d63c09169e.jsonl",
         "raw_chars": 41688,
         "baseline_chars": 41688,
         "treatment_chars": 63,
@@ -690,7 +606,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "raw_chars": 41614,
         "baseline_chars": 41614,
         "treatment_chars": 63,
@@ -698,7 +613,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "raw_chars": 41585,
         "baseline_chars": 41585,
         "treatment_chars": 63,
@@ -706,7 +620,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-32-51-019f997a-847a-7480-9901-b4c9ac2ccac4.jsonl",
         "raw_chars": 41542,
         "baseline_chars": 41542,
         "treatment_chars": 63,
@@ -714,7 +627,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-32-51-019f997a-847a-7480-9901-b4c9ac2ccac4.jsonl",
         "raw_chars": 41539,
         "baseline_chars": 41539,
         "treatment_chars": 63,
@@ -722,7 +634,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T12-20-43-019f9893-afa8-7f83-9066-8b51f9ab7ca6.jsonl",
         "raw_chars": 41494,
         "baseline_chars": 41494,
         "treatment_chars": 63,
@@ -730,7 +641,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T06-15-12-019f9745-0aa0-7081-bd7a-ca120acbf55a.jsonl",
         "raw_chars": 41494,
         "baseline_chars": 41494,
         "treatment_chars": 63,
@@ -738,7 +648,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "raw_chars": 41494,
         "baseline_chars": 41494,
         "treatment_chars": 63,
@@ -746,7 +655,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-46-50-019f9a2c-1e44-71a0-b826-f0d63c09169e.jsonl",
         "raw_chars": 41463,
         "baseline_chars": 41463,
         "treatment_chars": 63,
@@ -754,7 +662,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "raw_chars": 41430,
         "baseline_chars": 41430,
         "treatment_chars": 63,
@@ -762,7 +669,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T23-53-38-019f9b0e-05e2-7e50-9061-103b299a029c.jsonl",
         "raw_chars": 41361,
         "baseline_chars": 168,
         "treatment_chars": 77,
@@ -770,7 +676,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T08-02-35-019f97a7-5b2b-7f20-a36e-d4c1e24c4871.jsonl",
         "raw_chars": 41189,
         "baseline_chars": 41189,
         "treatment_chars": 63,
@@ -778,7 +683,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T06-14-44-019f9744-9f16-7301-bd75-87c50dccfa5e.jsonl",
         "raw_chars": 41154,
         "baseline_chars": 41154,
         "treatment_chars": 63,
@@ -786,7 +690,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T15-03-35-019f9928-ca5f-78b2-b2ce-7da230e63a8d.jsonl",
         "raw_chars": 41121,
         "baseline_chars": 41121,
         "treatment_chars": 63,
@@ -794,7 +697,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T11-02-56-019f984c-7a55-72c2-9529-0c24b7a6d874.jsonl",
         "raw_chars": 41121,
         "baseline_chars": 41121,
         "treatment_chars": 63,
@@ -802,7 +704,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-21T00-57-36-019f8188-d610-71b0-9b79-afb3c1360fd1.jsonl",
         "raw_chars": 41114,
         "baseline_chars": 41114,
         "treatment_chars": 63,
@@ -810,7 +711,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "raw_chars": 41102,
         "baseline_chars": 41102,
         "treatment_chars": 63,
@@ -838,7 +738,6 @@
     "exact_recovery_pass": true,
     "rows": [
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "tool": "exec",
         "raw_chars": 45187,
         "line_overlap": 0,
@@ -849,7 +748,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "tool": "exec",
         "raw_chars": 44595,
         "line_overlap": 0,
@@ -860,7 +758,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-46-50-019f9a2c-1e44-71a0-b826-f0d63c09169e.jsonl",
         "tool": "exec",
         "raw_chars": 44477,
         "line_overlap": 0,
@@ -871,7 +768,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "tool": "exec",
         "raw_chars": 44462,
         "line_overlap": 0,
@@ -882,7 +778,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-46-50-019f9a2c-1e44-71a0-b826-f0d63c09169e.jsonl",
         "tool": "exec",
         "raw_chars": 44447,
         "line_overlap": 0,
@@ -893,7 +788,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-21T00-57-36-019f8188-d610-71b0-9b79-afb3c1360fd1.jsonl",
         "tool": "exec",
         "raw_chars": 43737,
         "line_overlap": 0,
@@ -904,7 +798,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 43463,
         "line_overlap": 0,
@@ -915,7 +808,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T18-45-43-019f9f1a-85f4-7af3-a578-7bcae2781124.jsonl",
         "tool": "mcp__node_repl.js",
         "raw_chars": 43450,
         "line_overlap": 0.6667,
@@ -926,7 +818,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 43249,
         "line_overlap": 0,
@@ -937,7 +828,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-21T00-57-36-019f8188-d610-71b0-9b79-afb3c1360fd1.jsonl",
         "tool": "exec",
         "raw_chars": 43167,
         "line_overlap": 0,
@@ -948,7 +838,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-16-16-019f9a10-23c8-74f2-8e35-e84f50224fad.jsonl",
         "tool": "exec",
         "raw_chars": 43060,
         "line_overlap": 0,
@@ -959,7 +848,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "tool": "exec",
         "raw_chars": 42976,
         "line_overlap": 0,
@@ -970,7 +858,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "tool": "exec",
         "raw_chars": 42837,
         "line_overlap": 0,
@@ -981,7 +868,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 42156,
         "line_overlap": 0,
@@ -992,7 +878,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-32-44-019f997a-695c-7d62-8a4d-f0cd31178bd1.jsonl",
         "tool": "exec",
         "raw_chars": 42053,
         "line_overlap": 0,
@@ -1003,7 +888,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "tool": "exec",
         "raw_chars": 42026,
         "line_overlap": 0,
@@ -1014,7 +898,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-16-16-019f9a10-23c8-74f2-8e35-e84f50224fad.jsonl",
         "tool": "exec",
         "raw_chars": 41876,
         "line_overlap": 0,
@@ -1025,7 +908,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 41828,
         "line_overlap": 0,
@@ -1036,7 +918,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "tool": "exec",
         "raw_chars": 41782,
         "line_overlap": 0,
@@ -1047,7 +928,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T01-24-20-019f963a-c1c7-7e02-87d2-614e87b21610.jsonl",
         "tool": "exec",
         "raw_chars": 41716,
         "line_overlap": 0,
@@ -1058,7 +938,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "tool": "exec",
         "raw_chars": 41689,
         "line_overlap": 0,
@@ -1069,7 +948,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-46-50-019f9a2c-1e44-71a0-b826-f0d63c09169e.jsonl",
         "tool": "exec",
         "raw_chars": 41688,
         "line_overlap": 0,
@@ -1080,7 +958,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "tool": "exec",
         "raw_chars": 41614,
         "line_overlap": 0,
@@ -1091,7 +968,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 41585,
         "line_overlap": 0,
@@ -1102,7 +978,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-32-51-019f997a-847a-7480-9901-b4c9ac2ccac4.jsonl",
         "tool": "exec",
         "raw_chars": 41542,
         "line_overlap": 0,
@@ -1113,7 +988,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-32-51-019f997a-847a-7480-9901-b4c9ac2ccac4.jsonl",
         "tool": "exec",
         "raw_chars": 41539,
         "line_overlap": 0,
@@ -1124,7 +998,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T12-20-43-019f9893-afa8-7f83-9066-8b51f9ab7ca6.jsonl",
         "tool": "exec",
         "raw_chars": 41494,
         "line_overlap": 0,
@@ -1135,7 +1008,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T06-15-12-019f9745-0aa0-7081-bd7a-ca120acbf55a.jsonl",
         "tool": "exec",
         "raw_chars": 41494,
         "line_overlap": 0,
@@ -1146,7 +1018,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 41494,
         "line_overlap": 0,
@@ -1157,7 +1028,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-46-50-019f9a2c-1e44-71a0-b826-f0d63c09169e.jsonl",
         "tool": "exec",
         "raw_chars": 41463,
         "line_overlap": 0,
@@ -1168,7 +1038,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "tool": "exec",
         "raw_chars": 41430,
         "line_overlap": 0,
@@ -1179,7 +1048,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T08-02-35-019f97a7-5b2b-7f20-a36e-d4c1e24c4871.jsonl",
         "tool": "exec",
         "raw_chars": 41189,
         "line_overlap": 0,
@@ -1190,7 +1058,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T06-14-44-019f9744-9f16-7301-bd75-87c50dccfa5e.jsonl",
         "tool": "exec",
         "raw_chars": 41154,
         "line_overlap": 0,
@@ -1201,7 +1068,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T15-03-35-019f9928-ca5f-78b2-b2ce-7da230e63a8d.jsonl",
         "tool": "exec",
         "raw_chars": 41121,
         "line_overlap": 0,
@@ -1212,7 +1078,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T11-02-56-019f984c-7a55-72c2-9529-0c24b7a6d874.jsonl",
         "tool": "exec",
         "raw_chars": 41121,
         "line_overlap": 0,
@@ -1223,7 +1088,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-21T00-57-36-019f8188-d610-71b0-9b79-afb3c1360fd1.jsonl",
         "tool": "exec",
         "raw_chars": 41114,
         "line_overlap": 0,
@@ -1234,7 +1098,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 41102,
         "line_overlap": 0,
@@ -1245,7 +1108,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
         "tool": "exec",
         "raw_chars": 41102,
         "line_overlap": 0,
@@ -1256,7 +1118,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 41101,
         "line_overlap": 0,
@@ -1267,7 +1128,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T01-24-20-019f963a-c1c7-7e02-87d2-614e87b21610.jsonl",
         "tool": "exec",
         "raw_chars": 41096,
         "line_overlap": 0,
@@ -1278,7 +1138,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-35-01-019f997c-7fe3-7041-b592-6e1769f0f958.jsonl",
         "tool": "exec",
         "raw_chars": 41050,
         "line_overlap": 0,
@@ -1289,7 +1148,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
         "tool": "exec",
         "raw_chars": 41044,
         "line_overlap": 0,
@@ -1300,7 +1158,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-35-16-019f997c-bc0f-71e2-adf1-72417fa03486.jsonl",
         "tool": "exec",
         "raw_chars": 41044,
         "line_overlap": 0,
@@ -1311,7 +1168,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T17-46-32-019f99bd-fa37-7792-be22-ef3c13b5c1f6.jsonl",
         "tool": "exec",
         "raw_chars": 41032,
         "line_overlap": 0,
@@ -1322,7 +1178,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "tool": "exec",
         "raw_chars": 41017,
         "line_overlap": 0,
@@ -1333,7 +1188,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 40993,
         "line_overlap": 0,
@@ -1344,7 +1198,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-35-01-019f997c-7fe3-7041-b592-6e1769f0f958.jsonl",
         "tool": "exec",
         "raw_chars": 40951,
         "line_overlap": 0,
@@ -1355,7 +1208,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 40542,
         "line_overlap": 0,
@@ -1366,7 +1218,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-32-51-019f997a-847a-7480-9901-b4c9ac2ccac4.jsonl",
         "tool": "exec",
         "raw_chars": 40139,
         "line_overlap": 0,
@@ -1377,7 +1228,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T11-09-29-019f9852-77c4-7e92-9075-4aeaa02cd576.jsonl",
         "tool": "exec",
         "raw_chars": 39822,
         "line_overlap": 0,
@@ -1388,7 +1238,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-29-20-019f8ef3-a742-73d1-b798-cd35eb1d74c7.jsonl",
         "tool": "exec",
         "raw_chars": 39822,
         "line_overlap": 0,
@@ -1399,7 +1248,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T17-46-32-019f99bd-fa37-7792-be22-ef3c13b5c1f6.jsonl",
         "tool": "exec",
         "raw_chars": 39711,
         "line_overlap": 0,
@@ -1410,7 +1258,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T16-34-47-019f997c-491a-7833-9589-cab5d48ac295.jsonl",
         "tool": "shell_command",
         "raw_chars": 39507,
         "line_overlap": 1,
@@ -1421,7 +1268,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T15-26-20-019f993d-a121-7370-8f75-ba81f8381ade.jsonl",
         "tool": "shell_command",
         "raw_chars": 39507,
         "line_overlap": 1,
@@ -1432,7 +1278,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T15-03-50-019f9929-060d-7851-a706-5985bfe3e28a.jsonl",
         "tool": "shell_command",
         "raw_chars": 39507,
         "line_overlap": 1,
@@ -1443,7 +1288,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T15-16-43-019f9934-d2df-7481-a47e-90c93cc4d02a.jsonl",
         "tool": "shell_command",
         "raw_chars": 39507,
         "line_overlap": 1,
@@ -1454,7 +1298,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T11-38-29-019f986d-04a6-78a2-9661-af54cb0cb970.jsonl",
         "tool": "shell_command",
         "raw_chars": 39507,
         "line_overlap": 1,
@@ -1465,7 +1308,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T11-09-29-019f9852-77c4-7e92-9075-4aeaa02cd576.jsonl",
         "tool": "shell_command",
         "raw_chars": 39507,
         "line_overlap": 1,
@@ -1476,7 +1318,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T11-02-56-019f984c-7a55-72c2-9529-0c24b7a6d874.jsonl",
         "tool": "shell_command",
         "raw_chars": 39507,
         "line_overlap": 1,
@@ -1487,7 +1328,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 39408,
         "line_overlap": 0,
@@ -1498,7 +1338,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 39187,
         "line_overlap": 0,
@@ -1509,7 +1348,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 38803,
         "line_overlap": 0,
@@ -1520,7 +1358,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
         "tool": "exec",
         "raw_chars": 38482,
         "line_overlap": 0,
@@ -1531,7 +1368,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "tool": "exec",
         "raw_chars": 38418,
         "line_overlap": 0,
@@ -1542,7 +1378,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 37983,
         "line_overlap": 0,
@@ -1553,7 +1388,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 37944,
         "line_overlap": 0,
@@ -1564,7 +1398,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 37776,
         "line_overlap": 0,
@@ -1575,7 +1408,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 37537,
         "line_overlap": 0,
@@ -1586,7 +1418,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-21T00-57-36-019f8188-d610-71b0-9b79-afb3c1360fd1.jsonl",
         "tool": "exec",
         "raw_chars": 37265,
         "line_overlap": 0,
@@ -1597,7 +1428,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 37261,
         "line_overlap": 0,
@@ -1608,7 +1438,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 37255,
         "line_overlap": 0,
@@ -1619,7 +1448,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
         "tool": "exec",
         "raw_chars": 37163,
         "line_overlap": 0,
@@ -1630,7 +1458,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 36739,
         "line_overlap": 0,
@@ -1641,7 +1468,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 36700,
         "line_overlap": 0,
@@ -1652,7 +1478,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 36328,
         "line_overlap": 0,
@@ -1663,7 +1488,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
         "tool": "exec",
         "raw_chars": 36204,
         "line_overlap": 0,
@@ -1674,7 +1498,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 36048,
         "line_overlap": 0,
@@ -1685,7 +1508,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T19-46-50-019f9a2c-1e44-71a0-b826-f0d63c09169e.jsonl",
         "tool": "exec",
         "raw_chars": 35129,
         "line_overlap": 0,
@@ -1696,7 +1518,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T17-31-36-019f8f63-9751-7b43-9017-03d9c969ce05.jsonl",
         "tool": "exec",
         "raw_chars": 35085,
         "line_overlap": 0,
@@ -1707,7 +1528,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T17-31-36-019f8f63-9751-7b43-9017-03d9c969ce05.jsonl",
         "tool": "exec",
         "raw_chars": 35075,
         "line_overlap": 0,
@@ -1718,7 +1538,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T00-47-59-019f9b3f-d2c1-7fc1-8a50-6ddda9a6e798.jsonl",
         "tool": "exec",
         "raw_chars": 35043,
         "line_overlap": 0,
@@ -1729,7 +1548,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 34444,
         "line_overlap": 0,
@@ -1740,7 +1558,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T23-06-27-019f95bc-8537-7e81-9c27-1484dd4267b9.jsonl",
         "tool": "web.run",
         "raw_chars": 34416,
         "line_overlap": 0,
@@ -1751,7 +1568,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 34097,
         "line_overlap": 0,
@@ -1762,7 +1578,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
         "tool": "exec",
         "raw_chars": 33727,
         "line_overlap": 0,
@@ -1773,7 +1588,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-29-20-019f8ef3-a742-73d1-b798-cd35eb1d74c7.jsonl",
         "tool": "exec",
         "raw_chars": 33700,
         "line_overlap": 0,
@@ -1784,7 +1598,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T02-00-06-019f9135-235b-70a3-b841-dc41db61fdec.jsonl",
         "tool": "exec",
         "raw_chars": 33508,
         "line_overlap": 0,
@@ -1795,7 +1608,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 33378,
         "line_overlap": 0,
@@ -1806,7 +1618,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-24T18-37-35-019f94c6-5dd4-7e40-964e-18f2f134b8db.jsonl",
         "tool": "exec",
         "raw_chars": 33289,
         "line_overlap": 0,
@@ -1817,7 +1628,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 33196,
         "line_overlap": 0,
@@ -1828,7 +1638,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T23-53-38-019f9b0e-05e2-7e50-9061-103b299a029c.jsonl",
         "tool": "shell_command",
         "raw_chars": 32996,
         "line_overlap": 0.798,
@@ -1839,7 +1648,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 32796,
         "line_overlap": 0,
@@ -1850,7 +1658,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 32335,
         "line_overlap": 0,
@@ -1861,7 +1668,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T01-24-33-019f963a-f2bf-70f2-bc7b-33ee7b37f001.jsonl",
         "tool": "exec",
         "raw_chars": 31589,
         "line_overlap": 0,
@@ -1872,7 +1678,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 31542,
         "line_overlap": 0,
@@ -1883,7 +1688,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 31511,
         "line_overlap": 0,
@@ -1894,7 +1698,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-25T12-20-07-019f9893-2481-7cb2-89d8-e828f3aa0bee.jsonl",
         "tool": "exec",
         "raw_chars": 31429,
         "line_overlap": 0,
@@ -1905,7 +1708,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-29-20-019f8ef3-a742-73d1-b798-cd35eb1d74c7.jsonl",
         "tool": "exec",
         "raw_chars": 31019,
         "line_overlap": 0,
@@ -1916,7 +1718,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-27T00-23-13-019fa04f-8254-7c23-9eaf-b87fe4e4a0d2.jsonl",
         "tool": "exec",
         "raw_chars": 31016,
         "line_overlap": 0,
@@ -1927,7 +1728,6 @@
         "exact_recovery": true
       },
       {
-        "session": "rollout-2026-07-23T15-40-23-019f8efd-c37d-7621-9b4a-041d932b24b4.jsonl",
         "tool": "exec",
         "raw_chars": 30704,
         "line_overlap": 0,

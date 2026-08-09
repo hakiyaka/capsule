@@ -318,7 +318,8 @@ for release history. The 100-project research ledger is in
 ## Search visibility and publishing
 
 The `docs/` site is a small, crawlable GitHub Pages landing page with a
-canonical URL, `robots.txt`, XML sitemap, Open Graph metadata, and JSON-LD.
+canonical URL, a linked [guide index](https://hakiyaka.github.io/capsule/guide/index.html),
+`robots.txt`, XML sitemap, Open Graph metadata, and JSON-LD.
 The Pages deployment is defined in
 [`.github/workflows/pages.yml`](.github/workflows/pages.yml). After enabling
 Pages for the repository, add `https://hakiyaka.github.io/capsule/` as a

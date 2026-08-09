@@ -161,7 +161,6 @@ for (const [fileIndex, file] of files.entries()) {
     const treatment = runArm(currentHook, sample, file, `ab-b-${fileIndex}-${sampleIndex}`);
     const changed = treatment.primary !== sample.output;
     rows.push({
-      session: path.basename(file),
       sample: sampleIndex + 1,
       mode: pressure.mode,
       used_percent: pressure.used_percent,
@@ -184,10 +183,10 @@ for (const mode of ["normal", "high", "critical", "emergency"]) {
 const result = {
   method: {
     dataset: "Largest non-media tool outputs from the most recently modified local Codex session logs.",
-    arm_a: `Installed Capsule baseline at ${baseRoot}.`,
+    arm_a: "Installed Capsule baseline.",
     arm_b: "Adaptive context-pressure policies in the working tree.",
     accounting: "Model-visible serialized characters after PostToolUse, including hook guidance.",
-    privacy: "The report stores only session basenames, sizes, modes, and booleans; tool content is not copied.",
+    privacy: "The report stores only bounded sample metadata, sizes, modes, and booleans; tool content and session identifiers are not copied.",
     caveat: "Approximate text tokens use four characters per token. This excludes image tokens, caching, hidden model work, billing, and outputs outside the sampled sessions.",
   },
   summary: summarize(rows),

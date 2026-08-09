@@ -123,7 +123,7 @@ function main() {
     const warmEmitted = results.reduce((total, item) => total + item.warm.emitted_tokens, 0);
     const result = {
       benchmark: "project-compiler-ab",
-      root,
+      root: "repository",
       cases: results,
       aggregate: {
         cases: results.length,

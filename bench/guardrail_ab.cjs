@@ -233,8 +233,8 @@ try {
   const after = treatmentRouteWaste + treatmentFailure.repeated_visible_chars;
   const report = {
     method: {
-      baseline,
-      treatment: pluginRoot,
+      baseline: "installed Capsule baseline",
+      treatment: "working tree",
       routing_dataset: "Nine local task intents: two control-plane negatives, two observed domain/name collisions, two direct-skill negatives, and three positive security controls.",
       failure_dataset: "One deterministic 420-frame repeated error; first occurrences cancel, changed evidence is a safety control.",
       plan_dataset: "One unchanged repeated plan plus a real-mutation reset control.",

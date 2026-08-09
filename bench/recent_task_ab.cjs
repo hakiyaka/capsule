@@ -4,7 +4,6 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const sourceRoot = path.resolve(__dirname, "..");
 const currentVersion = require("../package.json").version;
 const currentUnified = require("../mcp/unified.cjs");
 const currentCompaction = require("../mcp/compaction.cjs");
@@ -150,7 +149,6 @@ function compactionBenchmark(files, baselineCompaction) {
       const before = chars(baselineAudit);
       const after = chars(treatmentAudit);
       insightCases.push({
-        session: path.basename(file),
         compactions: baselineAudit.compactions,
         before_chars: before,
         after_chars: after,
@@ -165,7 +163,6 @@ function compactionBenchmark(files, baselineCompaction) {
       const baselineContext = String(baselineSeed.context || "");
       const treatmentContext = String(treatmentSeed.context || "");
       seedCases.push({
-        session: path.basename(file),
         before_chars: baselineContext.length,
         after_chars: treatmentContext.length,
         avoided_chars: baselineContext.length - treatmentContext.length,
@@ -212,9 +209,9 @@ async function main() {
   const compaction = compactionBenchmark(files, baselineCompaction);
   const result = {
     generated_at: new Date().toISOString(),
-    baseline_root: baselineRoot,
-    treatment_root: sourceRoot,
-    sessions_scanned: files.map((file) => path.basename(file)),
+    baseline_label: "installed Capsule baseline",
+    treatment_label: "working tree",
+    sessions_scanned: files.length,
     routing,
     compaction,
     caveat: "Local serialized-character A/B. Approximate text tokens use four characters per token; image tokens, provider billing, caching, latency, and hidden compactor generation are excluded.",

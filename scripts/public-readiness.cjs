@@ -106,6 +106,31 @@ for (const relative of distributedRoots) {
   }
 }
 
+// Benchmark receipts and public documentation must not expose the maintainer's
+// home directory or raw Codex session filenames. Keep the useful aggregates,
+// but reject machine/session identifiers if they are accidentally committed.
+const publicArtifactFiles = [
+  path.join(root, "README.md"),
+  ...walk(path.join(root, "docs")).filter((file) =>
+    new Set([".html", ".md", ".txt", ".xml"]).has(path.extname(file).toLowerCase())
+  ),
+  ...walk(path.join(root, "bench")).filter((file) => path.extname(file).toLowerCase() === ".json"),
+].filter((file) => fs.existsSync(file));
+const publicPathPatterns = [
+  /[A-Za-z]:\\\\Users\\\\[^\s"]+/i,
+  /\/(?:Users|home)\/[^\s"]+/i,
+  /rollout-\d{4}-\d{2}-\d{2}T[^\s"]+\.jsonl/i,
+];
+for (const file of publicArtifactFiles) {
+  const text = fs.readFileSync(file, "utf8");
+  for (const pattern of publicPathPatterns) {
+    if (pattern.test(text)) {
+      failures.push(`public artifact contains machine/session identifier: ${path.relative(root, file)}`);
+      break;
+    }
+  }
+}
+
 const result = {
   audit: "public-readiness",
   passed: failures.length === 0,

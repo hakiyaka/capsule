@@ -1,10 +1,10 @@
 {
   "method": {
     "dataset": "Largest non-media tool outputs from the most recently modified local Codex session logs.",
-    "arm_a": "Installed Capsule baseline at C:\\Users\\90530\\.codex\\plugins\\cache\\personal\\capsule\\0.16.0+codex.20260728001007.",
+    "arm_a": "Installed Capsule baseline.",
     "arm_b": "Adaptive context-pressure policies in the working tree.",
     "accounting": "Model-visible serialized characters after PostToolUse, including hook guidance.",
-    "privacy": "The report stores only session basenames, sizes, modes, and booleans; tool content is not copied.",
+    "privacy": "The report stores only bounded sample metadata, sizes, modes, and booleans; tool content and session identifiers are not copied.",
     "caveat": "Approximate text tokens use four characters per token. This excludes image tokens, caching, hidden model work, billing, and outputs outside the sampled sessions."
   },
   "summary": {
@@ -38,7 +38,6 @@
   },
   "rows": [
     {
-      "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
       "sample": 1,
       "mode": "critical",
       "used_percent": 87.98,
@@ -50,7 +49,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
       "sample": 2,
       "mode": "critical",
       "used_percent": 87.98,
@@ -62,7 +60,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
       "sample": 3,
       "mode": "critical",
       "used_percent": 87.98,
@@ -74,7 +71,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
       "sample": 4,
       "mode": "critical",
       "used_percent": 87.98,
@@ -86,7 +82,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
       "sample": 1,
       "mode": "normal",
       "used_percent": 44.72,
@@ -98,7 +93,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
       "sample": 2,
       "mode": "normal",
       "used_percent": 44.72,
@@ -110,7 +104,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
       "sample": 3,
       "mode": "normal",
       "used_percent": 44.72,
@@ -122,7 +115,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
       "sample": 4,
       "mode": "normal",
       "used_percent": 44.72,
@@ -134,7 +126,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
       "sample": 1,
       "mode": "normal",
       "used_percent": 15.56,
@@ -146,7 +137,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
       "sample": 2,
       "mode": "normal",
       "used_percent": 15.56,
@@ -158,7 +148,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
       "sample": 3,
       "mode": "normal",
       "used_percent": 15.56,
@@ -170,7 +159,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
       "sample": 4,
       "mode": "normal",
       "used_percent": 15.56,
@@ -182,7 +170,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
       "sample": 1,
       "mode": "normal",
       "used_percent": 25.98,
@@ -194,7 +181,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
       "sample": 2,
       "mode": "normal",
       "used_percent": 25.98,
@@ -206,7 +192,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
       "sample": 3,
       "mode": "normal",
       "used_percent": 25.98,
@@ -218,7 +203,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
       "sample": 4,
       "mode": "normal",
       "used_percent": 25.98,
@@ -230,7 +214,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
       "sample": 1,
       "mode": "critical",
       "used_percent": 86.69,
@@ -242,7 +225,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
       "sample": 2,
       "mode": "critical",
       "used_percent": 86.69,
@@ -254,7 +236,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
       "sample": 3,
       "mode": "critical",
       "used_percent": 86.69,
@@ -266,7 +247,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
       "sample": 4,
       "mode": "critical",
       "used_percent": 86.69,
@@ -278,7 +258,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T23-33-18-019fa021-d120-7fd0-a530-b362e8704605.jsonl",
       "sample": 1,
       "mode": "normal",
       "used_percent": 17.83,
@@ -290,7 +269,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T23-33-18-019fa021-d120-7fd0-a530-b362e8704605.jsonl",
       "sample": 2,
       "mode": "normal",
       "used_percent": 17.83,
@@ -302,7 +280,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T00-23-13-019fa04f-8254-7c23-9eaf-b87fe4e4a0d2.jsonl",
       "sample": 1,
       "mode": "normal",
       "used_percent": 46.45,
@@ -314,7 +291,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T00-23-13-019fa04f-8254-7c23-9eaf-b87fe4e4a0d2.jsonl",
       "sample": 2,
       "mode": "normal",
       "used_percent": 46.45,
@@ -326,7 +302,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T00-23-13-019fa04f-8254-7c23-9eaf-b87fe4e4a0d2.jsonl",
       "sample": 3,
       "mode": "normal",
       "used_percent": 46.45,
@@ -338,7 +313,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-27T00-23-13-019fa04f-8254-7c23-9eaf-b87fe4e4a0d2.jsonl",
       "sample": 4,
       "mode": "normal",
       "used_percent": 46.45,
@@ -350,7 +324,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
       "sample": 1,
       "mode": "normal",
       "used_percent": 58.73,
@@ -362,7 +335,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
       "sample": 2,
       "mode": "normal",
       "used_percent": 58.73,
@@ -374,7 +346,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
       "sample": 3,
       "mode": "normal",
       "used_percent": 58.73,
@@ -386,7 +357,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T01-07-57-019f9b52-1bd9-7da0-b1a2-ddc3e3bd3c3a.jsonl",
       "sample": 4,
       "mode": "normal",
       "used_percent": 58.73,
@@ -398,7 +368,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T18-45-43-019f9f1a-85f4-7af3-a578-7bcae2781124.jsonl",
       "sample": 1,
       "mode": "normal",
       "used_percent": 51.19,
@@ -410,7 +379,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T18-45-43-019f9f1a-85f4-7af3-a578-7bcae2781124.jsonl",
       "sample": 2,
       "mode": "normal",
       "used_percent": 51.19,
@@ -422,7 +390,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T18-45-43-019f9f1a-85f4-7af3-a578-7bcae2781124.jsonl",
       "sample": 3,
       "mode": "normal",
       "used_percent": 51.19,
@@ -434,7 +401,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T18-45-43-019f9f1a-85f4-7af3-a578-7bcae2781124.jsonl",
       "sample": 4,
       "mode": "normal",
       "used_percent": 51.19,
@@ -446,7 +412,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
       "sample": 1,
       "mode": "critical",
       "used_percent": 82.12,
@@ -458,7 +423,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
       "sample": 2,
       "mode": "critical",
       "used_percent": 82.12,
@@ -470,7 +434,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
       "sample": 3,
       "mode": "critical",
       "used_percent": 82.12,
@@ -482,7 +445,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T00-48-08-019f9b3f-f78f-7d81-8b7c-53ef7e81ebca.jsonl",
       "sample": 4,
       "mode": "critical",
       "used_percent": 82.12,
@@ -494,7 +456,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T01-09-10-019f9b53-3adc-7e02-9d65-7eaaf1a9d109.jsonl",
       "sample": 1,
       "mode": "normal",
       "used_percent": 21.28,
@@ -506,7 +467,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T01-09-10-019f9b53-3adc-7e02-9d65-7eaaf1a9d109.jsonl",
       "sample": 2,
       "mode": "normal",
       "used_percent": 21.28,
@@ -518,7 +478,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T01-09-10-019f9b53-3adc-7e02-9d65-7eaaf1a9d109.jsonl",
       "sample": 3,
       "mode": "normal",
       "used_percent": 21.28,
@@ -530,7 +489,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T01-09-10-019f9b53-3adc-7e02-9d65-7eaaf1a9d109.jsonl",
       "sample": 4,
       "mode": "normal",
       "used_percent": 21.28,
@@ -542,7 +500,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
       "sample": 1,
       "mode": "normal",
       "used_percent": 35.49,
@@ -554,7 +511,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
       "sample": 2,
       "mode": "normal",
       "used_percent": 35.49,
@@ -566,7 +522,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
       "sample": 3,
       "mode": "normal",
       "used_percent": 35.49,
@@ -578,7 +533,6 @@
       "exact_recovery": true
     },
     {
-      "session": "rollout-2026-07-26T00-48-18-019f9b40-1ccd-7840-aa9d-46321edf7883.jsonl",
       "sample": 4,
       "mode": "normal",
       "used_percent": 35.49,

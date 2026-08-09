@@ -230,7 +230,6 @@ const exactRows = dataset.singles.map((sample, index) => {
   const baseline = invoke(baselineHook, sample, `exact-a-${index}`, sample.output);
   const treatment = invoke(currentHook, sample, `exact-b-${index}`, sample.output);
   return {
-    session: sample.session,
     raw_chars: sample.output.length,
     baseline_chars: baseline.chars,
     treatment_chars: treatment.chars,
@@ -245,7 +244,6 @@ const deltaRows = dataset.pairs.map((sample, index) => {
   const baseline = invoke(baselineHook, sample, `delta-a-${index}`, sample.output);
   const treatment = invoke(currentHook, sample, `delta-b-${index}`, sample.output);
   return {
-    session: sample.session,
     tool: sample.name,
     raw_chars: sample.output.length,
     line_overlap: lineOverlap(sample.before, sample.output),
@@ -260,11 +258,11 @@ const deltaRows = dataset.pairs.map((sample, index) => {
 const result = {
   method: {
     dataset: "Non-media tool outputs from the most recently modified local Codex sessions.",
-    arm_a: `Installed Capsule baseline at ${baseRoot}.`,
+    arm_a: "Installed Capsule baseline.",
     arm_b: "Working-tree Capsule with silent control tags, near-duplicate delta replay, and adaptive reasoning thresholds.",
     exact_replay: "Each real output is replayed byte-identically; accounting includes replacement plus hook-added context.",
     delta_replay: "Actual changed outputs are paired only when the tool name and serialized input are identical.",
-    privacy: "The report stores only session basenames, tool names, sizes, booleans, and aggregates; content is not copied.",
+    privacy: "The report stores only bounded sample metadata, tool names, sizes, booleans, and aggregates; content and session identifiers are not copied.",
     caveat: "Characters are a model-visible text proxy, not billing. Reasoning thresholds are policy activation points, not a claimed model-token reduction.",
   },
   exact_replay_control_plane: {

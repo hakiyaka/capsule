@@ -1,14 +1,8 @@
 {
   "generated_at": "2026-07-27T21:58:35.107Z",
-  "baseline_root": "C:\\Users\\90530\\.codex\\plugins\\cache\\personal\\capsule\\0.14.0+codex.20260727203236",
-  "treatment_root": "C:\\Users\\90530\\Documents\\Codex\\2026-07-26\\c\\outputs\\capsule",
-  "sessions_scanned": [
-    "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
-    "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
-    "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
-    "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
-    "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl"
-  ],
+  "baseline_label": "installed Capsule baseline",
+  "treatment_label": "working tree",
+  "sessions_scanned": 5,
   "routing": {
     "scope": "Router response plus the SKILL.md reads required by positive matches.",
     "before_chars": 42032,
@@ -61,7 +55,6 @@
       "saved_percent": 79.02,
       "cases": [
         {
-          "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
           "compactions": 11,
           "before_chars": 3523,
           "after_chars": 1247,
@@ -69,7 +62,6 @@
           "saved_percent": 64.6
         },
         {
-          "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
           "compactions": 40,
           "before_chars": 10149,
           "after_chars": 1243,
@@ -77,7 +69,6 @@
           "saved_percent": 87.75
         },
         {
-          "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
           "compactions": 2,
           "before_chars": 1459,
           "after_chars": 1235,
@@ -85,7 +76,6 @@
           "saved_percent": 15.35
         },
         {
-          "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
           "compactions": 33,
           "before_chars": 8550,
           "after_chars": 1243,
@@ -103,7 +93,6 @@
       "saved_percent": 28.47,
       "cases": [
         {
-          "session": "rollout-2026-07-26T23-22-59-019fa018-5fee-7a61-a960-5b03036b025f.jsonl",
           "before_chars": 1401,
           "after_chars": 839,
           "avoided_chars": 562,
@@ -112,7 +101,6 @@
           "treatment_capsules_retained": 0
         },
         {
-          "session": "rollout-2026-07-21T00-49-05-019f8181-0bbb-7f22-8f76-d16e745cdec3.jsonl",
           "before_chars": 1322,
           "after_chars": 854,
           "avoided_chars": 468,
@@ -121,7 +109,6 @@
           "treatment_capsules_retained": 0
         },
         {
-          "session": "rollout-2026-07-27T17-16-51-019fa3ef-843d-7732-8d25-0954921985de.jsonl",
           "before_chars": 920,
           "after_chars": 726,
           "avoided_chars": 194,
@@ -130,7 +117,6 @@
           "treatment_capsules_retained": 0
         },
         {
-          "session": "rollout-2026-07-27T01-21-53-019fa085-391e-7393-b4fb-88cb659f4e8f.jsonl",
           "before_chars": 743,
           "after_chars": 754,
           "avoided_chars": -11,
@@ -139,7 +125,6 @@
           "treatment_capsules_retained": 0
         },
         {
-          "session": "rollout-2026-07-25T17-25-19-019f99aa-8cff-7701-9466-bb1ce4fc6414.jsonl",
           "before_chars": 1195,
           "after_chars": 819,
           "avoided_chars": 376,

@@ -1,6 +1,6 @@
 {
   "benchmark": "project-compiler-ab",
-  "root": "C:\\Users\\90530\\Documents\\Codex\\2026-07-26\\c\\outputs\\capsule",
+  "root": "repository",
   "cases": [
     {
       "id": "mcp-dispatch",

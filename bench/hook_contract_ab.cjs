@@ -168,7 +168,7 @@ function runWorker(arm) {
       process.env.CAPSULE_POLL_REPLAY = "0";
       process.env.CAPSULE_SESSION_QUERY = arm === "B" ? "1" : "0";
       const transcriptPath = item.eligible
-        ? `C:\\Users\\fixture\\.codex\\sessions\\2026\\07\\${item.id}.jsonl`
+        ? `C:\\fixture\\.codex\\sessions\\2026\\07\\${item.id}.jsonl`
         : `C:\\fixtures\\${item.id}.jsonl`;
       result = hook.handle("posttooluse", {
         tool_name: "workspace.read_file",

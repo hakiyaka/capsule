@@ -6,6 +6,7 @@
 
 - Repository: https://github.com/hakiyaka/capsule
 - Project site: https://hakiyaka.github.io/capsule/
+- Guide index: https://hakiyaka.github.io/capsule/guide/index.html
 - Installation: https://hakiyaka.github.io/capsule/guide/install-capsule.html
 - Codex token efficiency: https://hakiyaka.github.io/capsule/guide/codex-token-efficiency.html
 - MCP context compression: https://hakiyaka.github.io/capsule/guide/mcp-context-compression.html

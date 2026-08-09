@@ -18,6 +18,8 @@ operation is explicitly lossy.
 
 Do not commit credentials, local state, generated capsules, machine-specific
 absolute paths, user prompts, session databases, or personal benchmark data.
+Benchmark receipts may keep reproducible aggregates and bounded sample metadata,
+but must not include local roots, session filenames, or raw session content.
 
 Use the shared primitives in `mcp/storage.cjs` for new local JSON state. Do not
 reintroduce ad-hoc temporary-file names, direct state writes, or a second

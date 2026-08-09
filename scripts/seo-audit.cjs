@@ -49,6 +49,7 @@ const feed = read("feed.xml");
 const llms = read("llms.txt");
 const notFound = read("404.html");
 const guides = [
+  "guide/index.html",
   "guide/codex-token-efficiency.html",
   "guide/mcp-context-compression.html",
   "guide/get-content-token-savings.html",
@@ -110,6 +111,10 @@ requireMatch(html, /name=["']twitter:image:alt["']/i, "Twitter image alt");
 requireMatch(html, /<h1\b[^>]*>[^<]+<\/h1>/i, "visible H1");
 requireMatch(html, /href=["']https:\/\/github\.com\/hakiyaka\/capsule(?:\/|["'])/i, "repository link");
 requireMatch(html, /application\/ld\+json/i, "JSON-LD block");
+requireMatch(html, /"url"\s*:\s*"https:\/\/github\.com\/hakiyaka\/capsule"/i, "SoftwareSourceCode URL");
+requireMatch(html, new RegExp(`"version"\\s*:\\s*"${escapeRegExp(releaseVersion)}"`, "i"), "SoftwareSourceCode version");
+requireMatch(html, /"keywords"\s*:\s*\[[^\]]*context-compression[^\]]*\]/i, "SoftwareSourceCode keywords");
+requireMatch(html, /"sameAs"\s*:\s*\[[^\]]*github\.com\/hakiyaka\/capsule[^\]]*\]/i, "SoftwareSourceCode sameAs");
 requireMatch(robots, /User-agent:\s*\*/i, "robots user agent");
 requireMatch(robots, /Allow:\s*\//i, "robots allow");
 requireMatch(robots, new RegExp(`Sitemap:\\s*${canonical}sitemap\\.xml`, "i"), "robots sitemap");
@@ -132,6 +137,23 @@ for (const block of html.matchAll(/<script\s+type=["']application\/ld\+json["']>
 }
 if (jsonLdBlocks === 0) failures.push("missing parseable JSON-LD");
 
+function hasBreadcrumbList(page, expected) {
+  for (const block of page.matchAll(/<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)) {
+    try {
+      const parsed = JSON.parse(block[1]);
+      if (parsed?.["@type"] !== "BreadcrumbList" || !Array.isArray(parsed.itemListElement)) continue;
+      const items = parsed.itemListElement;
+      const home = items.find((item) => item?.position === 1);
+      const leaf = items.find((item) => item?.position === 2);
+      if (home?.["@type"] === "ListItem" && home.item === canonical &&
+          leaf?.["@type"] === "ListItem" && leaf.item === expected) return true;
+    } catch {
+      // The page-level JSON-LD checks below report malformed structured data.
+    }
+  }
+  return false;
+}
+
 for (const relative of guides) {
   const page = read(relative);
   const expected = canonical + relative;
@@ -151,7 +173,8 @@ for (const relative of guides) {
   requireMatch(page, /rel=["']alternate["'][^>]+type=["']application\/rss\+xml["'][^>]+href=["']\.\.\/feed\.xml["']/i, `${relative}: RSS alternate`);
   requireMatch(page, /<h1\b[^>]*>[^<]+<\/h1>/i, `${relative}: visible H1`);
   requireMatch(page, /application\/ld\+json/i, `${relative}: JSON-LD block`);
-  if (!/"@type"\s*:\s*"(?:WebPage|HowTo|FAQPage)"/i.test(page)) failures.push(`${relative}: JSON-LD type`);
+  if (!/"@type"\s*:\s*"(?:CollectionPage|WebPage|HowTo|FAQPage)"/i.test(page)) failures.push(`${relative}: JSON-LD type`);
+  if (!hasBreadcrumbList(page, expected)) failures.push(`${relative}: BreadcrumbList`);
   if (!sitemap.includes(`<loc>${expected}</loc>`)) failures.push(`${relative}: sitemap URL`);
   if (!feed.includes(`<guid isPermaLink="true">${expected}</guid>`)) failures.push(`${relative}: RSS URL`);
   if (!llms.includes(expected)) failures.push(`${relative}: machine-readable URL`);
