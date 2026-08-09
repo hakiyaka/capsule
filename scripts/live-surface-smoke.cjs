@@ -23,6 +23,7 @@ const paths = [
   "https://github.com/hakiyaka/capsule/releases/download/v1.0.1/capsule-1.0.1-source.zip",
   "https://github.com/hakiyaka/capsule/releases/download/v1.0.1/capsule-1.0.1-source.zip.sha256",
 ];
+const headOnlyPaths = new Set(paths.filter((pathname) => /^https:\/\/github\.com\/hakiyaka\/capsule\/releases\/download\//i.test(pathname)));
 const guidePaths = [
   "codex-token-efficiency.html",
   "mcp-context-compression.html",
@@ -37,16 +38,18 @@ const guidePaths = [
 ].map((name) => `/guide/${name}`);
 const failures = [];
 
-async function get(pathname) {
+async function get(pathname, method = "GET") {
   const url = /^https?:\/\//i.test(pathname) ? pathname : `${base}${pathname}`;
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const response = await fetch(url, { redirect: "follow", signal: controller.signal, headers: { "user-agent": "capsule-live-surface-audit/1.0" } });
-      const bytes = Buffer.from(await response.arrayBuffer());
-      return { pathname, url, status: response.status, content_type: response.headers.get("content-type") || "", bytes };
+      const response = await fetch(url, { method, redirect: "follow", signal: controller.signal, headers: { "user-agent": "capsule-live-surface-audit/1.0" } });
+      const bytes = method === "HEAD"
+        ? Buffer.alloc(Number(response.headers.get("content-length")) || 0)
+        : Buffer.from(await response.arrayBuffer());
+      return { pathname, url, method, status: response.status, content_type: response.headers.get("content-type") || "", bytes };
     } catch (error) {
       lastError = error;
       if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, Math.min(1000 * attempt, 3000)));
@@ -74,7 +77,7 @@ function checkPng(result) {
 }
 
 async function main() {
-  const results = await Promise.all(paths.map(get));
+  const results = await Promise.all(paths.map((pathname) => get(pathname, headOnlyPaths.has(pathname) ? "HEAD" : "GET")));
   for (const result of results) {
     if (result.error) {
       failures.push(`${result.pathname}: ${result.error}`);
@@ -90,7 +93,7 @@ async function main() {
       continue;
     }
     check(result, (value) => value.status === 200, "HTTP 200");
-    check(result, (value) => value.bytes.length > 0, "non-empty body");
+    if (result.method !== "HEAD") check(result, (value) => value.bytes.length > 0, "non-empty body");
   }
   const byPath = Object.fromEntries(results.map((result) => [result.pathname, result]));
   const home = text(byPath["/"]); const faq = text(byPath["/guide/faq.html"]); const discoverability = text(byPath["/guide/github-discoverability.html"]);
@@ -121,7 +124,7 @@ async function main() {
     measured_at: new Date().toISOString(),
     attempts,
     timeout_ms: timeoutMs,
-    results: results.map((result) => ({ pathname: result.pathname, status: result.status ?? null, content_type: result.content_type ?? null, bytes: result.bytes?.length ?? 0, error: result.error ?? null })),
+    results: results.map((result) => ({ pathname: result.pathname, method: result.method ?? "GET", status: result.status ?? null, content_type: result.content_type ?? null, bytes: result.bytes?.length ?? 0, error: result.error ?? null })),
     failures,
     passed: failures.length === 0,
   };
