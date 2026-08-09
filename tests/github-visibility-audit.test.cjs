@@ -6,6 +6,43 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 const { compareSearchSnapshots, summarizeReleases, summarizeReferrers } = require("../scripts/github-visibility-metrics.cjs");
+const { collectPaginated, formatError, normalizeRepository } = require("../scripts/github-visibility-helpers.cjs");
+
+test("normalizes repository overrides and rejects API-path injection", () => {
+  assert.equal(normalizeRepository("  octo-org/example.repo  "), "octo-org/example.repo");
+  assert.equal(normalizeRepository(""), "hakiyaka/capsule");
+  assert.throws(() => normalizeRepository("octo-org/example?admin=true"), /owner\/name syntax/);
+  assert.throws(() => normalizeRepository("../other/repo"), /owner\/name syntax/);
+});
+
+test("collects every release page and marks an exact full-page boundary as truncated", () => {
+  const requests = [];
+  const result = collectPaginated((endpoint) => {
+    requests.push(endpoint);
+    const page = Number(endpoint.match(/page=(\d+)$/)?.[1]);
+    return [{id: page * 2 - 1}, {id: page * 2}];
+  }, "repos/octo-org/example/releases", {pageSize: 2, maxPages: 4});
+  assert.deepEqual(result, {
+    items: [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}, {id: 6}, {id: 7}, {id: 8}],
+    pages: 4,
+    truncated: true,
+  });
+  assert.deepEqual(requests, [
+    "repos/octo-org/example/releases?per_page=2&page=1",
+    "repos/octo-org/example/releases?per_page=2&page=2",
+    "repos/octo-org/example/releases?per_page=2&page=3",
+    "repos/octo-org/example/releases?per_page=2&page=4",
+  ]);
+  const complete = collectPaginated((endpoint) => endpoint.endsWith("page=1") ? [{id: 1}] : [], "repos/o/r?state=all", {pageSize: 2});
+  assert.deepEqual(complete, {items: [{id: 1}], pages: 1, truncated: false});
+});
+
+test("bounds optional API diagnostics without discarding the cause", () => {
+  const error = new Error(`HTTP 403 ${"x".repeat(900)}`);
+  const formatted = formatError(error);
+  assert.match(formatted, /^HTTP 403/);
+  assert.equal(formatted.length, 500);
+});
 
 test("summarizes GitHub popular referrer rows", () => {
   const fixture = JSON.parse(fs.readFileSync(path.join(__dirname, "fixtures", "github-traffic-referrers.json"), "utf8"));
@@ -30,6 +67,10 @@ test("uses the GitHub popular referrers endpoint", () => {
   const source = fs.readFileSync(path.join(__dirname, "..", "scripts", "github-visibility-audit.cjs"), "utf8");
   assert.match(source, /traffic\/popular\/referrers/);
   assert.doesNotMatch(source, /traffic\/referrers/);
+  assert.match(source, /maxBuffer: apiMaxBuffer/);
+  assert.match(source, /collectPaginated/);
+  assert.match(source, /community_error/);
+  assert.match(source, /pages_error/);
 });
 
 test("compares repository-search snapshots without inventing missing ranks", () => {

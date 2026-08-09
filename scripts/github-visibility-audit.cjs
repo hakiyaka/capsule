@@ -6,6 +6,7 @@
 
 const { spawnSync } = require("node:child_process");
 const { compareSearchSnapshots, summarizeReleases, summarizeReferrers } = require("./github-visibility-metrics.cjs");
+const { collectPaginated, formatError, normalizeRepository } = require("./github-visibility-helpers.cjs");
 
 const argv = process.argv.slice(2);
 const valueFlags = new Set(["--repo", "--baseline", "--write"]);
@@ -23,7 +24,7 @@ function validateArgs() {
   }
 }
 const repoIndex = argv.indexOf("--repo");
-const repo = repoIndex >= 0 ? String(argv[repoIndex + 1] || "") : (process.env.CAPSULE_GITHUB_REPO || "hakiyaka/capsule");
+const configuredRepo = repoIndex >= 0 ? String(argv[repoIndex + 1] || "") : (process.env.CAPSULE_GITHUB_REPO || "hakiyaka/capsule");
 const baselineIndex = argv.indexOf("--baseline");
 const baselineFile = baselineIndex >= 0 ? String(argv[baselineIndex + 1] || "") : "";
 const writeIndex = argv.indexOf("--write");
@@ -37,11 +38,30 @@ const searchQueries = [
   "exact recoverable context",
 ];
 const schemaVersion = 2;
+const configuredMaxBuffer = Number(process.env.CAPSULE_GITHUB_MAX_BUFFER_BYTES);
+const apiMaxBuffer = Number.isSafeInteger(configuredMaxBuffer) && configuredMaxBuffer >= 64 * 1024
+  ? configuredMaxBuffer
+  : 16 * 1024 * 1024;
+let repo;
 
 function api(endpoint) {
-  const result = spawnSync("gh", ["api", endpoint], { encoding: "utf8", windowsHide: true });
-  if (result.status !== 0) throw new Error(String(result.stderr || result.stdout || `gh api failed: ${endpoint}`).trim());
-  return JSON.parse(result.stdout);
+  const result = spawnSync("gh", ["api", endpoint], {
+    encoding: "utf8",
+    windowsHide: true,
+    maxBuffer: apiMaxBuffer,
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    const detail = String(result.stderr || result.stdout || `gh api failed: ${endpoint}`).trim();
+    const error = new Error(detail || `gh api failed: ${endpoint}`);
+    error.exitCode = result.status;
+    throw error;
+  }
+  try {
+    return JSON.parse(result.stdout);
+  } catch (error) {
+    throw new Error(`gh api returned invalid JSON for ${endpoint}: ${formatError(error)}`);
+  }
 }
 
 function sum(rows, key) {
@@ -66,20 +86,23 @@ function searchSnapshot(query) {
       top_repositories: items.slice(0, 10).filter((item) => item?.private !== true).map((item) => String(item?.full_name || "")).filter(Boolean),
     };
   } catch (error) {
-    return { query, incomplete_results: null, error: String(error?.message || error) };
+    return { query, incomplete_results: null, error: formatError(error) };
   }
 }
 
-function optionalApi(endpoint) {
+function optionalApi(endpoint, fallback) {
   try {
     return { value: api(endpoint), available: true, error: null };
-  } catch {
-    return { value: [], available: false, error: "endpoint unavailable" };
+  } catch (error) {
+    // Keep the actual gh/API diagnostic (usually including HTTP status) so a
+    // missing permission is not mistaken for a real zero-traffic result.
+    return { value: fallback, available: false, error: formatError(error) };
   }
 }
 
 try {
   validateArgs();
+  repo = normalizeRepository(configuredRepo);
   const metadata = api(`repos/${repo}`);
   const views = api(`repos/${repo}/traffic/views`);
   const clones = api(`repos/${repo}/traffic/clones`);
@@ -87,13 +110,12 @@ try {
   const popularPathResult = optionalApi(`repos/${repo}/traffic/popular/paths`);
   const referrers = referrerResult.value;
   const popularPaths = popularPathResult.value;
-  const releases = api(`repos/${repo}/releases?per_page=100`);
-  const community = (() => {
-    try { return api(`repos/${repo}/community/profile`); } catch { return null; }
-  })();
-  const pages = (() => {
-    try { return api(`repos/${repo}/pages`); } catch { return null; }
-  })();
+  const releasePages = collectPaginated((endpoint) => api(endpoint), `repos/${repo}/releases`);
+  const releases = releasePages.items;
+  const communityResult = optionalApi(`repos/${repo}/community/profile`, null);
+  const pagesResult = optionalApi(`repos/${repo}/pages`, null);
+  const community = communityResult.value;
+  const pages = pagesResult.value;
   const referrerSummary = summarizeReferrers(referrers);
   const releaseSummary = summarizeReleases(releases);
   const current = {
@@ -108,13 +130,17 @@ try {
     topics: Array.isArray(metadata.topics) ? metadata.topics.length : 0,
     topic_names: Array.isArray(metadata.topics) ? metadata.topics.map((topic) => String(topic)).sort() : [],
     releases: Array.isArray(releases) ? releases.length : 0,
+    release_pages: releasePages.pages,
+    release_pagination_complete: !releasePages.truncated,
     ...releaseSummary,
     description_chars: String(metadata.description || "").length,
     has_issues: Boolean(metadata.has_issues),
     has_discussions: Boolean(metadata.has_discussions),
     has_pages: Boolean(metadata.has_pages),
     has_wiki: Boolean(metadata.has_wiki),
-    community_health: Number(community?.health_percentage) || null,
+    community_health: Number.isFinite(Number(community?.health_percentage)) ? Number(community.health_percentage) : null,
+    community_available: communityResult.available,
+    community_error: communityResult.error,
     views_14d: Number(views.count) || sum(views.views, "count"),
     unique_viewers_14d: Number(views.uniques) || sum(views.views, "uniques"),
     clones_14d: Number(clones.count) || sum(clones.clones, "count"),
@@ -130,6 +156,8 @@ try {
     homepage: metadata.homepage || "",
     pages_url: pages?.html_url || "",
     pages_build_type: pages?.build_type || "",
+    pages_available: pagesResult.available,
+    pages_error: pagesResult.error,
   };
   const report = { audit: "github-visibility", schema_version: schemaVersion, current, baseline: null, ratios: null, caveat: "Traffic endpoints cover a rolling 14-day window; referrer uniques are summed per-domain values rather than global uniques; stars, forks, releases, and topics are cumulative or point-in-time metadata. This measures discoverability inputs, not guaranteed search ranking." };
   if (searchEnabled) {
