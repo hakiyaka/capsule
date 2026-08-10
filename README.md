@@ -277,28 +277,6 @@ hash-safe measurements; it does not export session text.
 See [BENCHMARK.md](BENCHMARK.md) for methodology and [CHANGELOG.md](CHANGELOG.md)
 for release history.
 
-## Search visibility and publishing
-
-The `docs/` site is a small, crawlable GitHub Pages landing page with a
-canonical URL, a linked [guide index](https://hakiyaka.github.io/capsule/guide/index.html),
-`robots.txt`, XML sitemap, Open Graph metadata, and JSON-LD.
-The Pages deployment is defined in
-[`.github/workflows/pages.yml`](.github/workflows/pages.yml). Repository owners
-may verify the site in Google Search Console or Bing Webmaster Tools and submit
-`https://hakiyaka.github.io/capsule/sitemap.xml`; search providers control
-crawl and ranking, so submission is only a discovery signal.
-GitHub's repository-level link card is separate from Pages metadata: upload
-[`docs/social-card.png`](docs/social-card.png) under **Settings → General →
-Social preview** when you control the repository.
-The same site exposes a small [RSS feed](https://hakiyaka.github.io/capsule/feed.xml)
-for releases and all guide pages so real users and aggregators can follow
-changes without relying on a search result.
-The [GitHub discoverability guide](https://hakiyaka.github.io/capsule/guide/github-discoverability.html)
-summarizes repeatable measurement limits, while the concise
-[machine-readable summary](https://hakiyaka.github.io/capsule/llms.txt) keeps
-canonical product links available to indexing tools. These surfaces describe
-the project; they do not manufacture traffic or guarantee ranking.
-
 ## Repository map
 
 ```text
