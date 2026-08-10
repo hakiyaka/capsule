@@ -49,6 +49,10 @@ function integer(value, fallback, min, max) {
   return Number.isFinite(number) ? Math.max(min, Math.min(max, Math.trunc(number))) : fallback;
 }
 
+const DEFAULT_MAX_SUBAGENTS_TOTAL = 16;
+const MAX_MAX_SUBAGENTS_TOTAL = 20;
+const SUBAGENT_PHASE_SUMMARY_AFTER = 10;
+
 function detectIntegrations(prompt) {
   return INTEGRATIONS
     .filter(([, pattern]) => pattern.test(prompt))
@@ -81,6 +85,12 @@ function plan(args = {}) {
   const maxToolCalls = requested || defaultBudget;
   const maxReadCalls = Math.max(6, Math.floor(maxToolCalls * 0.55));
   const maxOutputChars = complex ? 12_000 : 8_000;
+  const maxSubagents = integer(
+    process.env.CAPSULE_MAX_SUBAGENTS_TOTAL,
+    DEFAULT_MAX_SUBAGENTS_TOTAL,
+    1,
+    MAX_MAX_SUBAGENTS_TOTAL
+  );
   const explicitWorktree = /\b(?:worktree|git\s+branch|parallel\s+checkout)\b/i.test(prompt);
   const explicitAgents = /\b(?:subagent|delegate|parallel agent)\b/i.test(prompt);
   const emit = integrations.length > 0 || prompt.length >= 120 ||
@@ -88,8 +98,11 @@ function plan(args = {}) {
   const workflow = [
     "route only the needed skill or integration",
     "batch independent reads and edits",
+    `spawn at most ${SUBAGENT_PHASE_SUMMARY_AFTER} independent agents before one structured phase summary; keep the task total <=${maxSubagents}`,
+    "return only a compact decision/evidence/files/blockers digest; keep screenshots, base64, and full diffs out of the parent context",
     "make one grouped mutation",
     "run one decisive verification",
+    "call stats once and gain once after the grouped phase",
     "stop when the acceptance condition is proven",
   ];
   const integrationPolicy = integrations.length
@@ -119,6 +132,21 @@ function plan(args = {}) {
       max_read_calls: maxReadCalls,
       max_output_chars: maxOutputChars,
       max_parallel_calls: integrations.length ? 4 : 3,
+      max_subagents_total: maxSubagents,
+      subagent_phase_summary_after: Math.min(SUBAGENT_PHASE_SUMMARY_AFTER, Math.max(1, maxSubagents - 1)),
+      subagent_summary_schema: ["decisions", "evidence", "files", "blockers"],
+      subagent_lane_policy: "one agent per UI/i18n/performance/release lane; use an explicit lane revisit only for a distinct verification need",
+      subagent_output_policy: {
+        format: "compact-structured-digest",
+        max_chars: 1_200,
+        omit: ["raw screenshot", "base64 media", "full diff", "full transcript"],
+        recovery: "use exact capsule ids with expand/diff only when indispensable",
+      },
+      phase_measurement: {
+        required_actions: ["stats", "gain"],
+        cadence: "once after each grouped mutation and decisive verification",
+        purpose: "local exposure evidence, not provider billing",
+      },
       external_mcp_policy: integrationPolicy,
       subagents: explicitAgents ? "only if explicitly requested" : "off by default",
       worktree: explicitWorktree ? "explicit-request" : "off-by-default",

@@ -140,14 +140,13 @@ function terminalNovelty(args = {}) {
 
   const added = subtractLines(afterLines, beforeCounts);
   const removed = subtractLines(beforeLines, afterCounts);
-  const stable = Math.max(0, intersection);
   const body = [
     ...selectSignalLines(removed).map((line) => `- ${line}`),
     ...selectSignalLines(added).map((line) => `+ ${line}`),
   ];
   if (!body.length) body.push("~ semantic state unchanged; volatile timing/timestamp/PID noise omitted");
   const header = `[Capsule terminal novelty ${profile}; stable=${(overlap * 100).toFixed(1)}%; ` +
-    `+${added.length}/-${removed.length}; reused=${stable}; exact=${capsuleId}]`;
+    `+${added.length}/-${removed.length}; exact=${capsuleId}]`;
   const output = `${header}\n${body.join("\n")}`.slice(0, 2_000);
   const baseline = String(args.baseline_output || text);
   if (output.length + 100 >= baseline.length) return null;

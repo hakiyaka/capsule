@@ -116,7 +116,8 @@ function inferProfile(command, args = [], requested = "auto") {
   if (/\b(git|gh|glab)\b/.test(executable) && /\b(diff|show)\b/.test(joined)) return "diff";
   if (/\bgit\b/.test(executable) && /\b(log|reflog)\b/.test(joined)) return "git-log";
   if (/\b(git|gh|glab|gt)\b/.test(executable)) return "git";
-  if (/\b(jest|vitest|pytest|rspec|rake|playwright|cargo test|go test|dotnet test|mvn test|gradlew test)\b/.test(joined)) return "test";
+  if (/\b(jest|vitest|pytest|rspec|rake|playwright|cargo test|go test|dotnet test|mvn test|gradlew test)\b/.test(joined) ||
+      /\bnode(?:\.exe)?\s+--test\b/.test(joined)) return "test";
   if (/\b(tsc|eslint|lint|mypy|ruff|rubocop|golangci|prettier|format)\b/.test(joined)) return "diagnostic";
   if (/\b(find|fd|tree|dir|ls|get-childitem)\b/.test(joined)) return "listing";
   if (/\b(grep|rg|select-string)\b/.test(joined)) return "grep";

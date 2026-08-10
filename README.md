@@ -172,6 +172,12 @@ npm run hooks:restore
 | Recover exact evidence | `expand`, `diff` |
 | Measure behavior | `stats`, `gain`, `insight`, `doctor` |
 
+For multi-agent work, Capsule keeps a task-wide default of 16 subagents (hard maximum
+20), permits one agent per UI/i18n/performance/release lane by default, and asks for one structured decision/evidence/files/blockers digest after the first
+10 independent agents, and projects child results without raw screenshots, base64,
+full diffs, or transcripts. After each grouped change and decisive check, run `stats`
+and `gain` once; these are local exposure measurements, not billing claims.
+
 Examples:
 
 ```json

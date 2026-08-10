@@ -12,6 +12,14 @@ const toolchainJit = require("../mcp/toolchain-jit.cjs");
 const zeroInferencePoll = require("../mcp/zero-inference-poll.cjs");
 const getContent = require("../mcp/get-content.cjs");
 
+// Short successful terminal results are normally below the generic compressor
+// threshold. A bounded profile-aware projection is safe when the exact result
+// is already archived, but failed or mutation-capable output stays untouched.
+const SMALL_TERMINAL_PROFILES = new Set([
+  "test", "diagnostic", "build", "listing", "grep", "git", "git-log",
+  "table", "log", "count", "deps", "env",
+]);
+
 function payloadPath() {
   const index = process.argv.indexOf("--payload");
   if (index < 0 || !process.argv[index + 1]) throw new Error("--payload is required");
@@ -100,6 +108,43 @@ function bounded(value, limit = 480) {
   return `${text.slice(0, Math.max(0, limit - 14)).trim()} …[truncated]`;
 }
 
+function compactSuccessfulTerminal({
+  text,
+  command,
+  args = [],
+  profile,
+  cwd,
+  exit_code,
+  capsule_id,
+} = {}) {
+  if (process.env.CAPSULE_SMALL_TERMINAL_COMPRESSION === "0" ||
+      Number(exit_code) !== 0 || !capsule_id) return "";
+  const source = String(text || "");
+  if (source.length < 128) return "";
+  const requestedProfile = profile && !["auto", "generic"].includes(String(profile).toLowerCase())
+    ? profile
+    : "auto";
+  const inferred = compat.inferProfile(command, args, requestedProfile);
+  if (!SMALL_TERMINAL_PROFILES.has(inferred)) return "";
+
+  // Keep warning streams through the normal profile projector, but refuse this
+  // fast path for explicit failure language so diagnostic evidence is retained.
+  const stderr = source.match(/\n# stderr\n([\s\S]*)$/i)?.[1] || "";
+  if (/\b(?:error|failed|exception|panic|fatal|denied|unauthorized)\b/i.test(stderr)) return "";
+  let filtered;
+  try {
+    filtered = compat.filterText(source, { command, args, cwd, profile: inferred });
+  } catch {
+    return "";
+  }
+  const output = String(filtered?.lines?.join("\n") || "").trim();
+  if (!output || output.length >= source.length * 0.78) return "";
+  if (!core.tokenSafe(source, output, 0.84, 72)) return "";
+  const marker = `[Capsule exact=${capsule_id}]`;
+  if (output.length + marker.length + 1 >= source.length) return "";
+  return `${output}\n${marker}`;
+}
+
 async function runOne(payload, command, profile, executor = execute) {
   const started = Date.now();
   const fast = getContent.fastPath({
@@ -145,12 +190,21 @@ async function runOne(payload, command, profile, executor = execute) {
     max_chars: payload.max_chars,
     passthrough_chars: payload.passthrough_chars,
   });
+  const smallTerminal = compactSuccessfulTerminal({
+    text,
+    command,
+    args: [],
+    profile,
+    cwd: payload.cwd,
+    exit_code: result.exit_code,
+    capsule_id: saved.response.capsule_id,
+  });
   const zeroPollPassthrough = zeroInferencePoll.safeCommand(command) && !result.stderr
     ? result.stdout
     : text;
-  const baselineOutput = compact.route === "compressed"
+  const baselineOutput = smallTerminal || (compact.route === "compressed"
     ? `${compact.output}\n\n[Capsule exact capsule: ${saved.response.capsule_id}]`
-    : zeroPollPassthrough;
+    : zeroPollPassthrough);
   const novelty = terminalNovelty.terminalNovelty({
     session_id: payload.session_id,
     cwd: payload.cwd,
@@ -419,4 +473,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { execute, runPayload, waitForFilesystemSignal };
+module.exports = { compactSuccessfulTerminal, execute, runPayload, waitForFilesystemSignal };

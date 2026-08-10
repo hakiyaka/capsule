@@ -91,6 +91,7 @@ test.after(() => {
 test("profiles, custom filters, and gain accounting work locally", () => {
   assert.equal(compat.inferProfile("git", ["diff"]), "diff");
   assert.equal(compat.inferProfile("pytest", ["-q"]), "test");
+  assert.equal(compat.inferProfile("node", ["--test", "tests/example.test.cjs"]), "test");
   assert.equal(compat.inferProfile("kubectl", ["get", "pods"]), "table");
   assert.equal(compat.inferProfile("rg", ["needle", "."]), "grep");
 
@@ -1159,6 +1160,47 @@ test("Causal Toolchain JIT rejects mutation-capable and shell-composed successor
     profile: "git-status",
     cwd: process.cwd(),
   })), false);
+});
+
+test("successful terminal projections compact bounded diagnostics with exact recovery", () => {
+  const text = [
+    "# stdout",
+    "TAP version 13",
+    "1..120",
+    ...Array.from({ length: 120 }, (_, index) => `ok ${index + 1} - deterministic check ${index + 1}`),
+    "# tests 120",
+    "# pass 120",
+    "# fail 0",
+    "# duration_ms 214.3",
+    "",
+    "# stderr",
+    "Warning: experimental feature enabled",
+  ].join("\n");
+  const capsuleId = core.saveCapsule({
+    kind: "terminal-small-success-test",
+    source: "node --test",
+    text,
+    maxChars: 1_200,
+  }).response.capsule_id;
+  const projected = hookCli.compactSuccessfulTerminal({
+    text,
+    command: "node --test tests/example.test.cjs",
+    profile: "test",
+    cwd: process.cwd(),
+    exit_code: 0,
+    capsule_id: capsuleId,
+  });
+  assert.match(projected, new RegExp(`\\[Capsule exact=${capsuleId}\\]`));
+  assert.match(projected, /Warning: experimental feature enabled/);
+  assert.ok(projected.length < text.length * 0.78);
+  assert.equal(hookCli.compactSuccessfulTerminal({
+    text,
+    command: "node --test tests/example.test.cjs",
+    profile: "test",
+    cwd: process.cwd(),
+    exit_code: 1,
+    capsule_id: capsuleId,
+  }), "");
 });
 
 test("Causal Toolchain JIT normalizes native hook profiles before learning", () => {

@@ -18,6 +18,8 @@ Use one `capsule`; put action fields in `payload`.
 - Treat `gain` as contract-valid local exposure telemetry, not billing. Legacy hook projections are excluded unless `include_unverified:true` is explicitly requested.
 - Start `view_image` at `high`; use `original` only for pixel-level evidence.
 - Give subagents self-contained messages. Automatic policy uses `none` for independent tasks, a small recent window for deictic continuations, and full history only for explicit whole-conversation dependencies.
+- Subagent work is task-bounded: keep the default total to 16 (never above 20), use one agent per UI/i18n/performance/release lane, pause after 10 independent agents for one compact `{decisions,evidence,files,blockers}` summary, and reuse that digest instead of opening another review wave. Return no raw screenshots, base64 media, full diffs, or transcripts; retain exact recovery in Capsule.
+- After each grouped mutation and decisive verification, call `stats` once and `gain` once. Treat both as local exposure evidence, not billing; do not rerun exploratory reads just to obtain a measurement.
 - Return the smallest complete answer; explicit detail requirements win.
 - Never sacrifice accuracy for compression.
 - Skill `apply|restore` requires an explicit request and `confirm:true`.

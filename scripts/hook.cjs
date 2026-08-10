@@ -22,6 +22,9 @@ const terminalGenome = require("../mcp/terminal-genome.cjs");
 
 const DEFAULT_MAX_SUBAGENTS_PER_TASK = 8;
 const MAX_MAX_SUBAGENTS_PER_TASK = 32;
+const DEFAULT_MAX_SUBAGENTS_TOTAL = 16;
+const MAX_MAX_SUBAGENTS_TOTAL = 20;
+const SUBAGENT_PHASE_SUMMARY_AFTER = 10;
 
 function readInput() {
   try {
@@ -446,6 +449,14 @@ function executionStateFallback() {
     plan_count: 0,
     same_plan_count: 0,
     spawn_count: 0,
+    total_spawn_count: 0,
+    phase_summary_done: false,
+    phase_summary_count: 0,
+    phase_summary_hash: "",
+    subagent_lanes: {},
+    measurement_due: false,
+    measurement_guidance_emitted: false,
+    phase_measurements: { stats: false, gain: false },
     mutation_count: 0,
     tool_calls: 0,
     advisor_enabled: true,
@@ -504,6 +515,7 @@ function startAdvisorTask(input, prompt) {
   next.task_budget = {
     max_calls: plan.max_tool_calls,
     max_read_calls: plan.max_read_calls,
+    max_subagents_total: plan.max_subagents_total,
   };
   next.project_scope = currentProject;
   next.task_prompt_count = Number(next.task_prompt_count || 0) + 1;
@@ -877,6 +889,69 @@ function explicitEfficiencyOverride(input) {
     toolInput.capsule_force === true || toolInput.capsuleForce === true;
 }
 
+function capsuleAction(input) {
+  const toolName = firstString(input, ["tool_name", "toolName", "name"]).toLowerCase();
+  if (!/capsule/.test(toolName)) return "";
+  const toolInput = input.tool_input || input.toolInput || {};
+  return String(toolInput.action || toolInput.payload?.action || "").trim().toLowerCase();
+}
+
+function phaseSummary(input) {
+  const toolInput = input.tool_input || input.toolInput || {};
+  const value = toolInput.capsule_phase_summary ?? toolInput.capsulePhaseSummary;
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const required = ["decisions", "evidence", "files", "blockers"];
+  if (!required.every((key) => Object.prototype.hasOwnProperty.call(value, key))) return null;
+  let serialized;
+  try {
+    serialized = JSON.stringify(value);
+  } catch {
+    return null;
+  }
+  if (!serialized || serialized.length > 8_000) return null;
+  return {
+    hash: crypto.createHash("sha256").update(serialized).digest("hex").slice(0, 16),
+    chars: serialized.length,
+  };
+}
+
+function subagentLane(message) {
+  const text = String(message || "");
+  const lanes = [
+    ["ui", /\b(?:ui|ux|frontend|visual|pixel|browser|accessibility)\b/i],
+    ["i18n", /\b(?:i18n|l10n|locali[sz]ation|translation|locale|rtl)\b/i],
+    ["performance", /\b(?:perf(?:ormance)?|scale|latency|cache|optimi[sz]e|benchmark)\b/i],
+    ["release", /\b(?:release|deploy(?:ment)?|publish|package|semver|changelog)\b/i],
+  ];
+  return lanes.find(([, pattern]) => pattern.test(text))?.[0] || "";
+}
+
+function subagentTotalLimit(input, state) {
+  const configured = Number(process.env.CAPSULE_MAX_SUBAGENTS_TOTAL);
+  const fromPlan = Number(state?.task_budget?.max_subagents_total);
+  const base = Number.isFinite(configured)
+    ? Math.min(MAX_MAX_SUBAGENTS_TOTAL, Math.max(1, Math.trunc(configured)))
+    : Number.isFinite(fromPlan)
+    ? Math.min(MAX_MAX_SUBAGENTS_TOTAL, Math.max(1, Math.trunc(fromPlan)))
+    : DEFAULT_MAX_SUBAGENTS_TOTAL;
+  const mode = String(pressureState(input).mode || "normal").toLowerCase();
+  if (mode === "emergency") return Math.min(base, 4);
+  if (mode === "critical") return Math.min(base, 8);
+  if (mode === "high") return Math.min(base, 12);
+  return base;
+}
+
+function stripPhaseSummaryControl(toolInput) {
+  const next = { ...(toolInput || {}) };
+  delete next.capsule_phase_summary;
+  delete next.capsulePhaseSummary;
+  delete next.capsule_lane_revisit;
+  delete next.capsuleLaneRevisit;
+  return next;
+}
+
+const SUBAGENT_OUTPUT_CONTRACT = "[Capsule subagent output: compact digest only; fields=decisions,evidence,files,blockers; omit raw screenshots, base64 media, full diffs, and transcripts; use exact capsule ids for recovery.]";
+
 function isBatchedObservation(input, toolName) {
   const normalized = String(toolName || "").toLowerCase();
   const toolInput = input.tool_input || input.toolInput || {};
@@ -1074,7 +1149,15 @@ function noteToolIntent(input, toolName) {
   state.tool_calls = Number(state.tool_calls || 0) + 1;
   const paths = toolPaths(input);
   let guidance = "";
+  let measurementGuidance = "";
   let blockReason = "";
+  const action = capsuleAction(input);
+  const measurementAction = action === "stats" || action === "gain";
+  if (!measurementAction && state.measurement_due && !state.measurement_guidance_emitted &&
+      !isPlanningTool(normalized) && !isPollTool(normalized) && !isSpawnTool(normalized)) {
+    measurementGuidance = "[Capsule measurement checkpoint: after the grouped mutation and decisive verification, call stats once and gain once; do not reopen exploratory reads.]";
+    state.measurement_guidance_emitted = true;
+  }
   const ledgerProbe = compactionLedger.emitProbe({
     file: compactionLedgerFile(input),
     is_mutation: isMutationTool(normalized) || isNodeReplMutation(input),
@@ -1089,16 +1172,55 @@ function noteToolIntent(input, toolName) {
     }
   } else if (isSpawnTool(normalized)) {
     state.poll_count = 0;
-    state.spawn_count = Number(state.spawn_count || 0) + 1;
+    const nextSpawnCount = Number(state.spawn_count || 0) + 1;
+    const nextTotalSpawnCount = Number(state.total_spawn_count || 0) + 1;
+    const summary = phaseSummary(input);
+    const forced = explicitEfficiencyOverride(input);
+    const toolInput = input.tool_input || input.toolInput || {};
+    const lane = subagentLane(firstString(toolInput, ["message", "prompt", "task"]));
+    const laneRevisit = toolInput.capsule_lane_revisit === true || toolInput.capsuleLaneRevisit === true;
     const fanoutLimit = subagentFanoutLimit(input);
-    if (!blockReason && state.spawn_count > fanoutLimit && !explicitEfficiencyOverride(input)) {
-      blockReason = `[Capsule fan-out fuse: ${state.spawn_count - 1}/${fanoutLimit} subagents already spawned since the last implementation mutation; ` +
+    const totalLimit = subagentTotalLimit(input, state);
+    if (summary) {
+      state.phase_summary_done = true;
+      state.phase_summary_count = Number(state.phase_summary_count || 0) + 1;
+      state.phase_summary_hash = summary.hash;
+      state.phase_summary_chars = summary.chars;
+    }
+    if (!blockReason && nextSpawnCount > fanoutLimit && !forced) {
+      blockReason = `[Capsule fan-out fuse: ${nextSpawnCount - 1}/${fanoutLimit} subagents already spawned since the last implementation mutation; ` +
         "reuse an existing agent or make the task self-contained. Set capsule_force=true only for an indispensable additional fork.]";
     }
-    if ([4, 8].includes(state.spawn_count)) {
-      guidance = `Capsule fan-out governor: ${state.spawn_count} subagents were spawned ` +
+    if (!blockReason && nextTotalSpawnCount > SUBAGENT_PHASE_SUMMARY_AFTER &&
+        !state.phase_summary_done && !summary && !forced) {
+      blockReason = `[Capsule phase-summary gate: ${SUBAGENT_PHASE_SUMMARY_AFTER} independent agents already ran. ` +
+        "Before another spawn, provide capsule_phase_summary with decisions, evidence, files, and blockers; " +
+        "keep it compact and omit raw screenshots, base64 media, full diffs, and transcripts.]";
+    }
+    if (!blockReason && lane && state.subagent_lanes?.[lane] && !laneRevisit && !forced) {
+      blockReason = `[Capsule lane fuse: the ${lane} lane already has an agent for this task. ` +
+        "Reuse its result; set capsule_lane_revisit=true only for a distinct verification need.]";
+    }
+    if (!blockReason && nextTotalSpawnCount > totalLimit && !forced) {
+      blockReason = `[Capsule task fan-out fuse: ${nextTotalSpawnCount - 1}/${totalLimit} total subagents already spawned for this task; ` +
+        "reuse an existing agent or finish the grouped phase. Set capsule_force=true only for an indispensable additional fork.]";
+    }
+    if (!blockReason || forced) {
+      state.spawn_count = nextSpawnCount;
+      state.total_spawn_count = nextTotalSpawnCount;
+      if (lane) {
+        state.subagent_lanes = { ...(state.subagent_lanes || {}), [lane]: Number(state.subagent_lanes?.[lane] || 0) + 1 };
+      }
+    }
+    if ([4, 8].includes(nextSpawnCount)) {
+      guidance = `Capsule fan-out governor: ${nextSpawnCount} subagents were spawned ` +
         "since the last implementation mutation. Reuse existing agents, keep new tasks self-contained, " +
         "and avoid recursive delegation unless it covers a distinct dependency.";
+    }
+    if (!blockReason && nextTotalSpawnCount === SUBAGENT_PHASE_SUMMARY_AFTER) {
+      guidance = `[Capsule phase checkpoint: ${SUBAGENT_PHASE_SUMMARY_AFTER} agents reached. ` +
+        "Collect one compact summary with decisions/evidence/files/blockers before spawning more; " +
+        "return only that digest to the parent and keep raw screenshots/base64/full diffs in exact capsules.]";
     }
   } else if (isPlanningTool(normalized)) {
     state.poll_count = 0;
@@ -1214,7 +1336,7 @@ function noteToolIntent(input, toolName) {
       "Change the task packet, lane, or runtime evidence before retrying; set capsule_force=true " +
       "only for a deliberate retry.]";
   }
-  guidance = [guidance, cycleGuidance, retryGuidance].filter(Boolean).join("\n").slice(0, 1_200);
+  guidance = [guidance, measurementGuidance, cycleGuidance, retryGuidance].filter(Boolean).join("\n").slice(0, 1_200);
   state.last_tool = normalized.slice(0, 160);
   state.last_paths = paths;
   state.updated_at = Date.now();
@@ -1230,6 +1352,16 @@ function noteToolResult(input, toolName) {
   const normalized = String(toolName || "").toLowerCase();
   const file = hashedHookStateFile(input, "execution-progress");
   const state = readHookState(file, executionStateFallback());
+  const action = capsuleAction(input);
+  if (!isFailedToolResult(input) && (action === "stats" || action === "gain")) {
+    const measurements = state.phase_measurements && typeof state.phase_measurements === "object"
+      ? state.phase_measurements
+      : { stats: false, gain: false };
+    measurements[action] = true;
+    state.phase_measurements = measurements;
+    state.measurement_due = !(measurements.stats && measurements.gain);
+    state.measurement_guidance_emitted = false;
+  }
   const evidenceIdentity = stableEvidenceIdentity(input, normalized);
   if (evidenceIdentity && !isFailedToolResult(input)) {
     const successfulEvidence = state.successful_evidence || {};
@@ -1259,6 +1391,9 @@ function noteToolResult(input, toolName) {
     state.repeated_read_count = 0;
     state.last_read_fingerprint = "";
     state.last_read_epoch = Number(state.epoch || 0);
+    state.measurement_due = true;
+    state.measurement_guidance_emitted = false;
+    state.phase_measurements = { stats: false, gain: false };
     state.context_interest_tokens = 0;
     state.context_interest_tier = 0;
     state.mutation_count = Number(state.mutation_count || 0) + 1;
@@ -1299,6 +1434,11 @@ function executionCheckpoint(input) {
     Number(state.no_progress_reads || 0) ? `reads_since_progress=${state.no_progress_reads}` : "",
     Number(state.plan_count || 0) ? `plans_since_progress=${state.plan_count}` : "",
     Number(state.spawn_count || 0) ? `subagents_since_progress=${state.spawn_count}` : "",
+    Number(state.total_spawn_count || 0) ? `subagents_total=${state.total_spawn_count}` : "",
+    Number(state.total_spawn_count || 0) >= SUBAGENT_PHASE_SUMMARY_AFTER
+      ? `phase_summary=${state.phase_summary_done ? "done" : "required"}`
+      : "",
+    state.measurement_due ? "measurement=stats+gain" : "",
     Number(state.context_interest_tokens || 0)
       ? `context_interest≈${state.context_interest_tokens} weighted_tokens`
       : "",
@@ -2799,9 +2939,12 @@ function subagentForkPolicy(input, toolInput, forkTurns) {
     need === "none" ? "none" : need === "recent" || fullHistoryDowngraded ? "3" : "";
   const parentTokens = Number(pressureState(input).input_tokens || 0);
   const boundedTarget = !explicitlyBounded && mode === "auto" && target ? target : forkTurns;
-  const changed = !explicitModel || boundedTarget !== forkTurns;
+  const hasPhaseSummaryControl = toolInput.capsule_phase_summary != null || toolInput.capsulePhaseSummary != null;
+  const hasLaneControl = toolInput.capsule_lane_revisit != null || toolInput.capsuleLaneRevisit != null;
+  const changed = !explicitModel || boundedTarget !== forkTurns || hasPhaseSummaryControl || hasLaneControl;
 
   if (changed) {
+    const safeToolInput = stripPhaseSummaryControl(toolInput);
     return {
       hookSpecificOutput: {
         hookEventName: "PreToolUse",
@@ -2811,11 +2954,11 @@ function subagentForkPolicy(input, toolInput, forkTurns) {
             "Use gpt-5.6-luna when the current spawn tool supports it; otherwise use gpt-5.6-terra.",
         } : {}),
         updatedInput: {
-          ...toolInput,
+          ...safeToolInput,
           ...(!explicitModel ? { model: selectedModel } : {}),
           ...(boundedTarget !== forkTurns ? { fork_turns: boundedTarget } : {}),
         },
-        additionalContext: freshReviewBounded
+        additionalContext: `${freshReviewBounded
           ? `[Capsule subagent model=${selectedModel}; fresh review fork bounded to fork_turns:none; ` +
             "review only the supplied diff/evidence, not the parent conversation."
           : fullHistoryDowngraded
@@ -2826,7 +2969,8 @@ function subagentForkPolicy(input, toolInput, forkTurns) {
             `${parentTokens ? `; parent_input≈${parentTokens}` : ""}]`
           : `[Capsule subagent model=${selectedModel}; ` +
             `bounded_fork=${JSON.stringify(boundedTarget || forkTurns || "all")}; need=${need}` +
-            `${parentTokens ? `; parent_input≈${parentTokens}` : ""}]`,
+            `${parentTokens ? `; parent_input≈${parentTokens}` : ""}]`}
+          ${SUBAGENT_OUTPUT_CONTRACT}`,
       },
     };
   }
