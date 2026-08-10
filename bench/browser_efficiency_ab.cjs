@@ -67,6 +67,14 @@ function run() {
       `request GET /assets/chunk-${index}.js status=200 duration=${index % 17}ms`),
     "console error: websocket failed status=502",
   ].join("\n");
+  const computerUse = [
+    'tool: "computer-use.screenshot"',
+    'window: "Checkout" url="https://shop.example.test/checkout"',
+    'focused: "Card number"',
+    'alert: "Payment declined" status=402',
+    ...Array.from({ length: 2_000 }, (_, index) =>
+      `pixel region ${index} bounds=0,${index},1280,${index + 1} confidence=0.${index % 10}`),
+  ].join("\n");
   const cases = [
     textCase("accessibility", "chrome.browser_snapshot", accessibility, [
       "https://shop.example.test/cart", "Checkout", "focused=true", "status=503 failed",
@@ -74,6 +82,9 @@ function run() {
     textCase("minified-dom", "playwright.get_dom", dom, ["Billing", "Save"]),
     textCase("network-log", "browser.get_network_log", network, [
       "https://app.example.test/dashboard", "status=502",
+    ]),
+    textCase("computer-use", "Computer Use.screenshot", computerUse, [
+      "https://shop.example.test/checkout", "Payment declined", "status=402",
     ]),
   ];
 

@@ -2291,6 +2291,31 @@ test("browser projection preserves large minified HTML navigation evidence", () 
   assert.ok(replacement.length < output.length * 0.2);
 });
 
+test("Computer Use tool names with spaces use the compact exact-recoverable projection", () => {
+  const session = `computer-use-state-${process.pid}-${Date.now()}`;
+  const output = [
+    'window: "Checkout" url="https://shop.example.test/checkout"',
+    'focused: "Card number"',
+    'alert: "Payment declined" status=402',
+    ...Array.from({ length: 900 }, (_, index) => `pixel region ${index} bounds=0,${index},1280,${index + 1}`),
+  ].join("\n");
+  const result = hook.handle("posttooluse", {
+    tool_name: "Computer Use.screenshot",
+    tool_input: { window: "checkout" },
+    tool_output: output,
+    cwd: process.cwd(),
+    session_id: session,
+  });
+  const replacement = replacementText(result) || "";
+  assert.match(replacement, /^\[Capsule browser-state /);
+  assert.match(replacement, /shop\.example\.test\/checkout/);
+  assert.match(replacement, /Payment declined|status=402/);
+  assert.ok(replacement.length < output.length * 0.15);
+  const exactId = replacement.match(/exact=(cap_[a-f0-9]{16})/i)?.[1];
+  assert.ok(exactId);
+  assert.equal(core.loadCapsule(exactId).text, output);
+});
+
 test("browser observation budget batches read-only Node REPL calls and resets after interaction", () => {
   const session = `browser-observation-budget-${process.pid}-${Date.now()}`;
   const observation = {

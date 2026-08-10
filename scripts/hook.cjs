@@ -2321,10 +2321,10 @@ function structuredWebProjection(rawOutput, input, toolName, existingCapsuleId =
 }
 
 function isBrowserTool(toolName) {
-  const normalized = String(toolName || "").trim().toLowerCase();
+  const normalized = String(toolName || "").trim().toLowerCase().replace(/\s+/g, "-");
   return Boolean(normalized) &&
     !/capsule/.test(normalized) &&
-    /(?:^|[._-])(?:browser|chrome|playwright|cdp|computer[_-]?use)(?:$|[._-])/.test(normalized);
+    /(?:^|[._:-])(?:browser|chrome|playwright|cdp|computer(?:[_-]?use)?)(?:$|[._:-])/.test(normalized);
 }
 
 function browserStateProjection(output, input, toolName, existingCapsuleId = "") {

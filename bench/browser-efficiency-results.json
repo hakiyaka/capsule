@@ -6,9 +6,9 @@
     "exclusion": "Character reduction is not provider billing, image-token, latency, or cache-hit measurement."
   },
   "summary": {
-    "cases": 5,
-    "baseline_chars": 769472,
-    "treatment_chars": 3879,
+    "cases": 6,
+    "baseline_chars": 880296,
+    "treatment_chars": 4383,
     "weighted_saving_percent": 99.5,
     "safety_pass": true
   },
@@ -16,8 +16,8 @@
     {
       "name": "accessibility",
       "baseline_chars": 140036,
-      "treatment_chars": 1794,
-      "saving_percent": 98.72,
+      "treatment_chars": 1800,
+      "saving_percent": 98.71,
       "projected": true,
       "critical_evidence_preserved": true,
       "exact_recovery": true
@@ -25,7 +25,7 @@
     {
       "name": "minified-dom",
       "baseline_chars": 140138,
-      "treatment_chars": 220,
+      "treatment_chars": 226,
       "saving_percent": 99.84,
       "projected": true,
       "critical_evidence_preserved": true,
@@ -34,8 +34,17 @@
     {
       "name": "network-log",
       "baseline_chars": 115830,
-      "treatment_chars": 1670,
-      "saving_percent": 98.56,
+      "treatment_chars": 1676,
+      "saving_percent": 98.55,
+      "projected": true,
+      "critical_evidence_preserved": true,
+      "exact_recovery": true
+    },
+    {
+      "name": "computer-use",
+      "baseline_chars": 110824,
+      "treatment_chars": 474,
+      "saving_percent": 99.57,
       "projected": true,
       "critical_evidence_preserved": true,
       "exact_recovery": true
@@ -43,8 +52,8 @@
     {
       "name": "near-identical-state",
       "baseline_chars": 23846,
-      "treatment_chars": 153,
-      "saving_percent": 99.36,
+      "treatment_chars": 160,
+      "saving_percent": 99.33,
       "projected": true,
       "critical_evidence_preserved": true,
       "exact_recovery": true
@@ -52,7 +61,7 @@
     {
       "name": "exact-screenshot-replay",
       "baseline_chars": 349622,
-      "treatment_chars": 42,
+      "treatment_chars": 47,
       "saving_percent": 99.99,
       "projected": true,
       "critical_evidence_preserved": true,
