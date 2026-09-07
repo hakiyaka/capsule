@@ -1,6 +1,7 @@
 "use strict";
 
 const crypto = require("node:crypto");
+const modelProfile = require("./model-profile.cjs");
 
 const STOPWORDS = new Set([
   "a", "an", "and", "are", "as", "at", "be", "by", "do", "for", "from", "in", "into",
@@ -84,7 +85,8 @@ function plan(args = {}) {
   const defaultBudget = complex ? 32 : integrations.length ? 24 + Math.min(8, integrations.length * 2) : 18;
   const maxToolCalls = requested || defaultBudget;
   const maxReadCalls = Math.max(6, Math.floor(maxToolCalls * 0.55));
-  const maxOutputChars = complex ? 12_000 : 8_000;
+  const model = modelProfile.resolveModel(args);
+  const maxOutputChars = Math.round((complex ? 12_000 : 8_000) * modelProfile.outputScale(model));
   const maxSubagents = integer(
     process.env.CAPSULE_MAX_SUBAGENTS_TOTAL,
     DEFAULT_MAX_SUBAGENTS_TOTAL,
@@ -131,6 +133,7 @@ function plan(args = {}) {
       max_tool_calls: maxToolCalls,
       max_read_calls: maxReadCalls,
       max_output_chars: maxOutputChars,
+      model,
       max_parallel_calls: integrations.length ? 4 : 3,
       max_subagents_total: maxSubagents,
       subagent_phase_summary_after: Math.min(SUBAGENT_PHASE_SUMMARY_AFTER, Math.max(1, maxSubagents - 1)),

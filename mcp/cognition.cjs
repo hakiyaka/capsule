@@ -98,12 +98,15 @@ function recordEscrowPlan(plan) {
 }
 
 function planEscrow(args = {}) {
+  const modelProfile = require("./model-profile.cjs");
+  const model = modelProfile.resolveModel(args);
   const prompt = String(args.prompt || "").trim();
   const pressureMode = ["normal", "high", "critical", "emergency"].includes(args.pressure_mode)
     ? args.pressure_mode
     : "normal";
   const disabled = process.env.CAPSULE_TOKEN_ESCROW === "0";
-  const explicitDetail = ESCROW_DETAIL_RE.test(prompt);
+  const explicitDetail = ESCROW_DETAIL_RE.test(prompt) ||
+    /\b(?:in detail|comprehensive|step[ -]by[ -]step)\b/iu.test(prompt);
   const action = ESCROW_ACTION_RE.test(prompt);
   const branchy = ESCROW_BRANCH_RE.test(prompt) || (prompt.match(/\b(?:and|or|ve|veya)\b/giu) || []).length >= 3;
   const question = /[?？]\s*$/.test(prompt);
@@ -130,7 +133,7 @@ function planEscrow(args = {}) {
   const pressureScale = { normal: 1, high: 0.75, critical: 0.55, emergency: 0.35 }[pressureMode];
   const wordBudget = explicitDetail
     ? Math.max(700, Math.round(baseWords * Math.max(0.8, pressureScale)))
-    : Math.max(90, Math.round(baseWords * pressureScale));
+    : Math.max(90, Math.round(baseWords * pressureScale * modelProfile.outputScale(model)));
   const allocatedOutputTokens = Math.ceil(wordBudget * 1.33);
   const toolRounds = explicitDetail ? 8
     : pressureMode === "normal" ? (branchy ? 5 : 4)
@@ -149,6 +152,7 @@ function planEscrow(args = {}) {
     active,
     class: taskClass,
     pressure_mode: pressureMode,
+    model,
     explicit_detail: explicitDetail,
     word_budget: active ? wordBudget : 0,
     tool_round_budget: active ? toolRounds : 0,

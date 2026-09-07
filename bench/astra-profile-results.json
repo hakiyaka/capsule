@@ -1,0 +1,14 @@
+{
+  "method": "deterministic default-budget A/B; no model execution",
+  "model": "gpt-6-astra",
+  "advisor_output_char_budget": {
+    "baseline": 8000,
+    "astra": 6000
+  },
+  "final_word_budget": {
+    "baseline": 220,
+    "astra": 165
+  },
+  "automatic_budget_reduction_percent": 25,
+  "caveat": "Budget reduction is not measured provider token usage or a billing saving. Exact/failure preservation is covered by npm test."
+}

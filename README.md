@@ -27,6 +27,10 @@ repetition into compact, exact-recoverable evidence.
 
 ## Why Capsule?
 
+For GPT-6 Astra, Capsule provides smaller automatic text budgets while preserving
+the selected model, reasoning effort, explicit detail, and exact recovery. See the
+[Astra configuration and measurement guide](docs/astra.md).
+
 | Without Capsule | With Capsule |
 | --- | --- |
 | Repeated output fills the context window | Replays become a compact exact handle |

@@ -494,6 +494,7 @@ function startAdvisorTask(input, prompt) {
   try {
     plan = advisor.plan({
       prompt,
+      model: require("../mcp/model-profile.cjs").resolveModel(input, { config: true }),
       previous_task: {
         fingerprint: prior.task_id,
         term_hashes: prior.task_term_hashes,
@@ -987,6 +988,8 @@ function recordContextInterestBlock(charge, mode) {
 }
 
 function interestAdjustedPolicy(input, policy) {
+  const modelProfile = require("../mcp/model-profile.cjs");
+  policy = modelProfile.outputPolicy(modelProfile.resolveModel(input, { config: true }), policy);
   const state = readHookState(hashedHookStateFile(input, "execution-progress"), {});
   const tier = Number(state.context_interest_tier || 0);
   if (tier <= 0) return policy;
@@ -3622,6 +3625,7 @@ function handle(event, input) {
       const pressure = pressureState(input);
       const escrow = cognition.planEscrow({
         prompt,
+        model: require("../mcp/model-profile.cjs").resolveModel(input, { config: true }),
         pressure_mode: pressure.mode || "normal",
         record: true,
       }).response;

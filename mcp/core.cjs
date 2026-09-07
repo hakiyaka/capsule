@@ -7,6 +7,7 @@ const path = require("node:path");
 const zlib = require("node:zlib");
 const { spawnSync } = require("node:child_process");
 const storage = require("./storage.cjs");
+const modelProfile = require("./model-profile.cjs");
 
 const DEFAULT_MAX_CHARS = 800;
 const MAX_RETURN_CHARS = 12000;
@@ -62,10 +63,11 @@ function approxTokens(chars) {
 
 function estimateInputSavingsUsd(avoidedTokens, args = {}) {
   const requestedModel = String(
-    args.pricing_model || args.model || process.env.CAPSULE_PRICING_MODEL || "gpt-5.6-sol"
+    args.pricing_model || args.model || process.env.CAPSULE_PRICING_MODEL ||
+    process.env.CAPSULE_MODEL || "gpt-5.6-sol"
   ).trim().toLowerCase();
-  const model = requestedModel === "gpt-5.6" ? "gpt-5.6-sol" : requestedModel;
-  const prices = GPT_5_6_INPUT_PRICING_USD_PER_MILLION[model] || GPT_5_6_INPUT_PRICING_USD_PER_MILLION["gpt-5.6-sol"];
+  const model = requestedModel === "gpt-5.6" ? "gpt-5.6-sol" : modelProfile.normalizeModel(requestedModel);
+  const prices = GPT_5_6_INPUT_PRICING_USD_PER_MILLION[model];
   const contextTier = String(
     args.context_tier || process.env.CAPSULE_CONTEXT_TIER || "short"
   ).trim().toLowerCase() === "long" ? "long" : "short";
@@ -77,6 +79,23 @@ function estimateInputSavingsUsd(avoidedTokens, args = {}) {
     ? Math.min(1, Math.max(0, parsedCachedShare))
     : 0.5;
   const tokens = Math.max(0, Number(avoidedTokens) || 0);
+  // A model available in Codex does not imply a published API price. Preserve
+  // its identity and token measurements instead of silently pricing it as Sol.
+  if (!prices) {
+    return {
+      currency: "USD",
+      model,
+      requested_model: requestedModel,
+      context_tier: contextTier,
+      avoided_input_tokens: Math.round(tokens),
+      cached_share_assumption: Number(cachedShare.toFixed(4)),
+      estimated_saved_usd: null,
+      range_usd: null,
+      price_usd_per_million: null,
+      source: null,
+      scope: "Token savings only; no verified API pricing configured for this model.",
+    };
+  }
   const millions = tokens / 1_000_000;
   const price = prices[contextTier];
   const roundUsd = (value) => Number(value.toFixed(6));
@@ -85,7 +104,7 @@ function estimateInputSavingsUsd(avoidedTokens, args = {}) {
   const estimated = allCached * cachedShare + allUncached * (1 - cachedShare);
   return {
     currency: "USD",
-    model: GPT_5_6_INPUT_PRICING_USD_PER_MILLION[model] ? model : "gpt-5.6-sol",
+    model,
     requested_model: requestedModel,
     context_tier: contextTier,
     avoided_input_tokens: Math.round(tokens),
