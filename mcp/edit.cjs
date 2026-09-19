@@ -39,8 +39,10 @@ function canonicalKey(value) {
 
 function atomicWrite(target, bytes) {
   const temporary = `${target}.capsule-${process.pid}-${Date.now()}-${crypto.randomBytes(4).toString("hex")}.tmp`;
-  fs.writeFileSync(temporary, bytes);
   try {
+    const mode = fs.existsSync(target) ? fs.statSync(target).mode & 0o777 : undefined;
+    fs.writeFileSync(temporary, bytes, { flag: "wx", ...(mode == null ? {} : { mode }) });
+    if (mode != null && process.platform !== "win32") fs.chmodSync(temporary, mode);
     fs.renameSync(temporary, target);
   } catch (error) {
     try { fs.rmSync(temporary, { force: true }); } catch {}
@@ -166,6 +168,9 @@ function lineEdits(baseline, operations) {
 
 function applyOperation(input, raw) {
   const operation = normalizeOperation(raw);
+  if (!["prepend", "p", "append", "e", "before", "b", "after", "a", "delete", "d", "replace", "r"].includes(operation.kind)) {
+    throw new Error(`unknown edit operation: ${operation.kind}`);
+  }
   if (operation.kind === "prepend" || operation.kind === "p") {
     return { text: operation.text + input, replacements: 1, kind: "prepend" };
   }
@@ -173,7 +178,9 @@ function applyOperation(input, raw) {
     return { text: input + operation.text, replacements: 1, kind: "append" };
   }
 
-  const find = operation.kind === "before" || operation.kind === "after"
+  const isBefore = operation.kind === "before" || operation.kind === "b";
+  const isAfter = operation.kind === "after" || operation.kind === "a";
+  const find = isBefore || isAfter
     ? operation.anchor
     : operation.find;
   if (!find) throw new Error(`${operation.kind || "edit"} requires exact find/anchor text`);
@@ -182,7 +189,9 @@ function applyOperation(input, raw) {
     const pieces = input.split(find);
     const count = pieces.length - 1;
     if (!count) throw new Error(`exact text not found for ${operation.kind}`);
-    const replacement = operation.kind === "delete" ? "" : operation.text;
+    const replacement = ["delete", "d"].includes(operation.kind) ? ""
+      : isBefore ? operation.text + find
+        : isAfter ? find + operation.text : operation.text;
     return { text: pieces.join(replacement), replacements: count, kind: operation.kind };
   }
 

@@ -549,30 +549,54 @@ async function executeCode(args = {}, helpers = {}) {
     const jobId = `job_${cryptoRandom(12)}`;
     const stdoutPath = path.join(state.root, `${jobId}.stdout.log`);
     const stderrPath = path.join(state.root, `${jobId}.stderr.log`);
-    const stdoutFd = fs.openSync(stdoutPath, "a");
-    const stderrFd = fs.openSync(stderrPath, "a");
-    const child = spawn(invocation.command, invocation.args, {
-      cwd: scratch,
-      env: environment,
-      detached: true,
-      windowsHide: true,
-      stdio: ["ignore", stdoutFd, stderrFd],
-    });
-    child.unref();
-    fs.closeSync(stdoutFd);
-    fs.closeSync(stderrFd);
-    const jobs = readJobs();
-    jobs.jobs[jobId] = {
-      job_id: jobId,
-      pid: child.pid,
-      language: args.language || "javascript",
-      created_at: new Date().toISOString(),
-      scratch,
-      stdout: stdoutPath,
-      stderr: stderrPath,
-    };
-    saveJobs(jobs);
-    return { response: { ...jobs.jobs[jobId], running: true }, capturedChars: 0 };
+    let stdoutFd;
+    let stderrFd;
+    let child;
+    try {
+      stdoutFd = fs.openSync(stdoutPath, "a");
+      stderrFd = fs.openSync(stderrPath, "a");
+      await new Promise((resolve, reject) => {
+        child = spawn(invocation.command, invocation.args, {
+          cwd: scratch,
+          env: environment,
+          detached: true,
+          windowsHide: true,
+          stdio: ["ignore", stdoutFd, stderrFd],
+        });
+        child.once("error", reject);
+        child.once("spawn", resolve);
+      });
+      const jobs = readJobs();
+      jobs.jobs[jobId] = {
+        job_id: jobId,
+        pid: child.pid,
+        language: args.language || "javascript",
+        created_at: new Date().toISOString(),
+        scratch,
+        stdout: stdoutPath,
+        stderr: stderrPath,
+      };
+      saveJobs(jobs);
+      child.unref();
+      return { response: { ...jobs.jobs[jobId], running: true }, capturedChars: 0 };
+    } catch (error) {
+      if (child?.pid) {
+        await new Promise((resolve) => {
+          if (child.exitCode != null || child.signalCode != null) return resolve();
+          child.once("close", resolve);
+          child.kill();
+        });
+      }
+      if (stdoutFd != null) { fs.closeSync(stdoutFd); stdoutFd = undefined; }
+      if (stderrFd != null) { fs.closeSync(stderrFd); stderrFd = undefined; }
+      fs.rmSync(stdoutPath, { force: true });
+      fs.rmSync(stderrPath, { force: true });
+      fs.rmSync(scratch, { recursive: true, force: true });
+      throw error;
+    } finally {
+      if (stdoutFd != null) fs.closeSync(stdoutFd);
+      if (stderrFd != null) fs.closeSync(stderrFd);
+    }
   }
 
   try {

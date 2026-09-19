@@ -754,7 +754,56 @@ function cacheFileSize(file) {
   }
 }
 
+function withCapsuleSourceLock(callback) {
+  const lock = path.join(ensureState().root, "capsule-sources.lock");
+  const owner = path.join(lock, `owner-${process.pid}-${crypto.randomBytes(12).toString("hex")}`);
+  const deadline = Date.now() + 15_000;
+  const sleeper = new Int32Array(new SharedArrayBuffer(4));
+  while (true) {
+    try {
+      fs.mkdirSync(lock, { mode: 0o700 });
+      try { fs.writeFileSync(owner, "", { flag: "wx", mode: 0o600 }); }
+      catch (error) { fs.rmdirSync(lock); throw error; }
+      break;
+    } catch (error) {
+      if (error.code !== "EEXIST") throw error;
+      // Reclaim only a dead process's exact owner file. Only the process that
+      // unlinks that file may remove the directory, avoiding competing reapers.
+      try {
+        const names = fs.readdirSync(lock);
+        if (names.length === 1) {
+          const match = /^owner-(\d+)-[a-f0-9]{24}$/.exec(names[0]);
+          if (match) {
+            let dead = false;
+            try { process.kill(Number(match[1]), 0); } catch (failure) { dead = failure.code === "ESRCH"; }
+            if (dead) {
+              fs.unlinkSync(path.join(lock, names[0]));
+              fs.rmdirSync(lock);
+              continue;
+            }
+          }
+        }
+      } catch (failure) {
+        if (!["ENOENT", "ENOTEMPTY", "EEXIST"].includes(failure.code)) throw failure;
+      }
+      if (Date.now() >= deadline) {
+        throw Object.assign(new Error("capsule source state is locked; retry after the active writer finishes"), { code: "ELOCKED" });
+      }
+      Atomics.wait(sleeper, 0, 0, 10);
+    }
+  }
+  try { return callback(); }
+  finally {
+    fs.unlinkSync(owner);
+    fs.rmdirSync(lock);
+  }
+}
+
 function maintainCapsuleCache(options = {}) {
+  return withCapsuleSourceLock(() => maintainCapsuleCacheLocked(options));
+}
+
+function maintainCapsuleCacheLocked(options = {}) {
   const state = ensureState();
   const lock = path.join(state.root, "capsule-cache-gc.lock");
   if (options.lock !== false) {
@@ -890,14 +939,21 @@ function sourceKey(kind, source) {
   return sha256(`${kind}\0${source}`);
 }
 
-function saveCapsule({ kind, source, text, question, maxChars, details = {} }) {
+function saveCapsule(args) {
+  const saved = withCapsuleSourceLock(() => saveCapsuleLocked(args));
+  const cacheGc = maybeMaintainCapsuleCache();
+  if (cacheGc && cacheGc.removed) saved.response.cache_gc = cacheGc;
+  return saved;
+}
+
+function saveCapsuleLocked({ kind, source, text, question, maxChars, details = {} }) {
   const state = ensureState();
   const contentHash = sha256(Buffer.from(text, "utf8"));
-  const capsuleId = `cap_${contentHash.slice(0, 16)}`;
+  const key = sourceKey(kind, source);
+  const capsuleId = `cap_${sha256(`${key}\0${contentHash}`).slice(0, 16)}`;
   const files = capsuleFiles(capsuleId);
   const existing = readJson(files.metadata, null);
   const sources = readJson(state.sources, {});
-  const key = sourceKey(kind, source);
   const previousCapsuleId = sources[key] || null;
   let previousText = null;
 
@@ -942,7 +998,6 @@ function saveCapsule({ kind, source, text, question, maxChars, details = {} }) {
   writeJsonAtomic(files.metadata, metadata);
   sources[key] = capsuleId;
   writeJsonAtomic(state.sources, sources);
-  const cacheGc = maybeMaintainCapsuleCache();
 
   return {
     response: {
@@ -961,7 +1016,6 @@ function saveCapsule({ kind, source, text, question, maxChars, details = {} }) {
         excerpt: anchor.excerpt,
         excerpt_truncated: anchor.excerpt_truncated,
       })),
-      ...(cacheGc && cacheGc.removed ? { cache_gc: cacheGc } : {}),
       ...(kind === "command" ? {
         execution: {
           exit_code: details.exit_code,

@@ -1350,7 +1350,8 @@ function decodeHtmlEntities(value) {
     const number = entity[1].toLowerCase() === "x"
       ? Number.parseInt(entity.slice(2), 16)
       : Number.parseInt(entity.slice(1), 10);
-    return Number.isFinite(number) ? String.fromCodePoint(number) : _all;
+    return Number.isInteger(number) && number > 0 && number <= 0x10ffff && !(number >= 0xd800 && number <= 0xdfff)
+      ? String.fromCodePoint(number) : "\uFFFD";
   });
 }
 
@@ -1383,14 +1384,41 @@ function normalizeFetchedContent(buffer, contentType) {
   return { content: text, content_type: /\bjavascript|typescript|xml\b/i.test(contentType) ? "code" : "prose" };
 }
 
+async function readResponseBody(response, maxBytes) {
+  if (!response.body) return Buffer.alloc(0);
+  const reader = response.body.getReader();
+  const chunks = [];
+  let bytes = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > maxBytes) throw new Error(`response exceeded max_bytes (${maxBytes})`);
+      chunks.push(Buffer.from(value));
+    }
+    return Buffer.concat(chunks, bytes);
+  } catch (error) {
+    try { await reader.cancel(error); } catch {}
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+}
+
 async function fetchOne(spec, defaults, cache) {
   if (!spec.url || typeof spec.url !== "string") throw new Error("url is required");
   const timeout = int(spec.timeout_ms, int(defaults.timeout_ms, 30_000, 500, 120_000), 500, 120_000);
   const maxBytes = int(spec.max_bytes, int(defaults.max_bytes, 8 * 1024 * 1024, 1_024, 32 * 1024 * 1024), 1_024, 32 * 1024 * 1024);
   const ttlMs = int(spec.ttl_ms, int(defaults.ttl_ms, 24 * 60 * 60 * 1_000, 0, 30 * 24 * 60 * 60 * 1_000), 0, 30 * 24 * 60 * 60 * 1_000);
-  const cacheKey = hash(JSON.stringify({ url: spec.url, headers: spec.headers || defaults.headers || {} }));
+  const headers = new Headers({ "user-agent": `Capsule/${packageMetadata.version}` });
+  for (const input of [defaults.headers, spec.headers]) {
+    for (const [name, value] of new Headers(input || {})) headers.set(name, value);
+  }
+  // Version the key so entries created without merged authorization cannot be reused.
+  const cacheKey = hash(JSON.stringify({ version: 2, url: spec.url, headers: [...headers] }));
   const cached = cache.entries[cacheKey];
-  if (!spec.refresh && cached && Date.now() - cached.fetched_at_ms <= ttlMs) {
+  if (!(spec.refresh ?? defaults.refresh) && cached && Date.now() - cached.fetched_at_ms <= ttlMs) {
     return { ...cached.response, cached: true };
   }
   const controller = new AbortController();
@@ -1398,15 +1426,10 @@ async function fetchOne(spec, defaults, cache) {
   try {
     const response = await fetch(spec.url, {
       signal: controller.signal,
-      headers: {
-        "user-agent": `Capsule/${packageMetadata.version}`,
-        ...(defaults.headers || {}),
-        ...(spec.headers || {}),
-      },
+      headers,
     });
     if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
-    const buffer = Buffer.from(await response.arrayBuffer());
-    if (buffer.length > maxBytes) throw new Error(`response exceeded max_bytes (${maxBytes})`);
+    const buffer = await readResponseBody(response, maxBytes);
     const normalized = normalizeFetchedContent(buffer, response.headers.get("content-type") || "");
     const indexed = indexContent({
       content: normalized.content,
@@ -1428,6 +1451,9 @@ async function fetchOne(spec, defaults, cache) {
     };
     cache.entries[cacheKey] = { fetched_at_ms: Date.now(), response: result };
     return result;
+  } catch (error) {
+    controller.abort();
+    throw error;
   } finally {
     clearTimeout(timer);
   }

@@ -123,11 +123,27 @@ function installLauncher(state) {
   });
 }
 
-function clean(entries) {
+function ownedHookPaths(state) {
+  const owned = [state.launcher, path.join(__dirname, "hook.cjs")];
+  try {
+    const previous = JSON.parse(fs.readFileSync(state.pointer, "utf8"));
+    if (typeof previous.script === "string" && path.isAbsolute(previous.script)) owned.push(previous.script);
+  } catch {}
+  return owned;
+}
+
+function clean(entries, owned = ownedHookPaths(paths())) {
+  const normalize = (value) => {
+    const normalized = String(value).replace(/\\/g, "/");
+    return process.platform === "win32" ? normalized.toLowerCase() : normalized;
+  };
+  const targets = new Set(owned.map(normalize));
+  const isOwned = (command) => (String(command || "").match(/"[^"]*"|'[^']*'|\S+/g) || [])
+    .some((argument) => targets.has(normalize(argument.replace(/^(["'])(.*)\1$/, "$2"))));
   return (Array.isArray(entries) ? entries : []).map((entry) => ({
     ...entry,
     hooks: (entry.hooks || []).filter((hook) =>
-      !/capsule[\\/].*hook\.cjs|scripts[\\/]hook\.cjs|capsule-hook\.cjs/i.test(String(hook.command || ""))
+      !isOwned(hook.command)
     ),
   })).filter((entry) => entry.hooks.length);
 }
@@ -136,10 +152,11 @@ function install() {
   const state = paths();
   const hooks = readHooks(state.target);
   const feature = pluginHooksFeature();
+  const owned = ownedHookPaths(state);
   if (fs.existsSync(state.target) && !fs.existsSync(state.backup)) fs.copyFileSync(state.target, state.backup);
   installLauncher(state);
   for (const [name, event, matcher] of EVENTS) {
-    hooks.hooks[name] = clean(hooks.hooks[name]);
+    hooks.hooks[name] = clean(hooks.hooks[name], owned);
     if (!feature.enabled) {
       hooks.hooks[name].push({
         matcher,
