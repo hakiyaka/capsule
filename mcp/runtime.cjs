@@ -474,6 +474,8 @@ function invocationFor(language, code, sourcePath, scratch) {
   throw new Error(`unsupported language: ${language}`);
 }
 
+const backgroundChildren = new Map();
+
 function captureProcess(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const maxBytes = int(options.max_output_bytes, 32 * 1024 * 1024, 4_096, 128 * 1024 * 1024);
@@ -489,28 +491,37 @@ function captureProcess(command, args, options = {}) {
     const stderr = [];
     let bytes = 0;
     let overflow = false;
-    const timer = setTimeout(() => child.kill(), timeout);
+    let timedOut = false;
+    let escalation;
+    const terminate = () => {
+      child.kill();
+      if (!escalation) escalation = setTimeout(() => child.kill("SIGKILL"), 500);
+    };
+    const timer = setTimeout(() => { timedOut = true; terminate(); }, timeout);
     const collect = (bucket, chunk) => {
       bytes += chunk.length;
       if (bytes > maxBytes) {
         overflow = true;
-        child.kill();
+        terminate();
       } else bucket.push(chunk);
     };
     child.stdout.on("data", (chunk) => collect(stdout, chunk));
     child.stderr.on("data", (chunk) => collect(stderr, chunk));
     child.on("error", (error) => {
       clearTimeout(timer);
+      clearTimeout(escalation);
       reject(error);
     });
     child.on("close", (code, signal) => {
       clearTimeout(timer);
+      clearTimeout(escalation);
       if (overflow) {
         reject(new Error(`execution output exceeded max_output_bytes (${maxBytes})`));
         return;
       }
       resolve({
-        exit_code: code,
+        exit_code: timedOut ? 124 : code,
+        timed_out: timedOut,
         signal,
         elapsed_ms: Date.now() - started,
         stdout: Buffer.concat(stdout).toString("utf8"),
@@ -525,23 +536,35 @@ async function executeCode(args = {}, helpers = {}) {
   const sourcePath = args.path ? path.resolve(args.path) : null;
   if (sourcePath && !fs.statSync(sourcePath).isFile()) throw new Error(`path is not a file: ${sourcePath}`);
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-exec-"));
-  const invocation = invocationFor(args.language || "javascript", args.code, sourcePath, scratch);
+  let invocation;
+  try { invocation = invocationFor(args.language || "javascript", args.code, sourcePath, scratch); }
+  catch (error) {
+    fs.rmSync(scratch, { recursive: true, force: true });
+    throw error;
+  }
   const environment = {
     ...process.env,
     CAPSULE_FILE: sourcePath || "",
     ...(args.env || {}),
   };
   if (invocation.compile) {
-    const compiled = await captureProcess(invocation.compile.command, invocation.compile.args, {
-      cwd: scratch,
-      env: environment,
-      timeout_ms: args.timeout_ms,
-      max_output_bytes: args.max_output_bytes,
-    });
+    let compiled;
+    try {
+      compiled = await captureProcess(invocation.compile.command, invocation.compile.args, {
+        cwd: scratch,
+        env: environment,
+        timeout_ms: args.timeout_ms,
+        max_output_bytes: args.max_output_bytes,
+      });
+    } catch (error) {
+      fs.rmSync(scratch, { recursive: true, force: true });
+      throw error;
+    }
     if (compiled.exit_code !== 0) {
       fs.rmSync(scratch, { recursive: true, force: true });
       const text = `# stdout\n${compiled.stdout}\n# stderr\n${compiled.stderr}`;
-      return { responseText: text, route: "passthrough", capturedChars: text.length };
+      return { response: { output: text, exit_code: compiled.exit_code, signal: compiled.signal,
+        timed_out: compiled.timed_out, stage: "compile" }, route: "failed", capturedChars: text.length };
     }
   }
   if (args.background === true) {
@@ -564,7 +587,13 @@ async function executeCode(args = {}, helpers = {}) {
           stdio: ["ignore", stdoutFd, stderrFd],
         });
         child.once("error", reject);
-        child.once("spawn", resolve);
+        child.once("spawn", () => {
+          backgroundChildren.set(child.pid, child);
+          resolve();
+        });
+        child.once("close", () => {
+          if (backgroundChildren.get(child.pid) === child) backgroundChildren.delete(child.pid);
+        });
       });
       const jobs = readJobs();
       jobs.jobs[jobId] = {
@@ -629,6 +658,8 @@ async function executeCode(args = {}, helpers = {}) {
           route: "indexed",
           capsule_id: saved.response.capsule_id,
           exit_code: result.exit_code,
+          signal: result.signal,
+          timed_out: result.timed_out,
           elapsed_ms: result.elapsed_ms,
           search: searched.response,
         },
@@ -643,13 +674,15 @@ async function executeCode(args = {}, helpers = {}) {
     });
     return helpers.attachArchive(compact, saved.response.capsule_id, {
       exit_code: result.exit_code,
+      signal: result.signal,
+      timed_out: result.timed_out,
       elapsed_ms: result.elapsed_ms,
       language: args.language || "javascript",
       scratch_isolated: true,
       security_note: "Scratch-directory isolation is not an OS security sandbox.",
     });
   } finally {
-    fs.rmSync(scratch, { recursive: true, force: true });
+    await fs.promises.rm(scratch, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 });
   }
 }
 
@@ -658,6 +691,9 @@ function cryptoRandom(length) {
 }
 
 function isRunning(pid) {
+  // A Windows process may disappear from PID lookup before its handles close.
+  // Keep our own jobs busy until the close event makes scratch removal safe.
+  if (backgroundChildren.has(Number(pid))) return true;
   try {
     process.kill(pid, 0);
     return true;
@@ -710,7 +746,7 @@ function jobs(args = {}) {
     if (args.confirm !== true) throw new Error("confirm:true is required");
     if (isRunning(job.pid)) throw new Error("stop the job before removing it");
     for (const file of [job.stdout, job.stderr]) if (fs.existsSync(file)) fs.unlinkSync(file);
-    if (job.scratch && fs.existsSync(job.scratch)) fs.rmSync(job.scratch, { recursive: true, force: true });
+    if (job.scratch && fs.existsSync(job.scratch)) fs.rmSync(job.scratch, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 });
     delete catalog.jobs[job.job_id];
     saveJobs(catalog);
     return { response: { removed: job.job_id }, capturedChars: 0 };

@@ -219,7 +219,10 @@ function attachArchive(compact, capsuleId, details = {}) {
     route: compact.route,
     capturedChars: compact.raw_chars,
   };
-  if (compact.route === "passthrough") operation.responseText = compact.output;
+  const failed = Object.prototype.hasOwnProperty.call(details, "exit_code") && details.exit_code !== 0;
+  if (compact.route === "passthrough" && !failed && !details.signal && !details.timed_out) {
+    operation.responseText = compact.output;
+  }
   return operation;
 }
 
@@ -1222,7 +1225,7 @@ function spawnCapture(spec, defaults = {}) {
     }
     const cwd = path.resolve(spec.cwd || defaults.cwd || process.cwd());
     const timeout = int(spec.timeout_ms, int(defaults.timeout_ms, 30_000, 100, 300_000), 100, 300_000);
-    const maxBytes = int(spec.max_output_bytes, 32 * 1024 * 1024, 4_096, 128 * 1024 * 1024);
+    const maxBytes = int(spec.max_output_bytes, int(defaults.max_output_bytes, 32 * 1024 * 1024, 4_096, 128 * 1024 * 1024), 4_096, 128 * 1024 * 1024);
     const started = Date.now();
     const plan = core.commandSpawnPlan(spec.command, commandArgs, { cwd });
     const child = spawn(plan.command, plan.args, { cwd, env: plan.env, shell: false, windowsHide: true });
@@ -1230,12 +1233,18 @@ function spawnCapture(spec, defaults = {}) {
     const stderr = [];
     let bytes = 0;
     let overflow = false;
-    const timer = setTimeout(() => child.kill(), timeout);
+    let timedOut = false;
+    let escalation;
+    const terminate = () => {
+      child.kill();
+      if (!escalation) escalation = setTimeout(() => child.kill("SIGKILL"), 500);
+    };
+    const timer = setTimeout(() => { timedOut = true; terminate(); }, timeout);
     const collect = (bucket, chunk) => {
       bytes += chunk.length;
       if (bytes > maxBytes) {
         overflow = true;
-        child.kill();
+        terminate();
       } else {
         bucket.push(chunk);
       }
@@ -1244,10 +1253,12 @@ function spawnCapture(spec, defaults = {}) {
     child.stderr.on("data", (chunk) => collect(stderr, chunk));
     child.on("error", (error) => {
       clearTimeout(timer);
+      clearTimeout(escalation);
       reject(error);
     });
     child.on("close", (code, signal) => {
       clearTimeout(timer);
+      clearTimeout(escalation);
       if (overflow) {
         reject(new Error(`command output exceeded max_output_bytes (${maxBytes})`));
         return;
@@ -1256,7 +1267,8 @@ function spawnCapture(spec, defaults = {}) {
         command: spec.command,
         args: commandArgs,
         cwd,
-        exit_code: code,
+        exit_code: timedOut ? 124 : code,
+        timed_out: timedOut,
         signal,
         elapsed_ms: Date.now() - started,
         text: `# stdout\n${Buffer.concat(stdout).toString("utf8")}\n# stderr\n${Buffer.concat(stderr).toString("utf8")}`,
@@ -1267,6 +1279,12 @@ function spawnCapture(spec, defaults = {}) {
 
 async function batchCommands(args = {}) {
   if (!Array.isArray(args.commands) || !args.commands.length) throw new Error("commands is required");
+  for (const spec of args.commands) {
+    if (!spec || typeof spec.command !== "string" || !spec.command.trim()) throw new Error("batch command is required");
+    if (spec.args != null && (!Array.isArray(spec.args) || spec.args.some(item => typeof item !== "string"))) {
+      throw new Error("batch args must be an array of strings");
+    }
+  }
   const concurrency = int(args.concurrency, 4, 1, 8);
   const batchId = `batch_${Date.now().toString(36)}_${crypto.randomBytes(3).toString("hex")}`;
   const results = new Array(args.commands.length);
@@ -1275,6 +1293,7 @@ async function batchCommands(args = {}) {
     while (cursor < args.commands.length) {
       const index = cursor++;
       const spec = args.commands[index];
+      try {
       const captured = await spawnCapture(spec, args);
       const saved = core.saveCapsule({
         kind: "command",
@@ -1296,6 +1315,8 @@ async function batchCommands(args = {}) {
       const operation = attachArchive(compact, saved.response.capsule_id, {
         label: spec.label || `command-${index + 1}`,
         exit_code: captured.exit_code,
+        signal: captured.signal,
+        timed_out: captured.timed_out,
         elapsed_ms: captured.elapsed_ms,
       });
       results[index] = operation.response;
@@ -1320,10 +1341,15 @@ async function batchCommands(args = {}) {
         exit_code: captured.exit_code,
         source: "batch",
       });
+      } catch (error) {
+        results[index] = { label: spec.label || `command-${index + 1}`, exit_code: null,
+          status: "error", error: redact(`${error.code ? `${error.code}: ` : ""}${error.message || error}`),
+          output: "", original_chars: 0 };
+      }
     }
   }
   await Promise.all(Array.from({ length: Math.min(concurrency, args.commands.length) }, worker));
-  const capturedChars = results.reduce((sum, item) => sum + item.original_chars, 0);
+  const capturedChars = results.reduce((sum, item) => sum + Number(item.original_chars || 0), 0);
   const queries = Array.isArray(args.queries) ? args.queries : args.query ? [args.query] : [];
   const searched = queries.length
     ? searchIndex({ queries, kind: "batch-output", tags: [batchId], limit: args.limit }).response.searches
@@ -2925,6 +2951,10 @@ function validateFlowCondition(condition, ids, owner, depth = 0) {
   if (op === "matches" && String(value || "").length > 200) {
     throw new Error(`flow step ${owner}: when regex exceeds 200 characters`);
   }
+  if (op === "matches") {
+    try { new RegExp(String(value || ""), "i"); }
+    catch { throw new Error(`flow step ${owner}: invalid when regex`); }
+  }
   return { step, field, op, ...(value === undefined ? {} : { value }) };
 }
 
@@ -2996,10 +3026,21 @@ function validateFlowStep(step, ids) {
 }
 
 function flowExitCode(operation) {
-  const value = operation?.response?.exit_code ??
-    operation?.response?.execution?.exit_code ??
-    operation?.details?.exit_code;
-  return Number.isFinite(Number(value)) ? Number(value) : null;
+  const response = operation?.response;
+  const candidates = [response, response?.execution, operation?.details,
+    ...(Array.isArray(response?.results) ? response.results : [])];
+  let success = null;
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    if (candidate.timed_out) return 124;
+    if (candidate.signal || candidate.status === "error" || candidate.status === "failed") return 1;
+    if (!Object.prototype.hasOwnProperty.call(candidate, "exit_code")) continue;
+    if (candidate.exit_code == null || !Number.isFinite(Number(candidate.exit_code))) return 1;
+    const code = Number(candidate.exit_code);
+    if (code !== 0) return code;
+    success = 0;
+  }
+  return success;
 }
 
 function compactFlowOutput(operation, maxChars, query, action) {
@@ -3062,6 +3103,13 @@ async function runFlow(args = {}) {
   const ids = new Set(rawSteps.map((step) => String(step?.id || "")));
   if (ids.size !== rawSteps.length) throw new Error("flow step ids must be unique");
   const steps = rawSteps.map((step) => validateFlowStep(step, ids));
+  // Reject invalid graphs before starting even an independent side effect.
+  const validated = new Set();
+  while (validated.size < steps.length) {
+    const ready = steps.filter(step => !validated.has(step.id) && step.depends_on.every(id => validated.has(id)));
+    if (!ready.length) throw new Error("flow dependency graph contains a cycle");
+    for (const step of ready) validated.add(step.id);
+  }
   const concurrency = int(args.concurrency, 6, 1, 8);
   const maxTotalChars = int(args.max_chars, 12_000, 1_200, 48_000);
   const stepChars = Math.max(240, Math.min(1_600, Math.floor(maxTotalChars / steps.length)));

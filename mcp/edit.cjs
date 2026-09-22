@@ -241,6 +241,8 @@ function resolveEntries(args) {
     }
     if (exists && !fs.statSync(target).isFile()) throw new Error(`edit target is not a file: ${target}`);
     const beforeBytes = exists ? fs.readFileSync(target) : Buffer.alloc(0);
+    try { new TextDecoder("utf-8", { fatal: true }).decode(beforeBytes); }
+    catch { throw new Error(`edit target is not valid UTF-8: ${target}`); }
     const bom = beforeBytes.length >= 3 &&
       beforeBytes[0] === 0xef && beforeBytes[1] === 0xbb && beforeBytes[2] === 0xbf;
     const before = beforeBytes.toString("utf8").replace(/^\uFEFF/, "");
@@ -428,24 +430,6 @@ function edit(args = {}) {
   const backupDir = path.join(root, transactionId);
   fs.mkdirSync(backupDir);
   const written = [];
-  try {
-    entries.forEach((entry, index) => {
-      fs.writeFileSync(path.join(backupDir, `${index}.before`), entry.beforeBytes);
-    });
-    for (const entry of entries) {
-      fs.mkdirSync(path.dirname(entry.path), { recursive: true });
-      atomicWrite(entry.path, entry.afterBytes);
-      written.push(entry);
-    }
-  } catch (error) {
-    for (const entry of written.reverse()) {
-      if (entry.existed) atomicWrite(entry.path, entry.beforeBytes);
-      else fs.rmSync(entry.path, { force: true });
-    }
-    try { fs.rmSync(backupDir, { recursive: true, force: true }); } catch {}
-    throw error;
-  }
-
   const manifest = {
     transaction_id: transactionId,
     at: new Date().toISOString(),
@@ -457,7 +441,29 @@ function edit(args = {}) {
       after_sha256: entry.afterSha,
     })),
   };
-  fs.writeFileSync(path.join(backupDir, "transaction.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  try {
+    entries.forEach((entry, index) => {
+      fs.writeFileSync(path.join(backupDir, `${index}.before`), entry.beforeBytes);
+    });
+    // Recovery information must exist before any target can change.
+    fs.writeFileSync(path.join(backupDir, "transaction.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+    for (const entry of entries) {
+      fs.mkdirSync(path.dirname(entry.path), { recursive: true });
+      atomicWrite(entry.path, entry.afterBytes);
+      written.push(entry);
+    }
+  } catch (error) {
+    const failures = [];
+    for (const entry of written.reverse()) {
+      try {
+        if (entry.existed) atomicWrite(entry.path, entry.beforeBytes);
+        else fs.rmSync(entry.path, { force: true });
+      } catch (failure) { failures.push(failure); }
+    }
+    if (failures.length) throw new AggregateError([error, ...failures], `edit rollback incomplete; recovery retained at ${backupDir}`);
+    try { fs.rmSync(backupDir, { recursive: true, force: true }); } catch {}
+    throw error;
+  }
   for (let index = 0; index < entries.length; index += 1) {
     const entry = entries[index];
     const beforeCapsule = core.saveCapsule({
@@ -520,7 +526,9 @@ function undo(args = {}) {
     if (currentSha !== entry.after_sha256) {
       throw new Error(`undo refused because file changed after transaction: ${entry.path}`);
     }
-    return { ...entry, before: fs.readFileSync(path.join(directory, entry.backup)) };
+    const before = fs.readFileSync(path.join(directory, entry.backup));
+    if (digest(before) !== entry.before_sha256) throw new Error(`undo backup integrity check failed: ${entry.path}`);
+    return { ...entry, before };
   });
   for (const entry of entries) {
     if (entry.existed) atomicWrite(entry.path, entry.before);

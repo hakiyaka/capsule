@@ -766,7 +766,7 @@ function withCapsuleSourceLock(callback) {
       catch (error) { fs.rmdirSync(lock); throw error; }
       break;
     } catch (error) {
-      if (error.code !== "EEXIST") throw error;
+      if (!["EEXIST", "EPERM", "EBUSY"].includes(error.code)) throw error;
       // Reclaim only a dead process's exact owner file. Only the process that
       // unlinks that file may remove the directory, avoiding competing reapers.
       try {
@@ -784,7 +784,9 @@ function withCapsuleSourceLock(callback) {
           }
         }
       } catch (failure) {
-        if (!["ENOENT", "ENOTEMPTY", "EEXIST"].includes(failure.code)) throw failure;
+        // Windows can report delete-pending directories as EPERM/EBUSY while
+        // the preceding writer releases the lock. Treat this as contention.
+        if (!["ENOENT", "ENOTEMPTY", "EEXIST", "EPERM", "EBUSY"].includes(failure.code)) throw failure;
       }
       if (Date.now() >= deadline) {
         throw Object.assign(new Error("capsule source state is locked; retry after the active writer finishes"), { code: "ELOCKED" });

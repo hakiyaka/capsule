@@ -5,6 +5,9 @@ const core = require("./core.cjs");
 const unified = require("./unified.cjs");
 const tools = require("./schema.cjs");
 const packageMetadata = require("../package.json");
+const PROTOCOL_VERSIONS = new Set(["2024-11-05", "2025-03-26"]);
+const MAX_MESSAGE_BYTES = Math.min(128 * 1024 * 1024, Math.max(1024,
+  Number.parseInt(process.env.CAPSULE_MCP_MAX_MESSAGE_BYTES, 10) || 16 * 1024 * 1024));
 
 function errorSummary(error) {
   const name = String(error?.name || "Error").replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 80) || "Error";
@@ -40,18 +43,25 @@ async function dispatch(args = {}) {
 }
 
 async function handle(message) {
-  if (!message || message.jsonrpc !== "2.0" || typeof message.method !== "string") {
-    protocolError(message && message.id, -32600, "Invalid Request");
+  const hasId = message != null && Object.prototype.hasOwnProperty.call(message, "id");
+  const validId = !hasId || message.id === null || typeof message.id === "string" ||
+    (typeof message.id === "number" && Number.isFinite(message.id));
+  if (!message || Array.isArray(message) || message.jsonrpc !== "2.0" || typeof message.method !== "string" || !validId) {
+    protocolError(validId ? message?.id : null, -32600, "Invalid Request");
     return;
   }
 
-  if (message.method === "notifications/initialized" || message.method === "notifications/cancelled") {
+  if (!hasId) {
+    return;
+  }
+  if (message.params != null && (typeof message.params !== "object" || Array.isArray(message.params))) {
+    protocolError(message.id, -32602, "params must be an object");
     return;
   }
 
   if (message.method === "initialize") {
     result(message.id, {
-      protocolVersion: (message.params && message.params.protocolVersion) || "2025-03-26",
+      protocolVersion: PROTOCOL_VERSIONS.has(message.params?.protocolVersion) ? message.params.protocolVersion : "2025-03-26",
       capabilities: { tools: { listChanged: false } },
       serverInfo: { name: "capsule", version: packageMetadata.version },
       instructions: tools.instructions,
@@ -92,26 +102,55 @@ async function handle(message) {
 }
 
 let input = "";
+let inputBytes = 0;
+let discarding = false;
+const pending = new Set();
+
+function acceptLine(line) {
+  if (!line.trim()) return;
+  try {
+    const request = JSON.parse(line);
+    const work = Promise.resolve(handle(request)).catch(error => {
+      protocolError(request?.id, -32603, `Internal error: ${errorSummary(error)}`);
+    });
+    pending.add(work);
+    work.finally(() => pending.delete(work));
+  } catch (error) {
+    protocolError(null, -32700, `Parse error: ${errorSummary(error)}`);
+  }
+}
+
 process.stdin.setEncoding("utf8");
 process.stdin.on("data", (chunk) => {
-  input += chunk;
-  while (true) {
-    const newline = input.indexOf("\n");
-    if (newline < 0) break;
-    const line = input.slice(0, newline).trim();
-    input = input.slice(newline + 1);
-    if (!line) continue;
-    try {
-      Promise.resolve(handle(JSON.parse(line))).catch((error) => {
-        protocolError(null, -32603, `Internal error: ${errorSummary(error)}`);
-      });
-    } catch (error) {
-      protocolError(null, -32700, `Parse error: ${errorSummary(error)}`);
+  let offset = 0;
+  while (offset < chunk.length) {
+    const newline = chunk.indexOf("\n", offset);
+    const part = chunk.slice(offset, newline < 0 ? chunk.length : newline);
+    if (!discarding) {
+      inputBytes += Buffer.byteLength(part);
+      if (inputBytes > MAX_MESSAGE_BYTES) {
+        input = "";
+        discarding = true;
+        protocolError(null, -32600, "Request exceeds maximum message size");
+      } else input += part;
     }
+    if (newline < 0) break;
+    if (!discarding) acceptLine(input);
+    input = "";
+    inputBytes = 0;
+    discarding = false;
+    offset = newline + 1;
   }
 });
 
-process.stdin.on("end", () => process.exit(0));
+process.stdin.on("end", () => {
+  if (!discarding) acceptLine(input);
+  input = "";
+  Promise.allSettled([...pending]).then(() => {
+    unified.closeSearchDatabase();
+    process.stdout.end();
+  });
+});
 process.on("uncaughtException", (error) => {
   process.stderr.write(`capsule fatal: ${errorSummary(error)}\n`);
   process.exit(1);

@@ -315,6 +315,6 @@ test("successful background launch still publishes a usable job and runs the pro
     assert.equal(runtime.jobs({ operation: "status", job_id: job.job_id }).response.running, false);
   } finally {
     if (runtime.jobs({ operation: "status", job_id: job.job_id }).response.running) process.kill(job.pid);
-    fs.rmSync(job.scratch, { recursive: true, force: true });
+    await fs.promises.rm(job.scratch, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 });
   }
 });
