@@ -47,6 +47,15 @@ function temporaryPath(file) {
   return `${file}.${process.pid}.${Date.now()}.${crypto.randomUUID()}.tmp`;
 }
 
+function replacementMode(target, options) {
+  if (options.mode != null) return options.mode;
+  try { return fs.statSync(target).mode & 0o777; }
+  catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    return undefined;
+  }
+}
+
 /**
  * Write JSON through a same-directory temporary file and clean it on every
  * failure path. The caller can opt into pretty output for human-maintained
@@ -58,10 +67,11 @@ function writeJsonAtomic(file, value, options = {}) {
   const indent = options.pretty === true ? 2 : 0;
   const payload = `${JSON.stringify(value, null, indent)}\n`;
   const temporary = temporaryPath(target);
+  const mode = replacementMode(target, options);
   try {
-    fs.writeFileSync(temporary, payload, { encoding: "utf8", flag: "wx" });
-    if (options.mode != null && process.platform !== "win32") {
-      fs.chmodSync(temporary, options.mode);
+    fs.writeFileSync(temporary, payload, { encoding: "utf8", flag: "wx", ...(mode == null ? {} : { mode }) });
+    if (mode != null && process.platform !== "win32") {
+      fs.chmodSync(temporary, mode);
     }
     fs.renameSync(temporary, target);
   } finally {
@@ -76,10 +86,11 @@ function writeTextAtomic(file, text, options = {}) {
   const target = path.resolve(file);
   fs.mkdirSync(path.dirname(target), { recursive: true });
   const temporary = temporaryPath(target);
+  const mode = replacementMode(target, options);
   try {
-    fs.writeFileSync(temporary, String(text ?? ""), { encoding: "utf8", flag: "wx" });
-    if (options.mode != null && process.platform !== "win32") {
-      fs.chmodSync(temporary, options.mode);
+    fs.writeFileSync(temporary, String(text ?? ""), { encoding: "utf8", flag: "wx", ...(mode == null ? {} : { mode }) });
+    if (mode != null && process.platform !== "win32") {
+      fs.chmodSync(temporary, mode);
     }
     fs.renameSync(temporary, target);
   } finally {

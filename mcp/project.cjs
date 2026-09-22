@@ -68,7 +68,8 @@ function redactVisible(value) {
 }
 
 function projectPaths(root) {
-  const canonical = slash(path.resolve(root)).toLowerCase();
+  const resolved = slash(path.resolve(root));
+  const canonical = process.platform === "win32" ? resolved.toLowerCase() : resolved;
   const id = sha256(canonical).slice(0, 20);
   const directory = path.join(core.stateRoot(), "projects", id);
   return {
@@ -242,7 +243,10 @@ function walkProject(root, options = {}) {
         absolute,
         relative: slash(path.relative(root, absolute)),
         size: stat.size,
-        mtime_ms: Math.trunc(stat.mtimeMs),
+        mtime_ms: stat.mtimeMs,
+        ctime_ms: stat.ctimeMs,
+        inode: String(stat.ino),
+        device: String(stat.dev),
       });
     }
   };
@@ -561,12 +565,17 @@ function scanProject(args = {}) {
       fastCache &&
       old &&
       Number(old.bytes) === Number(candidate.size) &&
-      Number(old.mtime_ms) === Number(candidate.mtime_ms)
+      Number(old.mtime_ms) === Number(candidate.mtime_ms) &&
+      Number(old.ctime_ms) === Number(candidate.ctime_ms) &&
+      old.inode === candidate.inode && old.device === candidate.device
     ) {
       files[candidate.relative] = {
         ...old,
         bytes: candidate.size,
         mtime_ms: candidate.mtime_ms,
+        ctime_ms: candidate.ctime_ms,
+        inode: candidate.inode,
+        device: candidate.device,
       };
       reused += 1;
       metadataReused += 1;
@@ -580,6 +589,9 @@ function scanProject(args = {}) {
         ...old,
         bytes: candidate.size,
         mtime_ms: candidate.mtime_ms,
+        ctime_ms: candidate.ctime_ms,
+        inode: candidate.inode,
+        device: candidate.device,
       };
       reused += 1;
       continue;
@@ -590,6 +602,9 @@ function scanProject(args = {}) {
       hash: contentHash,
       bytes: candidate.size,
       mtime_ms: candidate.mtime_ms,
+      ctime_ms: candidate.ctime_ms,
+      inode: candidate.inode,
+      device: candidate.device,
       ...extractFacts(content, candidate.relative),
     };
   }
