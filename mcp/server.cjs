@@ -5,13 +5,14 @@ const core = require("./core.cjs");
 const unified = require("./unified.cjs");
 const tools = require("./schema.cjs");
 const packageMetadata = require("../package.json");
+const { ParameterError } = require("./parameter-error.cjs");
 
 function errorSummary(error) {
   const name = String(error?.name || "Error").replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 80) || "Error";
   const code = error?.code == null
     ? ""
     : ` (${String(error.code).replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 40)})`;
-  if (process.env.CAPSULE_VERBOSE_ERRORS === "1") {
+  if (error instanceof ParameterError || process.env.CAPSULE_VERBOSE_ERRORS === "1") {
     const detail = String(error?.message || error || "").replace(/[\r\n\t]+/g, " ").slice(0, 240);
     return `${name}${code}: ${detail}`;
   }

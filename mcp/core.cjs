@@ -8,6 +8,7 @@ const zlib = require("node:zlib");
 const { spawnSync } = require("node:child_process");
 const storage = require("./storage.cjs");
 const modelProfile = require("./model-profile.cjs");
+const { ParameterError } = require("./parameter-error.cjs");
 
 const DEFAULT_MAX_CHARS = 800;
 const MAX_RETURN_CHARS = 12000;
@@ -1616,7 +1617,7 @@ function smartCommand(args = {}) {
 function expandAnchor(args = {}) {
   const capsuleId = args.capsule_id || args.id || args.ref;
   if (!capsuleId) {
-    throw new Error("expand requires payload.capsule_id copied from a prior cap_* result; do not call expand before a capsule exists");
+    throw new ParameterError("expand requires payload.capsule_id copied from a prior cap_* result; do not call expand before a capsule exists");
   }
   const capsule = loadCapsule(capsuleId);
   const lines = normalizeLines(capsule.text);

@@ -4,6 +4,10 @@ All notable user-visible changes are recorded here.
 
 ## Unreleased
 
+- Preserve safe `fetch`/`expand` parameter guidance and malformed-payload errors
+  in MCP responses while continuing to hide private runtime error details.
+- Bound semantic-interrupt command and URL probes by the remaining operation
+  deadline, and avoid reporting incomplete timed-out probes as state changes.
 - Omit session identifiers and absolute session paths from telemetry responses
   by default, and bound MCP error responses unless local verbose diagnostics are
   explicitly enabled.
