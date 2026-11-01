@@ -24,7 +24,7 @@ function redact(text) {
     .slice(-800);
 }
 
-function commandSnapshot(probe, maxBytes) {
+function commandSnapshot(probe, maxBytes, timeoutMs) {
   if (probe.idempotent !== true) {
     throw new Error(`interrupt probe ${probe.id}: command requires idempotent:true`);
   }
@@ -32,6 +32,9 @@ function commandSnapshot(probe, maxBytes) {
     const stdout = [];
     const stderr = [];
     let bytes = 0;
+    let timedOut = false;
+    let settled = false;
+    let timer;
     const child = spawn(String(probe.command || ""), Array.isArray(probe.args) ? probe.args.map(String) : [], {
       cwd: probe.cwd || process.cwd(),
       windowsHide: true,
@@ -39,17 +42,14 @@ function commandSnapshot(probe, maxBytes) {
       env: { ...process.env, ...(probe.env || {}) },
       stdio: ["ignore", "pipe", "pipe"],
     });
-    const capture = (bucket) => (chunk) => {
-      if (bytes >= maxBytes) return;
-      const remaining = maxBytes - bytes;
-      const kept = Buffer.from(chunk).subarray(0, remaining);
-      bytes += kept.length;
-      bucket.push(kept);
-    };
-    child.stdout.on("data", capture(stdout));
-    child.stderr.on("data", capture(stderr));
-    child.on("error", reject);
-    child.on("close", (code, signal) => {
+    const finish = (error, code = null, signal = null) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (error && !timedOut) {
+        reject(error);
+        return;
+      }
       const out = Buffer.concat(stdout).toString("utf8");
       const err = Buffer.concat(stderr).toString("utf8");
       resolve({
@@ -59,10 +59,35 @@ function commandSnapshot(probe, maxBytes) {
         stdout: out,
         stderr: err,
         bytes,
+        timed_out: timedOut,
         hash: digest(JSON.stringify({ code, signal, out, err })),
         sample: redact(out || err),
       });
-    });
+    };
+    const capture = (bucket) => (chunk) => {
+      if (bytes >= maxBytes) return;
+      const remaining = maxBytes - bytes;
+      const kept = Buffer.from(chunk).subarray(0, remaining);
+      bytes += kept.length;
+      bucket.push(kept);
+    };
+    child.stdout.on("data", capture(stdout));
+    child.stderr.on("data", capture(stderr));
+    child.on("error", (error) => finish(error));
+    child.on("close", (code, signal) => finish(null, code, signal));
+    timer = setTimeout(() => {
+      timedOut = true;
+      // Do not use process groups here: they are not portable to Windows and
+      // could terminate unrelated processes. SIGKILL maps to direct child
+      // termination on Windows and cannot be ignored on POSIX.
+      try { child.kill("SIGKILL"); } catch { /* Settlement is still bounded below. */ }
+      // A descendant can retain inherited pipes after its direct parent exits.
+      // Stop those handles from keeping this interrupt request alive while
+      // preserving everything captured up to the deadline.
+      child.stdout.destroy();
+      child.stderr.destroy();
+      finish(null, null, "SIGKILL");
+    }, timeoutMs);
   });
 }
 
@@ -126,9 +151,15 @@ function jobSnapshot(probe, maxBytes) {
   };
 }
 
-async function urlSnapshot(probe, maxBytes) {
+async function urlSnapshot(probe, maxBytes, timeoutMs) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), int(probe.request_timeout_ms, 10_000, 500, 30_000));
+  const requestTimeoutMs = int(probe.request_timeout_ms, 10_000, 500, 30_000);
+  const deadlineLimited = timeoutMs <= requestTimeoutMs;
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, Math.min(requestTimeoutMs, timeoutMs));
   try {
     const response = await fetch(String(probe.url || ""), {
       signal: controller.signal,
@@ -146,19 +177,22 @@ async function urlSnapshot(probe, maxBytes) {
       sample: redact(body),
       truncated: buffer.length > kept.length,
     };
+  } catch (error) {
+    if (!timedOut || !deadlineLimited) throw error;
+    return { type: "url", timed_out: true, hash: digest("url-deadline"), sample: "" };
   } finally {
     clearTimeout(timer);
   }
 }
 
-async function snapshot(probe, maxBytes) {
+async function snapshot(probe, maxBytes, timeoutMs) {
   if (!probe || typeof probe !== "object") throw new Error("interrupt probes must be objects");
   if (!probe.id) throw new Error("interrupt probe id is required");
   switch (probe.type) {
     case "file": return fileSnapshot(probe, maxBytes);
-    case "command": return commandSnapshot(probe, maxBytes);
+    case "command": return commandSnapshot(probe, maxBytes, timeoutMs);
     case "job": return jobSnapshot(probe, maxBytes);
-    case "url": return urlSnapshot(probe, maxBytes);
+    case "url": return urlSnapshot(probe, maxBytes, timeoutMs);
     default: throw new Error(`interrupt probe ${probe.id}: unsupported type ${probe.type}`);
   }
 }
@@ -179,7 +213,8 @@ async function semanticInterrupt(args = {}) {
   const timeoutMs = int(args.timeout_ms, 30_000, intervalMs, 120_000);
   const maxBytes = int(args.max_bytes, 1_000_000, 1_024, 8_000_000);
   const started = Date.now();
-  const baselineStates = await Promise.all(probes.map((probe) => snapshot(probe, maxBytes)));
+  const remaining = () => Math.max(1, timeoutMs - (Date.now() - started));
+  const baselineStates = await Promise.all(probes.map((probe) => snapshot(probe, maxBytes, remaining())));
   let checks = probes.length;
   let capturedChars = baselineStates.reduce((sum, state) => sum + JSON.stringify(state).length, 0);
   const supplied = args.baseline && typeof args.baseline === "object" ? args.baseline : {};
@@ -190,11 +225,13 @@ async function semanticInterrupt(args = {}) {
 
   while (Date.now() - started < timeoutMs) {
     await sleep(Math.min(intervalMs, Math.max(1, timeoutMs - (Date.now() - started))));
-    const states = await Promise.all(probes.map((probe) => snapshot(probe, maxBytes)));
+    if (Date.now() - started >= timeoutMs) break;
+    const states = await Promise.all(probes.map((probe) => snapshot(probe, maxBytes, remaining())));
     checks += probes.length;
     capturedChars += states.reduce((sum, state) => sum + JSON.stringify(state).length, 0);
     const changed = probes.flatMap((probe, index) => {
       const state = states[index];
+      if (state.timed_out) return [];
       const isChanged = state.hash !== baseline.get(probe.id);
       return isChanged || terminal(probe, state) ? [{ id: probe.id, ...state }] : [];
     });

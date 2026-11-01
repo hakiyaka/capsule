@@ -24,6 +24,7 @@ const memoryLayers = require("./memory-layers.cjs");
 const getContent = require("./get-content.cjs");
 const storage = require("./storage.cjs");
 const packageMetadata = require("../package.json");
+const { ParameterError } = require("./parameter-error.cjs");
 
 let DatabaseSync = null;
 try {
@@ -64,13 +65,13 @@ function unpack(args = {}) {
   if (typeof payload === "string") {
     try {
       payload = JSON.parse(payload);
-    } catch (error) {
-      throw new Error(`payload must be valid JSON: ${error.message}`);
+    } catch {
+      throw new ParameterError("payload must be valid JSON");
     }
   }
   if (payload == null) payload = {};
   if (typeof payload !== "object" || Array.isArray(payload)) {
-    throw new Error("payload must be an object or a JSON object string");
+    throw new ParameterError("payload must be an object or a JSON object string");
   }
   const { payload: _payload, ...legacy } = args;
   return { ...legacy, ...payload, action: args.action };
@@ -1436,7 +1437,7 @@ async function fetchOne(spec, defaults, cache) {
 async function fetchAndIndex(args = {}) {
   const requests = Array.isArray(args.requests) ? args.requests : args.url ? [{ ...args, url: args.url }] : [];
   if (!requests.length) {
-    throw new Error("fetch requires payload.url or payload.requests=[{url:...}]; copy the real URL from the task and retry");
+    throw new ParameterError("fetch requires payload.url or payload.requests=[{url:...}]; copy the real URL from the task and retry");
   }
   const cache = readFetchCache();
   const results = new Array(requests.length);

@@ -48,7 +48,7 @@ test("skill router CLI remains available when the MCP transport is not hot-loade
   }
 });
 
-test("stdio MCP handshake and tool call", async (context) => {
+test("stdio MCP handshake, tool call, and safe parameter guidance", async (context) => {
   const state = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-mcp-state-"));
   const workspace = fs.mkdtempSync(path.join(os.tmpdir(), "capsule-mcp-work-"));
   const sample = path.join(workspace, "sample.txt");
@@ -138,4 +138,16 @@ test("stdio MCP handshake and tool call", async (context) => {
   });
   assert.equal(failed.result.isError, true);
   assert.doesNotMatch(failed.result.content[0].text, new RegExp(workspace.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+
+  for (const [arguments_, expected] of [
+    [{ action: "fetch", payload: {} }, /fetch requires payload\.url or payload\.requests/],
+    [{ action: "expand", payload: {} }, /expand requires payload\.capsule_id copied from a prior cap_\*/],
+    [{ action: "fetch", payload: "private-token-invalid-json" }, /payload must be valid JSON/],
+    [{ action: "fetch", payload: [] }, /payload must be an object/],
+  ]) {
+    const invalid = await request("tools/call", { name: "capsule", arguments: arguments_ });
+    assert.equal(invalid.result.isError, true);
+    assert.match(invalid.result.content[0].text, expected);
+    assert.doesNotMatch(invalid.result.content[0].text, /private-token-invalid-json/);
+  }
 });
